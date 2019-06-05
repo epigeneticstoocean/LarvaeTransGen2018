@@ -27,7 +27,36 @@ morph$CrossID_LarTrt <- paste(morph$CrossID, morph$JarTrt, sep="_")
 
 morph$AdultTrt <- substr(morph$CrossID, 1, 1)
 
-boxplot(morph$MaxFeretDiamum~morph$AdultTrt*morph$JarTrt)
+par(mar = c(5, 4, 0.5, 0.5), bg = "transparent")
+boxplot(morph$MaxFeretDiamum ~ morph$JarTrt * morph$AdultTrt, 
+        xlim = c(0, 5),
+        xlab = "Larvae Treatment",
+        ylab = "Diameter (um)",
+        names = c("Control", "OA", "Control", "OA"), 
+        col = c("powderblue", "red"))
+rect(xleft = -0.2, 
+     ybottom = 0, 
+     xright = 2.5, 
+     ytop = 85,
+     border = FALSE,
+     col = rgb(0, 0, 0.5, alpha = 0.1))
+rect(xleft = 2.5, 
+     ybottom = 0, 
+     xright = 5.2, 
+     ytop = 85,
+     border = FALSE,
+     col = rgb(0.5, 0, 0, alpha = 0.1))
+text(x = 1.25, y = 84, "Control Parents")
+text(x = 3.75, y = 84, "OA Parents")
+boxplot(morph$MaxFeretDiamum ~ morph$JarTrt * morph$AdultTrt, 
+        xlim = c(0, 5),
+        xlab = "Larvae Treatment",
+        ylab = "Diameter (um)",
+        names = c("Control", "OA", "Control", "OA"), 
+        col = c("powderblue", "red"),
+        add = TRUE)
+dev.copy(png, "results/Diameter_LarvaeAdultTreatmentContrast_Boxplot.png")
+dev.off()
 
 boxplot(morph$SurfaceAreaum2~morph$AdultTrt*morph$JarTrt)
 
