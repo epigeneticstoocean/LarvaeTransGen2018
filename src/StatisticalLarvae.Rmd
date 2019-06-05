@@ -24,17 +24,19 @@ library(lattice)
 library(optimx)
 library(dplyr)
 
-
 larvae <- read.csv("~/Documents/GitHub/LarvaeTransGen2018/data/Larvae_morphology.csv")
 ```
 Tests on mass per larvae
 ```{r}
 # Male should be Random effect but wont converge so leaving off for now
-area1 = lmer(sqrt(SurfaceAreaum2) ~ JarTrt * ParentTrt + (1|JarID) + (1|CrossID) +  (1|FemaleID) , data = larvae)
+
+area1 = lmer(sqrt(SurfaceAreaum2) ~ JarTrt * ParentTrt + (1|CrossID:JarID) +  (1|FemaleID) , data = larvae)
+
+# Check model assumptions 
 qqnorm(resid(area1))
 qqline(resid(area1))
 
-area2 = lmer(sqrt(SurfaceAreaum2) ~ JarTrt + ParentTrt + (1|JarID) + (1|CrossID) +  (1|FemaleID) , data = larvae)
+area2 = lmer(sqrt(SurfaceAreaum2) ~ JarTrt + ParentTrt +  (1|CrossID:JarID) +  (1|FemaleID) , data = larvae)
 anova(area1,area2) # Significant interaction so we go with more complicated model
 
 area3 = lmer(SurfaceAreaum2 ~ 1 * ParentTrt + (1|JarID) + (1|CrossID) +  (1|FemaleID) , data = larvae)
@@ -51,6 +53,8 @@ larvae_simple <- larvae[!duplicated(larvae$JarID), ]
 
 # Needs more data to be able to include random effect
 mass1 = lm(log(F1WtPerLarvae) ~ JarTrt * ParentTrt, data = larvae_simple)
+
+# Check out model assumptions
 qqnorm(resid(mass1))
 qqline(resid(mass1))
 
@@ -62,5 +66,9 @@ anova(mass2,mass3) #No larval treatment effect
 
 mass4 = lm(log(F1WtPerLarvae) ~ JarTrt + 1, data = larvae_simple)
 anova(mass2, mass4) # No significant adult effect
+
+```
+
+```{r}
 
 ```
