@@ -20,18 +20,76 @@ morph <- fread("data/Larvae_morphology.csv")
 head(morph)
 ```
 
-## Plots
+## Plots of overall effect
 
-```{r =}
+```{r }
 morph$CrossID_LarTrt <- paste(morph$CrossID, morph$JarTrt, sep="_")
-
-par(mar=c(10,4,0.5,0.5))
-boxplot(morph$MaxFeretDiamum~morph$CrossID_LarTrt, las=2)
 
 morph$AdultTrt <- substr(morph$CrossID, 1, 1)
 
 boxplot(morph$MaxFeretDiamum~morph$AdultTrt*morph$JarTrt)
 
+boxplot(morph$SurfaceAreaum2~morph$AdultTrt*morph$JarTrt)
+
+boxplot(morph$Perimeterum~morph$AdultTrt*morph$JarTrt)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+## Plots of overall effect
+
+Area
+```{r }
+
+par(mar=c(10,4,0.5,0.5))
+boxplot(morph$SurfaceAreaum2~morph$CrossID_LarTrt, las=2)
+
+difftab <- data.frame(tapply(morph$SurfaceAreaum2, list(morph$CrossID, morph$JarTrt), median))
+difftab$AdultTrt <- substr(rownames(difftab), 1,1)
+difftab$diff <- difftab$Exposed-difftab$Control
+
+par(mar=c(4,6,0.5,0.5))
+boxplot(difftab$diff~difftab$AdultTrt, xlab="Adult Treatment", names=c("Control", "OA"), ylab="Decrease in median shell area per family \n from control to OA conditions")
+
+t.test(difftab$diff~difftab$AdultTrt)
+# don't trust this p-value b/c non-independence among parents,
+# use permutation to test null H0
+
+difftab$Fem <- substr(rownames(difftab), 1, 4)
+difftab$Male <- substr(rownames(difftab), 6, 9)
+
+difftab$diff~difftab$AdultTrt
+
+(difftab$diff~difftab$AdultTrt*difftab$Fem*difftab$Male)
+
+plot(NULL, xlim=c(0,3), ylim=c(2500,max(difftab$Control)))
+arrows(x0 = 0.5, y0=difftab$Control[difftab$AdultTrt=="C"], x1=1.5, y1=difftab$Exposed[difftab$AdultTrt=="C"], col="blue")
+
+arrows(x0 = 1.0, y0=difftab$Control[difftab$AdultTrt=="E"], x1=2.0, y1=difftab$Exposed[difftab$AdultTrt=="E"], col="red")
+```
+
+
+
+cond <- morph$Female=="EF03"
+morph_sub <- morph[cond,]
+table(morph_sub$CrossID_LarTrt,morph_sub$JarID)
+table(morph_sub$CrossID_JarID,morph_sub$JarTrt)
+
+
+# need to rename jar ID
+morph$CrossID_JarID <- paste(morph$CrossID, morph$JarID, sep="_")
+par(mar=c(10,4,0.5,0.5))
+boxplot(morph_sub$MaxFeretDiamum~morph_sub$CrossID_JarID*morph_sub$JarTrt, las=2)
+
+```
+
+## Plots of female
+
+```{r }
+morph$Female <- substr(morph$CrossID, 1, 4)
+morph$Male <- substr(morph$CrossID, 6, 9)
+
+boxplot(morph$MaxFeretDiamum~morph$Female*morph$JarTrt, las=2)
+(female_means <- tapply(morph$MaxFeretDiamum, list(morph$Female, morph$AdultTrt), mean))
+colMeans(female_means, na.rm=TRUE)
+
+boxplot(morph$MaxFeretDiamum~morph$Male*morph$JarTrt, las=2)
+```
