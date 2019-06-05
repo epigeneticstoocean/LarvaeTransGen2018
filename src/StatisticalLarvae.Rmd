@@ -3,26 +3,64 @@ title: "StatisticalLarvae"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+Load packages
+```{r echo=FALSE, include = FALSE, warning=FALSE}
+# Code Dependencies
+library(readr)
+library(tidyr)
+library(ggplot2)
+library(Hmisc)
+library(plyr)
+library(bbmle)
+library(blme)
+library(MASS)
+library(plyr)
+library(reshape2)
+library(lme4)
+library(grid)
+library(data.table)
+library(gridExtra)
+library(lattice)
+library(optimx)
+library(dplyr)
+
+
+larvae <- read.csv("~/Documents/GitHub/LarvaeTransGen2018/data/Larvae_morphology.csv")
 ```
+Tests on mass per larvae
+```{r}
+# Male should be Random effect but wont converge so leaving off for now
+area1 = lmer(sqrt(SurfaceAreaum2) ~ JarTrt * ParentTrt + (1|JarID) + (1|CrossID) +  (1|FemaleID) , data = larvae)
+qqnorm(resid(area1))
+qqline(resid(area1))
 
-## R Markdown
+area2 = lmer(sqrt(SurfaceAreaum2) ~ JarTrt + ParentTrt + (1|JarID) + (1|CrossID) +  (1|FemaleID) , data = larvae)
+anova(area1,area2) # Significant interaction so we go with more complicated model
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+area3 = lmer(SurfaceAreaum2 ~ 1 * ParentTrt + (1|JarID) + (1|CrossID) +  (1|FemaleID) , data = larvae)
+anova(area1,area3) #Significant jar effect (larval treatment)
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+area4 = lmer(SurfaceAreaum2 ~ JarTrt * 1 + (1|JarID) + (1|CrossID) +  (1|FemaleID) , data = larvae)
+anova(area1, area4) # No significant adult effect
 
-```{r cars}
-summary(cars)
 ```
+Tests on mass per larvae
+```{r}
+#Pull out single measurement per jar
+larvae_simple <- larvae[!duplicated(larvae$JarID), ]
 
-## Including Plots
+# Needs more data to be able to include random effect
+mass1 = lm(log(F1WtPerLarvae) ~ JarTrt * ParentTrt, data = larvae_simple)
+qqnorm(resid(mass1))
+qqline(resid(mass1))
 
-You can also embed plots, for example:
+mass2 = lm(log(F1WtPerLarvae) ~ JarTrt + ParentTrt, data = larvae_simple)
+anova(mass1,mass2) # No Significant interaction so we go with more simple model
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+mass3 = lm(log(F1WtPerLarvae) ~ 1 + ParentTrt, data = larvae_simple)
+anova(mass2,mass3) #No larval treatment effect
+
+mass4 = lm(log(F1WtPerLarvae) ~ JarTrt + 1, data = larvae_simple)
+anova(mass2, mass4) # No significant adult effect
+
 ```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
