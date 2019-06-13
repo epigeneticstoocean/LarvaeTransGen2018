@@ -2,4 +2,4 @@
 
 Ffion's drawing of the larvae treatment:
 
-[](img/ffion_larvae.jpg)
+![](img/ffion_larvae.jpg)
