@@ -55,8 +55,8 @@ boxplot(morph$MaxFeretDiamum ~ morph$JarTrt * morph$AdultTrt,
         names = c("Control", "OA", "Control", "OA"), 
         col = c("powderblue", "red"),
         add = TRUE)
-dev.copy(png, "results/Diameter_LarvaeAdultTreatmentContrast_Boxplot.png")
-dev.off()
+#dev.copy(png, "results/Diameter_LarvaeAdultTreatmentContrast_Boxplot.png")
+
 
 boxplot(morph$SurfaceAreaum2~morph$AdultTrt*morph$JarTrt)
 
