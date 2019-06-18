@@ -5,30 +5,26 @@ output: html_document
 
 setwd("~/Desktop/Repos/LarvaeTransGen2018/src")
 
-Load packages
+# Load packages and data
 ```{r echo=FALSE, include = FALSE, warning=FALSE}
 # Code Dependencies
 library(readr)
 library(tidyr)
 library(ggplot2)
-library(Hmisc)
 library(plyr)
-library(bbmle)
-library(blme)
-library(MASS)
 library(reshape2)
 library(lme4)
 library(grid)
 library(data.table)
 library(gridExtra)
 library(lattice)
-library(optimx)
 library(dplyr)
 library(tidyverse)
 
 larvae <- read.csv("../data/Larvae_morphology.csv")
 ```
-Tests on area
+
+# Tests on area
 ```{r}
 # Male should be Random effect but wont converge so leaving off for now
 
@@ -50,9 +46,27 @@ anova(area1,area3) #Significant jar effect (larval treatment)
 
 area4 = lmer(sqrt(SurfaceAreaum2) ~ JarTrt * 1 + (1|CrossID:JarID) +  (1|FemaleID) , data = larvae)
 anova(area1, area4) # No significant adult effect
-
 ```
-Tests on mass per larvae
+
+# Tests on length
+```{r}
+length1 = lmer(log(MaxFeretDiamum) ~ JarTrt * ParentTrt + (1|CrossID:JarID) + (1|FemaleID), data = larvae)
+
+# Check model assumptions
+qqnorm(resid(length1))
+qqline(resid(length1))
+
+length2 = lmer(log(MaxFeretDiamum) ~ JarTrt + ParentTrt + (1|CrossID:JarID) + (1|FemaleID), data = larvae)
+anova(length1, length2) # Significant interaction, go with more complicated model
+
+length3 = lmer(log(MaxFeretDiamum) ~ 1 * ParentTrt + (1|CrossID:JarID) + (1|FemaleID), data = larvae)
+anova(length1, length3) # Significant larval effect
+
+length4 = lmer(log(MaxFeretDiamum) ~ JarTrt * 1 + (1|CrossID:JarID) + (1|FemaleID), data = larvae)
+anova(length1, length4) # Significant parental effect
+```
+
+# Tests on mass per larvae
 ```{r}
 #Pull out single measurement per jar
 larvae_simple <- larvae[!duplicated(larvae$JarID), ]
