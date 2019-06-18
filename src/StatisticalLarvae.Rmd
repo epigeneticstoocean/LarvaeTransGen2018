@@ -16,7 +16,6 @@ library(plyr)
 library(bbmle)
 library(blme)
 library(MASS)
-library(plyr)
 library(reshape2)
 library(lme4)
 library(grid)
@@ -29,7 +28,7 @@ library(tidyverse)
 
 larvae <- read.csv("../data/Larvae_morphology.csv")
 ```
-Tests on mass per larvae
+Tests on area
 ```{r}
 # Male should be Random effect but wont converge so leaving off for now
 
