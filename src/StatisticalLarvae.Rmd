@@ -18,6 +18,7 @@ library(grid)
 library(data.table)
 library(gridExtra)
 library(lattice)
+library(optimx)
 library(dplyr)
 library(tidyverse)
 
