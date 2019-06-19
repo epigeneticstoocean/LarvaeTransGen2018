@@ -3,68 +3,73 @@ title: "StatisticalLarvae"
 output: html_document
 ---
 
-setwd("~/Desktop/Repos/LarvaeTransGen2018/src")
+setwd("~/Desktop/Repos/LarvaeTransGen2018")
 
-# Load packages and data
+# Load packages
 ```{r echo=FALSE, include = FALSE, warning=FALSE}
 # Code Dependencies
-library(readr)
-library(tidyr)
-library(ggplot2)
+library(tidyverse)
 library(plyr)
 library(reshape2)
 library(lme4)
+library(blme)
 library(grid)
 library(data.table)
 library(gridExtra)
 library(lattice)
 library(optimx)
-library(dplyr)
-library(tidyverse)
+```
 
-larvae <- read.csv("../data/Larvae_morphology.csv")
+# Load data
+```{r}
+larvae <- read.csv("../data/Larvae_morphology.csv") %>%
+  mutate(ParTrt = ifelse(startsWith(as.character(CrossID), "E"), "Exposed", "Control")) %>%
+  separate(CrossID, c("FemaleID", "MaleID"), sep = "_", remove = FALSE)
+```
+
+# Tests on length
+```{r}
+length1 = lmer(log(MaxFeretDiamum) ~ JarTrt * ParTrt + (1|CrossID:JarID) + (1|FemaleID), data = larvae, 
+               control = lmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 20000)))
+
+prof_obj <- profile(length1)
+print(xyplot(log(prof_obj), absVal = TRUE))
+
+# Check model assumptions
+qqnorm(resid(length1))
+qqline(resid(length1))
+
+length2 = lmer(log(MaxFeretDiamum) ~ JarTrt + ParTrt + (1|CrossID:JarID) + (1|FemaleID), data = larvae,
+               control = lmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 20000)))
+anova(length1, length2) # Significant interaction, go with more complicated model
+
+length3 = lmer(log(MaxFeretDiamum) ~ 1 * ParTrt + (1|CrossID:JarID) + (1|FemaleID), data = larvae,
+               control = lmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 20000)))
+anova(length1, length3) # Significant larval effect
+
+length4 = lmer(log(MaxFeretDiamum) ~ JarTrt * 1 + (1|CrossID:JarID) + (1|FemaleID), data = larvae,
+               control = lmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 20000)))
+anova(length1, length4) # Significant parental effect
 ```
 
 # Tests on area
 ```{r}
 # Male should be Random effect but wont converge so leaving off for now
 
-area1 = lmer(sqrt(SurfaceAreaum2) ~ JarTrt * ParentTrt + (1|CrossID:JarID) +  (1|FemaleID) , data = larvae)
+area1 = lmer(sqrt(SurfaceAreaum2) ~ JarTrt * ParTrt + (1|CrossID:JarID) +  (1|FemaleID) , data = larvae)
 
 # Check model assumptions 
 qqnorm(resid(area1))
 qqline(resid(area1))
 
-area2 = lmer(sqrt(SurfaceAreaum2) ~ JarTrt + ParentTrt +  (1|CrossID:JarID) +  (1|FemaleID) , data = larvae)
+area2 = lmer(sqrt(SurfaceAreaum2) ~ JarTrt + ParTrt +  (1|CrossID:JarID) +  (1|FemaleID) , data = larvae)
 anova(area1,area2) # Significant interaction so we go with more complicated model
 
-
-
-
-
-area3 = lmer(sqrt(SurfaceAreaum2) ~ 1 * ParentTrt +(1|CrossID:JarID) +  (1|FemaleID) , data = larvae)
+area3 = lmer(sqrt(SurfaceAreaum2) ~ 1 * ParTrt +(1|CrossID:JarID) +  (1|FemaleID) , data = larvae)
 anova(area1,area3) #Significant jar effect (larval treatment)
 
 area4 = lmer(sqrt(SurfaceAreaum2) ~ JarTrt * 1 + (1|CrossID:JarID) +  (1|FemaleID) , data = larvae)
 anova(area1, area4) # No significant adult effect
-```
-
-# Tests on length
-```{r}
-length1 = lmer(log(MaxFeretDiamum) ~ JarTrt * ParentTrt + (1|CrossID:JarID) + (1|FemaleID), data = larvae)
-
-# Check model assumptions
-qqnorm(resid(length1))
-qqline(resid(length1))
-
-length2 = lmer(log(MaxFeretDiamum) ~ JarTrt + ParentTrt + (1|CrossID:JarID) + (1|FemaleID), data = larvae)
-anova(length1, length2) # Significant interaction, go with more complicated model
-
-length3 = lmer(log(MaxFeretDiamum) ~ 1 * ParentTrt + (1|CrossID:JarID) + (1|FemaleID), data = larvae)
-anova(length1, length3) # Significant larval effect
-
-length4 = lmer(log(MaxFeretDiamum) ~ JarTrt * 1 + (1|CrossID:JarID) + (1|FemaleID), data = larvae)
-anova(length1, length4) # Significant parental effect
 ```
 
 # Tests on mass per larvae
@@ -73,23 +78,19 @@ anova(length1, length4) # Significant parental effect
 larvae_simple <- larvae[!duplicated(larvae$JarID), ]
 
 # Needs more data to be able to include random effect
-mass1 = lm(log(F1WtPerLarvae) ~ JarTrt * ParentTrt, data = larvae_simple)
+mass1 = lm(log(F1WtPerLarvae) ~ JarTrt * ParTrt, data = larvae_simple)
 
 # Check out model assumptions
 qqnorm(resid(mass1))
 qqline(resid(mass1))
 
-mass2 = lm(log(F1WtPerLarvae) ~ JarTrt + ParentTrt, data = larvae_simple)
+mass2 = lm(log(F1WtPerLarvae) ~ JarTrt + ParTrt, data = larvae_simple)
 anova(mass1,mass2) # No Significant interaction so we go with more simple model
 
-mass3 = lm(log(F1WtPerLarvae) ~ 1 + ParentTrt, data = larvae_simple)
+mass3 = lm(log(F1WtPerLarvae) ~ 1 + ParTrt, data = larvae_simple)
 anova(mass2,mass3) #No larval treatment effect
 
 mass4 = lm(log(F1WtPerLarvae) ~ JarTrt + 1, data = larvae_simple)
 anova(mass2, mass4) # No significant adult effect
-
-```
-
-```{r}
 
 ```
