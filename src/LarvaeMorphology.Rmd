@@ -1,25 +1,21 @@
 ---
-title: "LarvaeMorphologyPlots"
+title: "LarvaeMorphology"
 output: html_document
 ---
 
-("~/Desktop/Repos/LarvaeTransGen2018")
+setwd("~/Desktop/Repos/LarvaeTransGen2018")
 
 # Load libraries
 ```{r include=FALSE}
-library(googlesheets)
 library(tidyverse)
 ```
 
 # Load data
 ```{r}
-gs_title("Larvae data 2018 cross exposure experiment") %>%
-  gs_download(ws = "Larvae_Morphology", "Larvae_Morphology.csv", overwrite = TRUE)
-larvmorph <- read.csv("~/-Larvae/Larvae_Morphology_Latest.csv", header = TRUE, sep = ",")
+larvmorph <- read.csv("../data/Larvae_morphology.csv")
 
 larvmorph <- larvmorph %>%
-  mutate(CrossID = as.character(CrossID)) %>%
-  mutate(ParTrt = ifelse(startsWith(CrossID, "E"), "Exposed", "Control"))
+  mutate(ParTrt = ifelse(startsWith(as.character(CrossID), "E"), "Exposed", "Control"))
 ```
 
 # Plots of length data by individual crosses
