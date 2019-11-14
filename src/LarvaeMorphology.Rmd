@@ -3,7 +3,7 @@ title: "LarvaeMorphology"
 output: html_document
 ---
 
-setwd("~/Desktop/Repos/LarvaeTransGen2018")
+setwd("~/Repos/LarvaeTransGen2018")
 
 # Load libraries
 ```{r include=FALSE}
@@ -32,7 +32,8 @@ ggplot(data = exlar, aes(x = CrossID, y = MaxFeretDiamum, fill = ParTrt)) +
   scale_fill_manual(name = "Parental Treatment", labels = c("Control", "OA"), 
                      values = c("#00BFC4", "#F8766D")) + 
   scale_y_continuous(breaks = seq(floor(min(larvmorph$MaxFeretDiamum)), 
-                                ceiling(max(larvmorph$MaxFeretDiamum)), 5)) + 
+                                  ceiling(max(larvmorph$MaxFeretDiamum)), 5), limits = c(floor(min(larvmorph$MaxFeretDiamum)), 
+                     ceiling(max(larvmorph$MaxFeretDiamum)))) + 
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
         panel.background = element_blank(), axis.line = element_line(colour = "black"))
 
@@ -43,7 +44,8 @@ ggplot(data = colar, aes(x = CrossID, y = MaxFeretDiamum, fill = ParTrt)) +
   scale_fill_manual(name = "Parental Treatment", labels = c("Control", "OA"), 
                       values = c("#00BFC4", "#F8766D")) + 
   scale_y_continuous(breaks = seq(floor(min(larvmorph$MaxFeretDiamum)), 
-                                ceiling(max(larvmorph$MaxFeretDiamum)), 5)) +  
+                                  ceiling(max(larvmorph$MaxFeretDiamum)), 5), limits = c(floor(min(larvmorph$MaxFeretDiamum)), 
+                     ceiling(max(larvmorph$MaxFeretDiamum)))) + 
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
         panel.background = element_blank(), axis.line = element_line(colour = "black"))
 ```
