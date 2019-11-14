@@ -25,24 +25,24 @@ exlar <- larvmorph %>%
 colar <- larvmorph %>%
   filter(JarTrt == "Control")
 
-ggplot(data = exlar, aes(x = CrossID, y = MaxFeretDiamum, fill = ParTrt)) +
-  geom_boxplot() +
-  labs(x = "Parental Cross", y = "Shell Length (um)", title = "OA Larvae") +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) +
-  scale_fill_manual(name = "Parental Treatment", labels = c("Control", "OA"), 
-                     values = c("#00BFC4", "#F8766D")) + 
-  scale_y_continuous(breaks = seq(floor(min(larvmorph$MaxFeretDiamum)), 
-                                  ceiling(max(larvmorph$MaxFeretDiamum)), 5), limits = c(floor(min(larvmorph$MaxFeretDiamum)), 
-                     ceiling(max(larvmorph$MaxFeretDiamum)))) + 
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-        panel.background = element_blank(), axis.line = element_line(colour = "black"))
-
 ggplot(data = colar, aes(x = CrossID, y = MaxFeretDiamum, fill = ParTrt)) +
   geom_boxplot() +
   labs(x = "Parental Cross", y = "Shell Length (um)", title = "Control Larvae") +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) +
   scale_fill_manual(name = "Parental Treatment", labels = c("Control", "OA"), 
                       values = c("#00BFC4", "#F8766D")) + 
+  scale_y_continuous(breaks = seq(floor(min(larvmorph$MaxFeretDiamum)), 
+                                  ceiling(max(larvmorph$MaxFeretDiamum)), 5), limits = c(floor(min(larvmorph$MaxFeretDiamum)), 
+                     ceiling(max(larvmorph$MaxFeretDiamum)))) + 
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+        panel.background = element_blank(), axis.line = element_line(colour = "black"))
+
+ggplot(data = exlar, aes(x = CrossID, y = MaxFeretDiamum, fill = ParTrt)) +
+  geom_boxplot() +
+  labs(x = "Parental Cross", y = "Shell Length (um)", title = "OA Larvae") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) +
+  scale_fill_manual(name = "Parental Treatment", labels = c("Control", "OA"), 
+                     values = c("#00BFC4", "#F8766D")) + 
   scale_y_continuous(breaks = seq(floor(min(larvmorph$MaxFeretDiamum)), 
                                   ceiling(max(larvmorph$MaxFeretDiamum)), 5), limits = c(floor(min(larvmorph$MaxFeretDiamum)), 
                      ceiling(max(larvmorph$MaxFeretDiamum)))) + 
