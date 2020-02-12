@@ -3,7 +3,7 @@ title: "LarvaeDataVisualization"
 output: html_document
 ---
 
-setwd("~/Desktop/Repos/LarvaeTransGen2018")
+setwd("~/Repos/LarvaeTransGen2018")
 
 # Load libraries
 ```{r include=FALSE}
@@ -24,7 +24,8 @@ library(car)
 # Load data
 Name the data you export from FileMaker Pro by their exact table names and save them as CSVs, e.g. Larvae_Morphology.csv
 ```{r}
-setwd("~/GitHub/LarvaeTransGen2018/data")
+
+#setwd("~/GitHub/LarvaeTransGen2018/data") #Elise's working directory
 Larvae_Morphology <- read.csv("../data/Larvae_Morphology.csv")
 Barcode_Jar <- read.csv("../data/Barcode_Jar.csv")
 Block_ID <- read.csv("../data/Block_ID.csv")
@@ -82,6 +83,7 @@ explar <- LarvaeMorph %>%
 conlar <- LarvaeMorph %>%
   filter(JarTrt == "Control")
 
+<<<<<<< HEAD
 #subset the data into exposed and control parent treatments for calcification data
 expparcalc <- LarvaeCalc %>%
   filter(CrossType == "Exposed")
@@ -170,6 +172,29 @@ ggplot(data = LarvaeMorph, aes(x = CrossID, y = MaxFeretDiamum)) +
                       values = c("#00BFC4", "#F8766D")) + 
   scale_y_continuous(breaks = seq(floor(min(LarvaeMorph$MaxFeretDiamum)), 
                                 ceiling(max(LarvaeMorph$MaxFeretDiamum)), 5)) +  
+=======
+ggplot(data = colar, aes(x = CrossID, y = MaxFeretDiamum, fill = ParTrt)) +
+  geom_boxplot() +
+  labs(x = "Parental Cross", y = "Shell Length (um)", title = "Control Larvae") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) +
+  scale_fill_manual(name = "Parental Treatment", labels = c("Control", "OA"), 
+                      values = c("#00BFC4", "#F8766D")) + 
+  scale_y_continuous(breaks = seq(floor(min(larvmorph$MaxFeretDiamum)), 
+                                  ceiling(max(larvmorph$MaxFeretDiamum)), 5), limits = c(floor(min(larvmorph$MaxFeretDiamum)), 
+                     ceiling(max(larvmorph$MaxFeretDiamum)))) + 
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+        panel.background = element_blank(), axis.line = element_line(colour = "black"))
+
+ggplot(data = exlar, aes(x = CrossID, y = MaxFeretDiamum, fill = ParTrt)) +
+  geom_boxplot() +
+  labs(x = "Parental Cross", y = "Shell Length (um)", title = "OA Larvae") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) +
+  scale_fill_manual(name = "Parental Treatment", labels = c("Control", "OA"), 
+                     values = c("#00BFC4", "#F8766D")) + 
+  scale_y_continuous(breaks = seq(floor(min(larvmorph$MaxFeretDiamum)), 
+                                  ceiling(max(larvmorph$MaxFeretDiamum)), 5), limits = c(floor(min(larvmorph$MaxFeretDiamum)), 
+                     ceiling(max(larvmorph$MaxFeretDiamum)))) + 
+>>>>>>> 4a75465271a6ee09f6a237844bd72d694c6c83a6
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
         panel.background = element_blank(), axis.line = element_line(colour = "black"), panel.border=element_rect(color="black",fill=NA))+
   facet_grid(.~CrossType, scale="free_x")
