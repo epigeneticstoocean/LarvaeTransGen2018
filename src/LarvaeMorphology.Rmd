@@ -1,5 +1,5 @@
 ---
-title: "LarvaeMorphology"
+title: "LarvaeDataVisualization"
 output: html_document
 ---
 
@@ -8,67 +8,263 @@ setwd("~/Desktop/Repos/LarvaeTransGen2018")
 # Load libraries
 ```{r include=FALSE}
 library(tidyverse)
+library(plyr)
+library(sciplot)
+library(reshape2)
+library(lme4)
+library(blme)
+library(grid)
+library(data.table)
+library(gridExtra)
+library(lattice)
+library(optimx)
+library(car)
 ```
 
 # Load data
+Name the data you export from FileMaker Pro by their exact table names and save them as CSVs, e.g. Larvae_Morphology.csv
 ```{r}
-larvmorph <- read.csv("../data/Larvae_morphology.csv")
+setwd("~/GitHub/LarvaeTransGen2018/data")
+Larvae_Morphology <- read.csv("../data/Larvae_Morphology.csv")
+Barcode_Jar <- read.csv("../data/Barcode_Jar.csv")
+Block_ID <- read.csv("../data/Block_ID.csv")
+Cross<- read.csv("../data/Cross.csv")
+Fert_QG<- read.csv("../data/Fert_QG.csv")
+Header_WC<- read.csv("../data/Header_WC.csv")
+Larvae_Calcification <- read.csv("../data/Larvae_Calcification.csv")
+Larvae_Counts <- read.csv("../data/Larvae_Counts.csv")
+Larvae_WC <- read.csv("../data/Larvae_WC.csv")
+Parent_ID <- read.csv("../data/Parent_ID.csv")
+Larvae_Cilia<- read.csv("../data/Larvae_Cilia.csv")
 
-larvmorph <- larvmorph %>%
-  mutate(ParTrt = ifelse(startsWith(as.character(CrossID), "E"), "Exposed", "Control"))
+# join data from tables so we can analyze morphology data. 
+# LarvaeMorph dataset includes multiple entries per jar
+
+LarvaeMorph<- merge(x=Larvae_Morphology, y=Barcode_Jar, by="JarID", all.x=TRUE)
+LarvaeMorph<- merge(x=LarvaeMorph, y=Larvae_Calcification, by="JarID", all.x=TRUE)
+#use gather function in tidyr to make the Fert_QG Jar ID columns in long form vs. wide form
+Fert_QG_long <- Fert_QG %>% tidyr::gather(Key, JarID, JarID1:JarID6)
+#use the gathered data frame to merge with LarvaeMorph
+LarvaeMorph <- merge(x = LarvaeMorph, y = Fert_QG_long, by = c("JarID", "CrossID"), all.x=TRUE)
+LarvaeMorph<- merge(x=LarvaeMorph, y=Cross, by="CrossID", all.x=TRUE)
+LarvaeMorph<- merge(x=LarvaeMorph, y=Larvae_Cilia, by="JarID", all.x=TRUE)
+
+LarvaeMorph$JarSeatable<- as.factor(LarvaeMorph$JarSeatable) #make seatable a factor
+#use LarvaeMorph data frame for figures on larvae morphology
+
+#create dataset only one entry per JarID and the mean of morphological data; use this new dataset for calcification data
+
+meanMorph<- aggregate(cbind(Perimeterum, SurfaceAreaum2, MaxFeretDiamum)~JarID, data=Larvae_Morphology, mean)#get mean values for morphology
+seMorph<- aggregate(cbind(Perimeterum, SurfaceAreaum2, MaxFeretDiamum)~JarID, data=Larvae_Morphology, se)#get se values for morphology
+names(seMorph)<- c("JarID", "PerimeterumSE", "SurfaceAreaum2SE", "MaxFeretDiamumSE")
+LarvaeCalc<-merge(x=Larvae_Calcification, y=meanMorph, by="JarID", all.x=TRUE)
+LarvaeCalc<- merge(x=LarvaeCalc, y=seMorph, by="JarID", all.x=TRUE)
+LarvaeCalc<- merge(x=LarvaeCalc, y=Barcode_Jar, by="JarID", all.x=TRUE)
+#use the gathered data frame from above to merge with LarvaeCalc
+LarvaeCalc <- merge(x = LarvaeCalc, y = Fert_QG_long, by = c("JarID", "CrossID"), all.x=TRUE)
+LarvaeCalc<- merge(x=LarvaeCalc, y=Cross, by="CrossID", all.x=TRUE)
+LarvaeCalc<- merge(x=LarvaeCalc, y=Larvae_Cilia, by="JarID", all.x=TRUE)
+LarvaeCalc<- subset(LarvaeCalc, F1TotalLarvaeWtg >=0) # remove all jars with total larvae weight less than zero
+LarvaeCalc<- subset(LarvaeCalc, F1LarvaeCount>=100) # remove all jars with larvae counts that are less than 100
+#use LarvaeCalc dataframe to make figures on larvae calcification
 ```
 
-# Plots of length data by individual crosses
+Subset data by larvae treatment and parent treatment
 ```{r}
-exlar <- larvmorph %>%
+#subset the data into exposed and control parent treatments
+exppar <- LarvaeMorph %>%
+  filter(CrossType == "Exposed")
+conpar <- LarvaeMorph %>%
+  filter(CrossType == "Control")
+#subset the data into exposed and control larvae treatments
+explar <- LarvaeMorph %>%
   filter(JarTrt == "Exposed")
-colar <- larvmorph %>%
+conlar <- LarvaeMorph %>%
   filter(JarTrt == "Control")
 
-ggplot(data = exlar, aes(x = CrossID, y = MaxFeretDiamum, fill = ParTrt)) +
-  geom_boxplot() +
-  labs(x = "Parental Cross", y = "Shell Length (um)", title = "OA Larvae") +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) +
-  scale_fill_manual(name = "Parental Treatment", labels = c("Control", "OA"), 
-                     values = c("#00BFC4", "#F8766D")) + 
-  scale_y_continuous(breaks = seq(floor(min(larvmorph$MaxFeretDiamum)), 
-                                ceiling(max(larvmorph$MaxFeretDiamum)), 5)) + 
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-        panel.background = element_blank(), axis.line = element_line(colour = "black"))
+#subset the data into exposed and control parent treatments for calcification data
+expparcalc <- LarvaeCalc %>%
+  filter(CrossType == "Exposed")
+conparcalc <- LarvaeCalc %>%
+  filter(CrossType == "Control")
+#subset the data into exposed and control larvae treatments
+explarcalc <- LarvaeCalc %>%
+  filter(JarTrt == "Exposed")
+conlarcalc <- LarvaeCalc %>%
+  filter(JarTrt == "Control")
 
-ggplot(data = colar, aes(x = CrossID, y = MaxFeretDiamum, fill = ParTrt)) +
-  geom_boxplot() +
-  labs(x = "Parental Cross", y = "Shell Length (um)", title = "Control Larvae") +
+```
+
+Look at data that might be count or weight outliers 
+```{r}
+plot(F1LarvaeCount~PercentFert, data=LarvaeCalc, col=JarTrt)
+ggplot(data=LarvaeCalc, aes(x=mLJarActual, y=F1LarvaeCount))+
+  geom_point(aes(shape=JarTrt, colour=PercentFert))
+
+plot(F1TotalLarvaeWtg~F1LarvaeCount, data=LarvaeCalc, col=JarTrt)
+plot(F1WtPerLarvae~F1LarvaeCount, data=LarvaeCalc, col=JarTrt)
+text(F1WtPerLarvae~F1LarvaeCount, labels=JarID, data=LarvaeCalc, font=2, cex=.9)
+
+
+```
+
+The plots below can be used for all morphology data: length, perimeter, surface area
+```{r}
+#plot data by jar that are grouped by cross ID; but use JarSeatable instead of JarID so I can plot both exposed and control jars over one another
+#start with larvae of control parents
+ggplot(data = conpar, aes(x = JarSeatable, y = MaxFeretDiamum)) +
+  geom_point(aes(shape=JarTrt, colour=JarTrt))+
+  labs(x = "Replicate", y = "Shell Length (um)", title = "Larvae length control parents") +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) +
-  scale_fill_manual(name = "Parental Treatment", labels = c("Control", "OA"), 
+  scale_color_manual(name = "Larvae Treatment", labels = c("Control", "OA"), values = c("#00BFC4", "#F8766D")) + 
+  scale_shape_manual(name="Larvae Treatment", labels=c("Control","OA"), values =c(19,17))+
+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.border=element_rect(color="black", fill=NA),
+        panel.background = element_rect(colour="white"), axis.line = element_line(colour = "black")) + 
+  facet_grid(.~CrossID)
+
+#plot larvae of exposed parents
+ggplot(data = exppar, aes(x = JarSeatable, y = MaxFeretDiamum)) +
+  geom_point(aes(shape=JarTrt, colour=JarTrt))+
+  labs(x = "Replicate", y = "Shell Length (um)", title = "Larvae length exposed parents") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) +
+  scale_color_manual(name = "Larvae Treatment", labels = c("Control", "OA"), values = c("#00BFC4", "#F8766D")) + 
+  scale_shape_manual(name="Larvae Treatment", labels=c("Control","OA"), values =c(19,17))+
+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.border=element_rect(color="black", fill=NA),
+        panel.background = element_rect(colour="white"), axis.line = element_line(colour = "black")) + 
+  facet_grid(.~CrossID)
+
+#same plot structure as above, but using boxplots instead of points for each larvae measured
+#plot larvae of control parents
+ggplot(data = conpar, aes(x = JarSeatable, y = MaxFeretDiamum)) +
+  geom_boxplot(aes(colour=JarTrt))+
+  labs(x = "Replicate", y = "Shell Length (um)", title = "Larvae length control parents") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) +
+  scale_color_manual(name = "Larvae Treatment", labels = c("Control", "OA"), values = c("#00BFC4", "#F8766D")) + 
+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.border=element_rect(color="black", fill=NA),
+        panel.background = element_rect(colour="white"), axis.line = element_line(colour = "black")) + 
+  facet_grid(.~CrossID)
+
+#plot larvae of exposed parents
+ggplot(data = exppar, aes(x = JarSeatable, y = MaxFeretDiamum)) +
+  geom_boxplot(aes(colour=JarTrt))+
+  labs(x = "Replicate", y = "Shell Length (um)", title = "Larvae length exposed parents") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) +
+  scale_color_manual(name = "Larvae Treatment", labels = c("Control", "OA"), values = c("#00BFC4", "#F8766D")) + 
+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.border=element_rect(color="black", fill=NA),
+        panel.background = element_rect(colour="white"), axis.line = element_line(colour = "black")) + 
+  facet_grid(.~CrossID)
+
+
+```
+
+
+Make boxplots by parental cross, plotting both larvae treatments over one another. Can be used for all morphology parameters: surface area, length, 
+```{r}
+ggplot(data = LarvaeMorph, aes(x = CrossID, y = MaxFeretDiamum)) +
+  geom_boxplot(aes(colour=JarTrt)) +
+  labs(x = "Parental Cross", y = "Shell Length (um)", title = "Larvae lengths") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) +
+  scale_color_manual(name = "Larvae Treatment", labels = c("Control", "OA"), 
+                      values = c("#00BFC4", "#F8766D"))+
+  scale_fill_manual(name = "Larvae Treatment", labels = c("Control", "OA"), 
                       values = c("#00BFC4", "#F8766D")) + 
-  scale_y_continuous(breaks = seq(floor(min(larvmorph$MaxFeretDiamum)), 
-                                ceiling(max(larvmorph$MaxFeretDiamum)), 5)) +  
+  scale_y_continuous(breaks = seq(floor(min(LarvaeMorph$MaxFeretDiamum)), 
+                                ceiling(max(LarvaeMorph$MaxFeretDiamum)), 5)) +  
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-        panel.background = element_blank(), axis.line = element_line(colour = "black"))
+        panel.background = element_blank(), axis.line = element_line(colour = "black"), panel.border=element_rect(color="black",fill=NA))+
+  facet_grid(.~CrossType, scale="free_x")
 ```
 
-# Plot of overall length data
+Plot calcification data
 ```{r}
-ggplot(data = larvmorph, aes(x = ParTrt, y = MaxFeretDiamum, fill = JarTrt)) +
-  geom_boxplot() + 
-  labs(x = "Parental Treatment", y = "Shell Length (um)") +
-  scale_x_discrete(breaks = c("Control", "Exposed"), labels = c("Control", "OA")) +
-  scale_fill_manual(name = "Larval Treatment", labels = c("Control", "OA"), 
-                    values = c("#00BFC4", "#F8766D")) + 
-  scale_y_continuous(breaks = seq(55,80,5)) + 
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-        panel.background = element_blank(), axis.line = element_line(colour = "black"))
+#plot data by jar that are grouped by cross ID; but use JarSeatable instead of JarID so I can plot both exposed and control jars over one another
+#start with larvae of control parents
+ggplot(data = conparcalc, aes(x = JarID, y = F1WtPerLarvae)) +
+  geom_point(aes(shape=JarTrt, colour=JarTrt))+
+  labs(x = "Replicate", y = "F1 larvae count", title = "Larvae count control parents") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) +
+  scale_color_manual(name = "Larvae Treatment", labels = c("Control", "OA"), values = c("#00BFC4", "#F8766D")) + 
+  scale_shape_manual(name="Larvae Treatment", labels=c("Control","OA"), values =c(19,17))+
+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.border=element_rect(color="black", fill=NA),
+        panel.background = element_rect(colour="white"), axis.line = element_line(colour = "black")) + 
+  facet_grid(.~CrossID, scale="free_x")
+
+#plot larvae of exposed parents
+ggplot(data = expparcalc, aes(x = JarSeatable, y = F1WtPerLarvae)) +
+  geom_point(aes(shape=JarTrt, colour=JarTrt))+
+  labs(x = "Replicate", y = "F1 weight per larvae", title = "Larvae weight exposed parents") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) +
+  scale_color_manual(name = "Larvae Treatment", labels = c("Control", "OA"), values = c("#00BFC4", "#F8766D")) + 
+  scale_shape_manual(name="Larvae Treatment", labels=c("Control","OA"), values =c(19,17))+
+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.border=element_rect(color="black", fill=NA),
+        panel.background = element_rect(colour="white"), axis.line = element_line(colour = "black")) + 
+  facet_grid(.~CrossID)
+
+#same plot structure as above, but using boxplots instead of points for each cross measured
+#plot larvae of control parents
+ggplot(data = conparcalc, aes(x = CrossID, y = F1WtPerLarvae)) +
+  geom_boxplot(aes(colour=JarTrt))+
+  labs(x = "CrossID", y = "F1 weight per larvae", title = "Larvae weight control parents") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) +
+  scale_color_manual(name = "Larvae Treatment", labels = c("Control", "OA"), values = c("#00BFC4", "#F8766D")) + 
+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.border=element_rect(color="black", fill=NA),
+        panel.background = element_rect(colour="white"), axis.line = element_line(colour = "black")) 
+
+#plot larvae of exposed parents
+ggplot(data = expparcalc, aes(x = CrossID, y = F1WtPerLarvae)) +
+  geom_boxplot(aes(colour=JarTrt))+
+  labs(x = "CrossID", y = "F1 weight per larvae", title = "Larvae weight control parents") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) +
+  scale_color_manual(name = "Larvae Treatment", labels = c("Control", "OA"), values = c("#00BFC4", "#F8766D")) + 
+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.border=element_rect(color="black", fill=NA),
+        panel.background = element_rect(colour="white"), axis.line = element_line(colour = "black")) 
+
+
 ```
 
-# Plots of difference between parental treatments
+Make boxplots by parental cross, plotting both larvae treatments over one another.For calcification data; can also be used for cilia counts
 ```{r}
-crossdiff <- data.frame(tapply(larvmorph$MaxFeretDiamum, list(larvmorph$CrossID, larvmorph$JarTrt), median)) %>%
+ggplot(data = LarvaeCalc, aes(x = CrossID, y = F1WtPerLarvae)) +
+  geom_boxplot(aes(colour=JarTrt)) +
+  labs(x = "Parental Cross", y = "F1 Weight per larvae (g)", title = "Larvae weights") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) +
+  scale_color_manual(name = "Larvae Treatment", labels = c("Control", "OA"), 
+                      values = c("#00BFC4", "#F8766D"))+
+  scale_fill_manual(name = "Larvae Treatment", labels = c("Control", "OA"), 
+                      values = c("#00BFC4", "#F8766D")) +  
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+        panel.background = element_blank(), axis.line = element_line(colour = "black"), panel.border=element_rect(color="black",fill=NA))+
+  facet_grid(.~CrossType, scale="free_x")
+```
+
+
+Plots of difference between parental treatments for morphology
+```{r}
+crossdiff <- data.frame(tapply(LarvaeMorph$MaxFeretDiamum, list(LarvaeMorph$CrossID, LarvaeMorph$JarTrt), median)) %>%
   rownames_to_column("CrossID") %>%
-  mutate(ParTrt = ifelse(startsWith(CrossID, "E"), "Exposed", "Control")) %>%
+  mutate(CrossTemp = CrossID) %>%
+  mutate(ParentTrt = ifelse(startsWith(CrossID, "E"), "Exposed", "Control")) %>%
+  separate(CrossTemp, c("FemaleID", "MaleID", "BlockID", "Fourth"), sep="_") %>% select(-Fourth) %>%
   mutate(Diff = Exposed - Control)
 
-ggplot(data = crossdiff, aes(x = ParTrt, y = Diff, fill = ParTrt)) + 
+crossdiff$CrossID<- as.factor(crossdiff$CrossID)
+crossdiff$FemaleID<-as.factor(crossdiff$FemaleID)
+crossdiff$MaleID<-as.factor(crossdiff$MaleID)
+
+#look at cross differences by Male and Female ID
+ggplot(data = crossdiff, aes(x = MaleID, y = Diff)) + 
+  geom_point(aes(shape=ParentTrt, colour=ParentTrt)) + 
+  labs(x = "Male ID", y = "Change in median shell length (um) per family\nfrom control to OA conditions") + 
+  scale_colour_manual(name="Parent treatment", labels= c("control", "OA"), values = c("#00BFC4", "#F8766D")) + 
+  scale_shape_manual(name="Parent treatment", labels= c("control", "OA"), values = c(19, 17))+
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(), panel.background = element_blank(), 
+        axis.line = element_line(colour = "black"), panel.border=element_rect(colour="black", fill=NA))+
+   theme(axis.text.x = element_text(angle = 90, vjust = 0.5))+
+           facet_grid(.~FemaleID, scale="free_x")
+
+#look at overall differences by parent treatment
+ggplot(data = crossdiff, aes(x = ParentTrt, y = Diff, fill = ParentTrt)) + 
   geom_boxplot() + 
   labs(x = "Parental Treatment", y = "Change in median shell length (um) per family\nfrom control to OA conditions") + 
   scale_x_discrete(breaks = c("Control", "Exposed"), labels = c("Control", "OA")) + 
@@ -77,3 +273,142 @@ ggplot(data = crossdiff, aes(x = ParTrt, y = Diff, fill = ParTrt)) +
         panel.grid.minor = element_blank(), panel.background = element_blank(), 
         axis.line = element_line(colour = "black"))
 ```
+
+Look at differences for calcification
+```{r}
+crossdiffcalc <- data.frame(tapply(LarvaeCalc$F1WtPerLarvae, list(LarvaeCalc$CrossID, LarvaeCalc$JarTrt), median)) %>%
+  rownames_to_column("CrossID") %>%
+  mutate(CrossTemp = CrossID) %>%
+  mutate(ParentTrt = ifelse(startsWith(CrossID, "E"), "Exposed", "Control")) %>%
+  separate(CrossTemp, c("FemaleID", "MaleID", "BlockID", "Fourth"), sep="_") %>% select(-Fourth) %>%
+  mutate(Diff = Exposed - Control)
+
+crossdiffcalc$CrossID<- as.factor(crossdiffcalc$CrossID)
+crossdiffcalc$FemaleID<-as.factor(crossdiffcalc$FemaleID)
+crossdiffcalc$MaleID<-as.factor(crossdiffcalc$MaleID)
+
+#look at cross differences by Male and Female ID
+ggplot(data = crossdiffcalc, aes(x = FemaleID, y = Diff)) + 
+  geom_point(aes(shape=ParentTrt, colour=ParentTrt)) + 
+  labs(x = "Female ID", y = "Change in median weight per family\nfrom control to OA conditions") + 
+  scale_colour_manual(name="Parent treatment", labels= c("control", "OA"), values = c("#00BFC4", "#F8766D")) + 
+  scale_shape_manual(name="Parent treatment", labels= c("control", "OA"), values = c(19, 17))+
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(), panel.background = element_blank(), 
+        axis.line = element_line(colour = "black"))+
+   theme(axis.text.x = element_text(angle = 90, vjust = 0.5))+
+           facet_grid(.~MaleID, scale="free_x")
+
+#look at overall differences by parent treatment
+ggplot(data = crossdiffcalc, aes(x = ParentTrt, y = Diff, fill = ParentTrt)) + 
+  geom_boxplot() + 
+  labs(x = "Parental Treatment", y = "Change in median larvae weight per family\nfrom control to OA conditions") + 
+  scale_x_discrete(breaks = c("Control", "Exposed"), labels = c("Control", "OA")) + 
+  scale_fill_manual(values = c("#00BFC4", "#F8766D")) + 
+  theme(legend.position = "none", panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(), panel.background = element_blank(), 
+        axis.line = element_line(colour = "black"))
+```
+
+Make plot that looks at morphology by larvae and parent treatment
+```{r}
+par(mar = c(5, 4, 0.5, 0.5), bg = "transparent")
+boxplot(LarvaeMorph$MaxFeretDiamum ~ LarvaeMorph$JarTrt * LarvaeMorph$CrossType, 
+        xlim = c(0, 5),
+        xlab = "Larvae Treatment",
+        ylab = "Diameter (um)",
+        names = c("Control", "OA", "Control", "OA"), 
+        col = c("powderblue", "red"))
+rect(xleft = -0.2, 
+     ybottom = 0, 
+     xright = 2.5, 
+     ytop = 85,
+     border = FALSE,
+     col = rgb(0, 0, 0.5, alpha = 0.1))
+rect(xleft = 2.5, 
+     ybottom = 0, 
+     xright = 5.2, 
+     ytop = 85,
+     border = FALSE,
+     col = rgb(0.5, 0, 0, alpha = 0.1))
+text(x = 1.25, y = 84, "Control Parents")
+text(x = 3.75, y = 84, "OA Parents")
+boxplot(LarvaeMorph$MaxFeretDiamum ~ LarvaeMorph$JarTrt * LarvaeMorph$CrossType, 
+        xlim = c(0, 5),
+        xlab = "Larvae Treatment",
+        ylab = "Diameter (um)",
+        names = c("Control", "OA", "Control", "OA"), 
+        col = c("powderblue", "red"),
+        add = TRUE)
+```
+
+Make plot that looks at calcification and cilia by larvae and parent treatment
+```{r}
+par(mar = c(5, 4, 0.5, 0.5), bg = "transparent")
+boxplot(LarvaeMorph$PercentCilia ~ LarvaeMorph$JarTrt * LarvaeMorph$CrossType, 
+        xlim = c(0, 5),
+        xlab = "Larvae Treatment",
+        ylab = "Percent Cilia",
+        names = c("Control", "OA", "Control", "OA"), 
+        col = c("powderblue", "red"))
+rect(xleft = -0.2, 
+     ybottom = 0, 
+     xright = 2.5, 
+     ytop = 1,
+     border = FALSE,
+     col = rgb(0, 0, 0.5, alpha = 0.1))
+rect(xleft = 2.5, 
+     ybottom = 0, 
+     xright = 5.2, 
+     ytop = 1,
+     border = FALSE,
+     col = rgb(0.5, 0, 0, alpha = 0.1))
+text(x = 1.25 , y = 0.000007, "Control Parents")
+text(x = 3.75, y = 0.000007, "OA Parents")
+boxplot(LarvaeMorph$PercentCilia ~ LarvaeMorph$JarTrt * LarvaeMorph$CrossType, 
+        xlim = c(0, 5),
+        xlab = "Larvae Treatment",
+        ylab = "",
+        names = c("Control", "OA", "Control", "OA"), 
+        col = c("powderblue", "red"),
+        add = TRUE)
+
+
+```
+
+
+```{r}
+#export plots
+
+plots.dir.path<- list.files(tempdir(), pattern="rs-graphics", full.names= TRUE)
+plots.png.paths<- list.files(plots.dir.path, pattern=".png", full.names=TRUE)
+file.copy(from=plots.png.paths, to="../results")
+```
+
+#get plots for means of parent and larvae treatment; use LarvaeCalc dataset because it only has one value per jar
+```{r}
+ 
+#get the data as means for treatments
+meancil<- aggregate(PercentCilia~CrossType*JarTrt, data=LarvaeCalc, FUN= mean)
+secil<- aggregate(PercentCilia~CrossType*JarTrt, data=LarvaeCalc, FUN= se)
+#plot the data as bargraphs with ggplot
+ggplot(data = meancil, aes(x = CrossType, y = PercentCilia, fill=JarTrt)) +
+  geom_bar(stat="identity", aes(fill=JarTrt), position="dodge")+
+  labs(x = "Parent Treatment", y = "Proportion Cilia Extruded") +
+  scale_fill_manual(name = "Larvae Treatment", labels = c("Control", "OA"), values = c("blue4", "red2")) +
+  geom_errorbar(aes(ymin= meancil$PercentCilia-secil$PercentCilia, ymax=meancil$PercentCilia+secil$PercentCilia),width=0.2, position=position_dodge(.9))+
+  theme_classic()
+
+#look at the data within each group
+Histdata<-unite(LarvaeCalc, Group, c(CrossType, JarTrt), sep="_")
+ggplot(Histdata, aes(x=PercentCilia)) + geom_histogram()+ facet_grid(~Group)
+#run analysis to look for significance
+aov1<- aov(PercentCilia~CrossType*JarTrt, data=LarvaeCalc)
+summary(aov1)
+shapiro.test(aov1$residuals) #does not meet assumption
+leveneTest(aov1)# meets assumption
+
+#since the proportion data do not meet the assumption of normality, try a transformation
+
+```
+

@@ -1,0 +1,406 @@
+---
+title: "OysterEggMorphology"
+author: "Camila Cortina"
+date: "1/16/2019 updated by Elise 2/6/20"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+#Load libraries
+```{r include=FALSE}
+library(lmerTest)
+library(car)
+library(onewaytests)
+library(e1071)
+library(vioplot)
+library(ggplot2)
+
+
+```
+
+#Load data
+Name the data you export from FileMaker Pro by their exact table names and save them as CSVs, e.g. Egg_Morphology.csv
+###This chunk of code gets the data and defines new categories, based on the Image number name, necessary for analysis such as the label, environment, and block 
+```{r}
+setwd("~/GitHub/LarvaeTransGen2018/data")
+egg_data<- read.csv("Egg_Morphology.csv")
+head(egg_data)
+
+#Makes the FemaleIDs a string to use the strsplit function to get CrossType
+egg_data$ImageID<- as.character(egg_data$ImageID)
+egg_data$FemaleID<- as.character(egg_data$FemaleID)
+#assign each row CrossType using the strsplit function on the FemaleID column
+egg_data$CrossType<- sapply(strsplit(egg_data$FemaleID, "F"), '[',1)
+
+#spilts the FemaleID string to get the block number or B1 or B2 or B3
+egg_data$Block<- sapply(strsplit(egg_data$FemaleID, "_"), '[',2)
+#changing block to a factor to arrange boxplots, etc.
+egg_data$Block<-as.factor(egg_data$Block)
+
+#rearranging the order of the strings so that block is first, to display all blocks together on a graph
+egg_data$FemaleID<- paste(sapply(strsplit(egg_data$ImageID, "_"), '[',2),sapply(strsplit(egg_data$ImageID, "_"), '[',1),sep="_")
+
+#look at the structure of the data
+str(egg_data)
+
+#make Female ID a factor again
+egg_data$FemaleID<- as.factor(egg_data$FemaleID)
+
+```
+
+
+###Subsetting the data
+```{r}
+#subsetting egg_data to not have CF06_B2 because it only had 8 eggs total and they were all small ones that may have been excluded otherwise
+#exclude variables CF06_B2
+sub.eggs<- subset(egg_data, FemaleID != "B2_CF06", drop = TRUE)
+sub.eggs$FemaleID<- as.factor(sub.eggs$FemaleID) #relevel FemaleID in sub.eggs to get rid of CF06_B2 from the dataset
+
+#subsetting the eggs so that any area 100000 pixels or below is excluded, this takes out 46 data points out of 1314 total 
+#unclear if this subset was done simply to fix the data skew or to remove underdeveloped eggs
+sub.eggs2<- subset(sub.eggs, AreaPix2 >= 100000, drop = TRUE)
+
+#subsetting to take out CF04_B3 because 26% of their eggs were taken out of the set when excluding eggs with an area under 100,000 pixels # Elise found that B1_EF07 had only 11 eggs left, but it was still kept in and B3_CF04 wasn't why? 
+sub.eggs3<- subset(sub.eggs2, FemaleID != "B3_CF04", drop = TRUE) #is this really necessary? Elise doesn't think it is because there are still 22 eggs for that female, but only 11 eggs for EF07_B1, which we keep in
+sub.eggs3$FemaleID<- as.factor(sub.eggs3$FemaleID) #relevel FemaleID in sub.eggs3 to get rid of CF06_B2 from the dataset, but this didn't work
+Area.female.plot3<- boxplot(AreauM2~FemaleID, data = sub.eggs3, las = 2, xlab = "Female ID", ylab = "Area in uM2", title = "Area of eggs by female", cex.axis = .55)
+
+diameter.female.plot3<- boxplot(DiameteruM~FemaleID, data = sub.eggs3, las = 2, xlab = "female ID", ylab = "Diameter in micrometers", main = "Diameter of eggs by female", cex.axis = .55)
+
+```
+
+###Everything in this chunk is for the final subsetted data (the dataset excluding eggs with an area below 100,000 and all of CF04_B3)
+```{r}
+#a linear mixed model incorporating CrossType (parent treatment) and block as fixed effects and and female ID as a random effect
+egg.model.sub3<- lmer(AreauM2~CrossType + Block + (1|FemaleID), data = sub.eggs3, REML = FALSE)
+summary(egg.model.sub3)
+
+#The same model but without CrossType, so that we can compare the two models to see if the environment had a significant effect on the size
+egg.model.sub3.woenvr<- lmer(AreauM2~Block + (1|FemaleID), data = sub.eggs3, REML = FALSE)
+summary(egg.model.sub3.woenvr)
+
+#The same model, but without the block to see how much of an effect block had on the size
+egg.model.sub3.woblock<- lmer(AreauM2~CrossType + (1|FemaleID), data = sub.eggs3, REML = FALSE)
+summary(egg.model.sub3.woblock)
+
+#running an anova to compare the first two models - will tell us if the parental environment had a significant effect. 
+anova(egg.model.sub3, egg.model.sub3.woenvr)
+#Pr(>Chisq) = .4972, the environment does not have a significant effect on the egg size 
+
+#running an anova to compare the first model with the model without block to tell us if block had a significant effect on the egg size
+anova(egg.model.sub3, egg.model.sub3.woblock)
+#Pr(>Chisq) = .137, so the blocks did not have a significant effect on the egg size after removing CF04_B3. When CF04_B3 was included (see chunk below) there was a slightly significant effect due to the block Pr(>Chisq) = .0342 
+
+#plotting the residuals
+par(mfrow = c(1,1))
+plot(egg.model.sub3, main = "Residuals plot for the model")
+#testing normality of the residuals
+qqnorm(residuals(egg.model.sub3))
+hist(residuals(egg.model.sub3), breaks = 50)
+#residuals of the model are not normally distributed 
+shapiro.test(residuals(egg.model.sub3))
+
+#a linear model with female ID as another fixed effect - is this what you wanted to compare females?
+linear.model.sub.eggs3<- lm(AreauM2 ~ CrossType + FemaleID, data = sub.eggs3)
+summary(linear.model.sub.eggs3)
+#gives some instances of significance by female ID, however it said that one of them could not be compared due to signularities, which does not really make sense to me..#Elise did not get anything about singularties when she ran it
+#with a one way anova and the linear model from above both the environment and female are significant
+anova(linear.model.sub.eggs3)#Elise got a significant effect of female
+
+#Linear model to compare environment, block, and female?
+egglm3<- lm(AreauM2~CrossType + Block + FemaleID, data = sub.eggs3)
+summary(egglm3)
+par(mfrow=c(2,2))
+plot(egglm3)
+#I am not sure why 3 of the females were not defined due to singularities...#Elise did not get this error
+
+#not sure what to do for the TukeyHSD because it gives me an error saying that TukeyHSD cannot be applied to class lmerMod or lm
+#TukeyHSD(linear.model.sub.eggs3)
+#TukeyHSD(egg.model.sub3)
+aov(linear.model.sub.eggs3)
+summary(aov(AreauM2~FemaleID + CrossType, data = sub.eggs3))
+par(mfrow = c(2,2))
+plot(aov(AreauM2~FemaleID+CrossType, data = sub.eggs3))
+#TukeyHSD(aov(AreauM2~FemaleID + CrossType, data = sub.eggs3))
+par(mfrow = c(1,1))
+
+#testing homogeneity of the data - the variances of eggs for each female are NOT the same
+bartlett.test(AreauM2 ~ FemaleID, data = sub.eggs3)
+
+#Ran a second test with the levene test because the data are left skewed, still indicating that the variances are significantly not equal. 
+leveneTest(AreauM2 ~ FemaleID, data = sub.eggs3)
+
+#testing normality of the raw data
+qqnorm(sub.eggs3$AreauM2)
+qqline(sub.eggs3$AreauM2)
+#squaring it seems to make it a little more normal # elise disagrees, does not look more normal by squaring, looks worse
+qqnorm((sub.eggs3$AreauM2)^2)
+qqline((sub.eggs3$AreauM2)^2)
+
+#trying a welch's anova because the data was not homogeneous 
+welch.test(AreauM2 ~ FemaleID, data = sub.eggs3)
+
+```
+
+
+###square-transforming the orignial data seems to offset most of the abnormality of the data
+```{r}
+#the final subsetted data is still moderately skewed
+skewness(sub.eggs3$AreauM2)
+#squaring the subsetted data seems to have over-corrected it
+sub.eggs3$sqrdarea<- (sub.eggs3$AreauM2)^2
+hist(sub.eggs3$sqrdarea, breaks = 50)
+
+
+#histogram of original data
+hist(egg_data$AreauM2, breaks = 50, main = "Area of Eggs in the Original Data", xlab = "Area Per Egg in micrometers", ylab = "Frequency")
+#the skewness of the orignial data is -1.291, suggesting the data is highly skewed
+skewness(egg_data$AreauM2)
+#squaring the original data
+egg_data$areasqrd<- (egg_data$AreauM2)^2
+#histogram of square-transformed data
+hist(egg_data$areasqrd, breaks = 100)
+#the skewness is now miniscule 
+skewness(egg_data$areasqrd)
+qqnorm(egg_data$areasqrd)
+
+egg.model.sub.sq<- lmer(areasqrd~CrossType + Block + (1|FemaleID), data = egg_data, REML = FALSE)
+plot(egg.model.sub.sq)
+qqnorm(residuals(egg.model.sub.sq))
+shapiro.test(residuals(egg.model.sub.sq)) #this is significant
+#The same model but without parental environment, so that we can compare the two models to see if the environment had a significant effect on the size
+egg.model.subsq.woenvr<- lmer(areasqrd~Block + (1|FemaleID), data = egg_data, REML = FALSE)
+
+#The same model, but without the block to see how much of an effect block had on the size
+egg.model.sub.woblock<- lmer(areasqrd~CrossType + (1|FemaleID), data = egg_data, REML = FALSE)
+
+#running an anova to compare the first two models - will tell us if the parental environment had a significant effect. 
+anova(egg.model.sub.sq, egg.model.subsq.woenvr)
+```
+
+
+###Potential models based on other measurements that were taken by the cell profiler
+
+```{r}
+#a mixed linear model comparing eccentricities
+egg.model.sub.ecc3<- lmer(Eccentricity~CrossType + Block + (1|FemaleID), data = sub.eggs3, REML = FALSE)
+summary(egg.model.sub.ecc3)
+plot(egg.model.sub.ecc3)
+qqnorm(residuals(egg.model.sub.ecc3))
+qqline(residuals(egg.model.sub.ecc3))
+#a mixed linear model comparing form factor - the residuals look very not normal
+egg.model.sub.form3<- lmer(FormFactor~CrossType + Block + (1|FemaleID), data = sub.eggs3, REML = FALSE)
+summary(egg.model.sub.form3)
+plot(egg.model.sub.form3)
+qqnorm(residuals(egg.model.sub.form3)) # data are not normal
+
+#a mixed linear model comparing major axis 
+egg.model.sub.maj3<- lmer(MajorAxisLengthPix~CrossType + Block + (1|FemaleID), data = sub.eggs3, REML = FALSE)
+summary(egg.model.sub.maj3) 
+plot(egg.model.sub.maj3)
+qqnorm(residuals(egg.model.sub.form3))#data are not normal
+```
+##Final models
+```{r}
+par(mfrow=c(2,2))
+## Fit linear mixed model to the data:
+full_model<- lmer(AreauM2~CrossType * Block + (1|FemaleID), data = sub.eggs3)
+## Summary including coefficient table with p-values for t-statistics using
+## Satterthwaite's method for denominator degrees of freedom:
+summary(full_model)
+
+## Type III anova table with p-values for F-tests based on Satterthwaite's
+## method:
+aov.1 <- anova(full_model)
+aov.1
+
+## Inspect the contrast matrix for the Type III test of :
+show_tests(aov.1, fractions = TRUE)$CrossType #Elise cannot get this to work
+
+## Choose type II anova table with Kenward-Roger method for the F-test:
+## Not run: don't use this unless better
+if(requireNamespace("pbkrtest", quietly = TRUE))
+anova(full_model, type=2, ddf="Kenward-Roger")
+
+## Anova-like table of random-effect terms using likelihood ratio tests:
+anova(full_model)#Camila originally had this as ranova()
+
+## F-tests of 'single term deletions' for all marginal terms:
+drop1(full_model)
+
+## Least-Square means and pairwise differences:
+(lsm <- ls_means(full_model)) #elise can't get this to work
+ls_means(full_model, which = "block", pairwise = TRUE) 
+
+## ls_means also have plot and as.data.frame methods:
+## Not run:
+plot(lsm, which=c("CrossType", "Block"))
+as.data.frame(lsm)
+
+## backward elimination of non-significant effects:
+step_result <- step(full_model)
+
+## Elimination tables for random- and fixed-effect terms:
+step_result
+ 
+# Extract the model that step found:
+final_model <- get_model(step_result)
+final_model
+
+citation("lmerTest")
+```
+
+##Models that I did before we decided to subset further
+```{r}
+#a linear mixed model incorporating environment and block as fixed effects and and female ID as a random effect
+egg.model.sub2<- lmer(AreauM2~CrossType + Block + (1|FemaleID), data = sub.eggs, REML = FALSE)
+summary(egg.model.sub2)
+
+#The same model but without environment, so that we can compare the two models to see if the environment had a significant effect on the size
+egg.model.sub2.woenvr<- lmer(AreauM2~Block + (1|FemaleID), data = sub.eggs, REML = FALSE)
+summary(egg.model.sub2.woenvr)
+
+#The same model, but without the block to see how much of an effect block had on the size
+egg.model.sub2.woblock<- lmer(AreauM2~CrossType + (1|FemaleID), data = sub.eggs, REML = FALSE)
+summary(egg.model.sub2.woblock)
+
+#a linear model (not mixed)
+egglm<- lm(AreauM2~CrossType + Block, data = sub.eggs)
+summary(egglm)
+par(mfrow=c(2,2))
+plot(egglm)
+
+#comparing the model without environment as an effect - shows that environment does not have a significant effect on the area
+anova(egg.model.sub2, egg.model.sub2.woenvr)
+#Pr(>Chisq) = .9843
+
+#comparing the model without block as an effect - shows that block does have a slightly significant effect on the area 
+anova(egg.model.sub2, egg.model.sub2.woblock)
+#Pr(>Chisq) = .0342
+
+#plot of the residuals of the model
+plot(egg.model.sub2)
+
+#normality of the residuals
+qqnorm(residuals(egg.model.sub2))
+hist(residuals(egg.model.sub2), breaks = 50)
+
+#normality of the raw data
+qqnorm(egg_data$AreauM2)
+hist(egg_data$AreauM2, breaks = 50)
+
+#a mixed model with environment and block interacting
+egg.model.sub.interact<- lmer(AreauM2~CrossType*Block + (1|FemaleID), data = sub.eggs, REML = FALSE)
+
+anova(egg.model.sub2, egg.model.sub.interact)
+
+#average size of egg by female ID
+average_by_female<- aggregate(AreauM2 ~ FemaleID, data = sub.eggs, FUN = "mean")
+head(average_by_female)
+
+#a mixed linear model comparing eccentricities
+egg.model.sub.ecc<- lmer(Eccentricity~CrossType + Block + (1|FemaleID), data = sub.eggs, REML = FALSE)
+summary(egg.model.sub.ecc)
+plot(egg.model.sub.ecc)
+qqnorm(residuals(egg.model.sub.ecc))
+
+#a mixed linear model comparing form factor
+egg.model.sub.form<- lmer(FormFactor~CrossType + Block + (1|FemaleID), data = sub.eggs, REML = FALSE)
+summary(egg.model.sub.form)
+plot(egg.model.sub.form)
+qqnorm(residuals(egg.model.sub.form))
+
+#a mixed linear model comparing major axis 
+par(mfrow = c(1,1))
+egg.model.sub.maj<- lmer(MajorAxisLengthPix~CrossType + Block + (1|FemaleID), data = sub.eggs, REML = FALSE)
+summary(egg.model.sub.maj) 
+plot(egg.model.sub.maj)
+qqnorm(residuals(egg.model.sub.form))
+```
+
+####Boxplots of the data
+```{r}
+#plots on the final subsetted data
+Area.female.plot2<- boxplot(AreauM2~FemaleID, data = sub.eggs3, las = 2, main = "Area of eggs by each female - subsetted", xlab = "female ID", ylab = "Area in uM2", cex.axis = .55)
+hist(sub.eggs3$AreauM2, breaks = 50, main = "Histogram of the area of the subsetted data", xlab = "Area in uM2")
+#comparing with the max feret diameter, which is the maximum length across the egg
+hist(sub.eggs3$DiameteruM, breaks = 50, main = "Histogram of the diameter of the subsetted data", xlab = "Diameter in uM")
+
+
+
+par(mfrow = c(1,1))
+
+#ggplot(egg_data, aes(x=FemaleID, y=AreauM2))+
+#  geom_boxplot()
+
+#boxplot of each female and their eggs area using ggplot
+#ggplot(egg_data, aes(x=FemaleID, y=AreauM2), las = 2)+ geom_boxplot() 
+
+#boxplot of each female and their eggs - not pretty 
+#boxplot(AreauM2~FemaleID+Block, data = egg_data, las = 2)
+
+#better looking boxplot of each female and the distribution of the area of their eggs with the FULL dataset
+Area.female.plot<- boxplot(AreauM2~FemaleID, data = egg_data, las = 2, ylab = "Area in uM2", xlab = "Female ID", main = "Area of eggs for each female - full dataset", cex.axis = .5)
+
+#boxplot of area by block (does not show treatment) for FULL dataset
+boxplot(AreauM2~Block, data = egg_data, las = 2, main = "Area by block - full dataset", xlab = "Block", ylab = "Area in uM2")
+
+#boxplot of area by block (does not show treatment) for final subsetted dataset
+boxplot(AreauM2~Block, data = sub.eggs3, las = 2, main = "Area by block of subsetted data", xlab = "Block", ylab = "Area in uM2")
+
+#A simple box plot to display the area relative to the environment for FULL dataset
+control_vs_exposed<- boxplot(AreauM2~CrossType, data = egg_data, main = "Control vs. Exposed by Area", xlab = "Adult Environment", ylab = "Area in uM2")
+
+#A simple box plot to display the area relative to the environment for final subsetted dataset
+boxplot(AreauM2~CrossType, data = sub.eggs3, main = "Control vs. Exposed by area for subsetted data", xlab = "Adult Environment", ylab = "Area in uM2")
+
+#boxplot of area by block with environment 
+Area.envr.block.plot<- boxplot(AreauM2~CrossType+Block, data = egg_data, main = "Environment with block by area - full dataset", xlab = "Environment and Block", ylab = "Area in uM2")
+#same boxplot excluding the areas under 100000 and CF04_B3
+boxplot(AreauM2~CrossType+Block, data = sub.eggs3, main = "Environment with block by area - subsetted dataset", xlab = "Environment and Block", ylab = "Area in micrometers2")
+legend(x = "topright", legend = c("C = control", "E = exposed", "B = block"))
+boxplot(DiameteruM~CrossType+Block, data = sub.eggs3, main = "Environment with block by diameter", xlab = "Environment and Block", ylab = "Diameter in micrometers")
+
+#boxplots for form factor
+#FormFactor: (2D only) Calculated as 4*π*Area/Perimeter^2. Equals 1 for a perfectly circular object.
+#environment and block
+form.envr.block.plot<- boxplot(FormFactor~CrossType+Block, data = egg_data, main = "Form Factor for Block and Environment", xlab = "Block and Environment", ylab = "Form factor : 4*π*Area/Perimeter^2")
+#showing just female 
+form.female.plot<- boxplot(FormFactor~FemaleID, data = egg_data, las = 2, main = "Form Factor for each female", xlab = "Female ID", ylab = "Form factor : 4*π*Area/Perimeter^2", cex.axis = .55)
+
+#boxplots for eccentricity 
+#Eccentricity: (2D only) The eccentricity of the ellipse that has the same second-moments as the region. The eccentricity is the ratio of the distance between the foci of the ellipse and its major axis length. The value is between 0 and 1. (0 and 1 are degenerate cases; an ellipse whose eccentricity is 0 is actually a circle, while an ellipse whose eccentricity is 1 is a line segment.)
+#environment and block
+ecc.envr.block.plot<- boxplot(Eccentricity~CrossType+Block, data = egg_data, main = "Eccentricity for Block and Environment", xlab = "Block and Environment", ylab = "Eccentricity")
+#showing just female 
+ecc.female.plot<- boxplot(Eccentricity~FemaleID, data = egg_data, las = 2, main = "Eccentricity for each female", xlab = "Female ID", ylab = "Eccentricity", cex.axis = .55)
+
+#boxplots for major axis length - looks very similar to the area because axis length and area are related
+#environment and block
+majaxis.envr.block.plot<- boxplot(MajorAxisLengthPix~CrossType+Block, data = egg_data, main = "Major Axis for Block and Environment", xlab = "Block and Environment", ylab = "Major Axis Length in pixels")
+#showing just female 
+majaxis.female.plot<- boxplot(MajorAxisLengthPix~FemaleID, data = egg_data, las = 2, main = "Major Axis Length for each female", xlab = "Female ID", ylab = "Major Axis Length", cex.axis = .55)
+```
+
+###Violin plots
+```{r}
+#Violin plot depicting each females egg distribution
+ggplot(aes(FemaleID, AreauM2), data = sub.eggs3)+ geom_violin()
+
+boxplot(AreauM2~CrossType+Block, data = sub.eggs3)
+#I want to make a graph similar to this one, but I can't figure out how to with ggplot
+#ggplot(aes(Block+CrossType, AreauM2), data = sub.eggs3)+ geom_violin() 
+
+#tried getting the vioplot package to do this, but it said it could not find the "vioplot" function
+
+#with(data = sub.eggs3, (vioplot(AreauM2 ~ CrossType + Block)))
+```
+
+
+
+
+
+
+
+
