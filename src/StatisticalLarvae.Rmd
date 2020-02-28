@@ -22,14 +22,60 @@ library(optimx)
 
 # Load data
 ```{r}
-larvae <- read.csv("../data/Larvae_morphology.csv") %>%
-  mutate(ParTrt = ifelse(startsWith(as.character(CrossID), "E"), "Exposed", "Control")) %>%
-  separate(CrossID, c("FemaleID", "MaleID"), sep = "_", remove = FALSE)
+#set working directory
+setwd("~/R/GitHub/LarvaeTransGen2018/data") #Elise's working directory
+Larvae_Morphology <- read.csv("../data/Larvae_Morphology.csv")
+Barcode_Jar <- read.csv("../data/Barcode_Jar.csv")
+Block_ID <- read.csv("../data/Block_ID.csv")
+Cross<- read.csv("../data/Cross.csv")
+Fert_QG<- read.csv("../data/Fert_QG.csv")
+Header_WC<- read.csv("../data/Header_WC.csv")
+Larvae_Calcification <- read.csv("../data/Larvae_Calcification.csv")
+Larvae_Counts <- read.csv("../data/Larvae_Counts.csv")
+Larvae_WC <- read.csv("../data/Larvae_WC.csv")
+Parent_ID <- read.csv("../data/Parent_ID.csv")
+Larvae_Cilia<- read.csv("../data/Larvae_Cilia.csv")
+
+# join data from tables so we can analyze morphology data. 
+# LarvaeMorph dataset includes multiple entries per jar
+
+LarvaeMorph<- merge(x=Larvae_Morphology, y=Barcode_Jar, by="JarID", all.x=TRUE)
+LarvaeMorph<- merge(x=LarvaeMorph, y=Larvae_Calcification, by="JarID", all.x=TRUE)
+#use gather function in tidyr to make the Fert_QG Jar ID columns in long form vs. wide form
+Fert_QG_long <- Fert_QG %>% tidyr::gather(Key, JarID, JarID1:JarID6)
+#use the gathered data frame to merge with LarvaeMorph
+LarvaeMorph <- merge(x = LarvaeMorph, y = Fert_QG_long, by = c("JarID", "CrossID"), all.x=TRUE)
+LarvaeMorph<- merge(x=LarvaeMorph, y=Cross, by="CrossID", all.x=TRUE)
+LarvaeMorph<- merge(x=LarvaeMorph, y=Larvae_Cilia, by="JarID", all.x=TRUE)
+
+LarvaeMorph$JarSeatable<- as.factor(LarvaeMorph$JarSeatable) #make seatable a factor
+#use LarvaeMorph data frame for figures on larvae morphology
+
+#create dataset only one entry per JarID and the mean of morphological data; use this new dataset for calcification data
+
+meanMorph<- aggregate(cbind(Perimeterum, SurfaceAreaum2, MaxFeretDiamum)~JarID, data=Larvae_Morphology, mean)#get mean values for morphology
+seMorph<- aggregate(cbind(Perimeterum, SurfaceAreaum2, MaxFeretDiamum)~JarID, data=Larvae_Morphology, se)#get se values for morphology
+names(seMorph)<- c("JarID", "PerimeterumSE", "SurfaceAreaum2SE", "MaxFeretDiamumSE")
+LarvaeCalc<-merge(x=Larvae_Calcification, y=meanMorph, by="JarID", all.x=TRUE)
+LarvaeCalc<- merge(x=LarvaeCalc, y=seMorph, by="JarID", all.x=TRUE)
+LarvaeCalc<- merge(x=LarvaeCalc, y=Barcode_Jar, by="JarID", all.x=TRUE)
+#use the gathered data frame from above to merge with LarvaeCalc
+LarvaeCalc <- merge(x = LarvaeCalc, y = Fert_QG_long, by = c("JarID", "CrossID"), all.x=TRUE)
+LarvaeCalc<- merge(x=LarvaeCalc, y=Cross, by="CrossID", all.x=TRUE)
+LarvaeCalc<- merge(x=LarvaeCalc, y=Larvae_Cilia, by="JarID", all.x=TRUE)
+LarvaeCalc<- subset(LarvaeCalc, F1TotalLarvaeWtg >=0) # remove all jars with total larvae weight less than zero
+LarvaeCalc<- subset(LarvaeCalc, F1LarvaeCount>=100) # remove all jars with larvae counts that are less than 100
+#use LarvaeCalc dataframe to make figures on larvae calcification
+
+#the code below is old code 
+#larvae <- read.csv("../data/Larvae_Morphology.csv") %>%
+  #mutate(ParTrt = ifelse(startsWith(as.character(CrossID), "E"), "Exposed", "Control")) %>%
+  #separate(CrossID, c("FemaleID", "MaleID"), sep = "_", remove = FALSE)
 ```
 
 # Tests on length
 ```{r}
-length1 = lmer(log(MaxFeretDiamum) ~ JarTrt * ParTrt + (1|CrossID:JarID) + (1|FemaleID), data = larvae, 
+length1 = lmer(log(MaxFeretDiamum) ~ JarTrt * CrossType + (1|CrossID:JarID) + (1|FemaleID), data = LarvaeMorph, 
                control = lmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 20000)))
 
 prof_obj <- profile(length1)
@@ -93,4 +139,26 @@ anova(mass2,mass3) #No larval treatment effect
 mass4 = lm(log(F1WtPerLarvae) ~ JarTrt + 1, data = larvae_simple)
 anova(mass2, mass4) # No significant adult effect
 
+```
+
+# Tests on area from Elise 2/28/20
+```{r}
+# trying to come up with which model is best to use to analyze the data
+
+area1 = lmer(sqrt(SurfaceAreaum2) ~ JarTrt * CrossType + (1|MaleID) +  (1|FemaleID) + (1|CrossID) +(1|JarSeatable), data = LarvaeMorph)
+
+# Check model assumptions 
+qqnorm(resid(area1))
+qqline(resid(area1))
+
+area2 = lmer(sqrt(SurfaceAreaum2) ~ JarTrt + CrossType +  (1|MaleID) +  (1|FemaleID) + (1|CrossID) +(1|JarSeatable) , data = LarvaeMorph)
+anova(area1,area2) # Significant interaction so we go with more complicated model
+
+area3 = lmer(sqrt(SurfaceAreaum2) ~ 1 * CrossType +(1|MaleID) +  (1|FemaleID) + (1|CrossID) +(1|JarSeatable), data = LarvaeMorph)
+anova(area1,area3) #Significant jar effect (larval treatment)
+
+area4 = lmer(sqrt(SurfaceAreaum2) ~ JarTrt * 1 + (1|MaleID) +  (1|FemaleID) + (1|CrossID) +(1|JarSeatable), data = LarvaeMorph)
+anova(area1, area4) # significant adult effect
+
+summary(area1)
 ```
