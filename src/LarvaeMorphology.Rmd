@@ -1,9 +1,8 @@
 ---
-title: "LarvaeDataVisualization"
+title: "Larvae Morphology & Biomineralization"
 output: html_document
 ---
 
-setwd("~/Repos/LarvaeTransGen2018")
 
 # Load libraries
 ```{r include=FALSE}
@@ -12,66 +11,574 @@ library(plyr)
 library(sciplot)
 library(reshape2)
 library(lme4)
+library(lmerTest)
 library(blme)
 library(grid)
 library(data.table)
 library(gridExtra)
 library(lattice)
-library(optimx)
+#library(optimx)
 library(car)
+library(Hmisc)
+library(corrplot)
+
+
+#make a skewness function
+skewness<- function (x){
+  result<-sum(((x-mean(x))/sd(x))^3)
+  return(result)
+}
 ```
 
 # Load data
 Name the data you export from FileMaker Pro by their exact table names and save them as CSVs, e.g. Larvae_Morphology.csv
 ```{r}
-
-#setwd("~/GitHub/LarvaeTransGen2018/data") #Elise's working directory
-Larvae_Morphology <- read.csv("../data/Larvae_Morphology.csv")
-Barcode_Jar <- read.csv("../data/Barcode_Jar.csv")
-Block_ID <- read.csv("../data/Block_ID.csv")
-Cross<- read.csv("../data/Cross.csv")
-Fert_QG<- read.csv("../data/Fert_QG.csv")
-Header_WC<- read.csv("../data/Header_WC.csv")
-Larvae_Calcification <- read.csv("../data/Larvae_Calcification.csv")
-Larvae_Counts <- read.csv("../data/Larvae_Counts.csv")
-Larvae_WC <- read.csv("../data/Larvae_WC.csv")
-Parent_ID <- read.csv("../data/Parent_ID.csv")
-Larvae_Cilia<- read.csv("../data/Larvae_Cilia.csv")
-
-# join data from tables so we can analyze morphology data. 
-# LarvaeMorph dataset includes multiple entries per jar
-
-LarvaeMorph<- merge(x=Larvae_Morphology, y=Barcode_Jar, by="JarID", all.x=TRUE)
-LarvaeMorph<- merge(x=LarvaeMorph, y=Larvae_Calcification, by="JarID", all.x=TRUE)
-#use gather function in tidyr to make the Fert_QG Jar ID columns in long form vs. wide form
-Fert_QG_long <- Fert_QG %>% tidyr::gather(Key, JarID, JarID1:JarID6)
-#use the gathered data frame to merge with LarvaeMorph
-LarvaeMorph <- merge(x = LarvaeMorph, y = Fert_QG_long, by = c("JarID", "CrossID"), all.x=TRUE)
-LarvaeMorph<- merge(x=LarvaeMorph, y=Cross, by="CrossID", all.x=TRUE)
-LarvaeMorph<- merge(x=LarvaeMorph, y=Larvae_Cilia, by="JarID", all.x=TRUE)
-
-LarvaeMorph$JarSeatable<- as.factor(LarvaeMorph$JarSeatable) #make seatable a factor
-#use LarvaeMorph data frame for figures on larvae morphology
-
-#create dataset only one entry per JarID and the mean of morphological data; use this new dataset for calcification data
-
-meanMorph<- aggregate(cbind(Perimeterum, SurfaceAreaum2, MaxFeretDiamum)~JarID, data=Larvae_Morphology, mean)#get mean values for morphology
-seMorph<- aggregate(cbind(Perimeterum, SurfaceAreaum2, MaxFeretDiamum)~JarID, data=Larvae_Morphology, se)#get se values for morphology
-names(seMorph)<- c("JarID", "PerimeterumSE", "SurfaceAreaum2SE", "MaxFeretDiamumSE")
-LarvaeCalc<-merge(x=Larvae_Calcification, y=meanMorph, by="JarID", all.x=TRUE)
-LarvaeCalc<- merge(x=LarvaeCalc, y=seMorph, by="JarID", all.x=TRUE)
-LarvaeCalc<- merge(x=LarvaeCalc, y=Barcode_Jar, by="JarID", all.x=TRUE)
-#use the gathered data frame from above to merge with LarvaeCalc
-LarvaeCalc <- merge(x = LarvaeCalc, y = Fert_QG_long, by = c("JarID", "CrossID"), all.x=TRUE)
-LarvaeCalc<- merge(x=LarvaeCalc, y=Cross, by="CrossID", all.x=TRUE)
-LarvaeCalc<- merge(x=LarvaeCalc, y=Larvae_Cilia, by="JarID", all.x=TRUE)
-LarvaeCalc<- subset(LarvaeCalc, F1TotalLarvaeWtg >=0) # remove all jars with total larvae weight less than zero
-LarvaeCalc<- subset(LarvaeCalc, F1LarvaeCount>=100) # remove all jars with larvae counts that are less than 100
-#use LarvaeCalc dataframe to make figures on larvae calcification
+#setwd("~/Repos/LarvaeTransGen2018")
+setwd("~/R/GitHub/LarvaeTransGen2018/data") #Elise's working directory
+#upload all of the data tables for the larvae experiment
+Larvae_Morphology <- read.csv("../data/Larvae_Morphology.csv") #contains data from CellProfiler from the larvae outlines
+Barcode_Jar <- read.csv("../data/Barcode_Jar.csv") #contains data on CrossID, seatable, and whether or not larvae were present
+Block_ID <- read.csv("../data/Block_ID.csv") #contains data on the block
+Cross<- read.csv("../data/Cross.csv") #contains data on the female and male IDs for the cross and whether the cross was for QG or Meth
+Fert_QG<- read.csv("../data/Fert_QG.csv") #contains data on fertilization counts, the JarIDs for the crosses
+Header_WC<- read.csv("../data/Header_WC.csv") #contains data on the header tanks used to fill the jars
+Larvae_Calcification <- read.csv("../data/Larvae_Calcification.csv") #contains data on filter weights and counts
+Larvae_Counts <- read.csv("../data/Larvae_Counts.csv") #contains data on sedgewick rafter larvae counts
+Larvae_WC <- read.csv("../data/Larvae_WC.csv") #contains data on larvae jar water chemistry
+Parent_ID <- read.csv("../data/Parent_ID.csv") #contains data on the adults at the time of shucking. Includes Parent ID assignments
+Larvae_Cilia<- read.csv("../data/Larvae_Cilia.csv") #contains data on cilia extrusion of the larvae photographed for morphology
+Egg_Morphology<- read.csv("../data/Egg_Morphology.csv") #contains data on egg sizes from CellProfiler
+Adult_Sample<- read.csv("../data/Adult_Sample.csv") #contains data on adult oysters at the time of collection
+Storage_pH_Checks<- read.csv("../data/Storage_pH_Checks.csv") #contains data on the storage solution pH
+WC_Standard<- read.csv("../data/WC_Standard.csv") #contains data on the standars used for water chemistry
 ```
 
-Subset data by larvae treatment and parent treatment
+
+Join the data into dataframes for analysis.
 ```{r}
+# join data into dataframes for analysis and visualization
+
+#First dataframe will be for examining eggs and adults; one value for each adult
+ParentInfo<- merge(x=Parent_ID, y=Adult_Sample, by="AdultID", all.x=TRUE, all.y=TRUE)
+#get average egg size for each female
+MedianEgg<- ddply(Egg_Morphology, .(EggFemaleID), numcolwise(median, na.rm=T)) #get median egg size
+FemAdults<- merge(x=ParentInfo, y= MedianEgg, by.x="ParentBlockID", by.y= "EggFemaleID", all.y=TRUE)
+#will have to add tank water chemistry data to this dataframe when it is available
+#make ParentTrt a factor
+FemAdults$ParentTrt<- as.factor(FemAdults$ParentTrt)
+
+#Second dataframe will be for examining egg morphology for all eggs traced; multiple values for each adult
+Eggs<- merge(x=Egg_Morphology, y=ParentInfo, by.x="EggFemaleID", by.y="ParentBlockID", all.x=TRUE)
+#will have to add tank water chemistry data to this dataframe when it is available
+#make ParentTrt a factor
+Eggs$ParentTrt<- as.factor(Eggs$ParentTrt)
+
+#Third dataframe will be for one line per traced larva, includes all the data for that jar, including average egg size for that jar
+#Eggs dataframe has all of the info that we need for the 
+Larvae<-merge(x=Larvae_Morphology, y=Barcode_Jar, by="JarID", all.x=TRUE)
+#use gather function in tidyr to make the Fert_QG Jar ID columns in long form vs. wide form
+Fert_QG_long <- Fert_QG %>% tidyr::gather(Key, JarID, JarID1:JarID6)
+#use the gathered data frame to merge with Larvae
+Larvae<-merge(x=Larvae, y=Fert_QG_long, by.x= c("JarID", "CrossID"), by.y=c("JarID", "CrossID"), all.x=TRUE) #did the join by two columns so CrossID column wasn't duplicated
+Larvae<- merge(x=Larvae, y=Cross, by="CrossID", all.x=TRUE)
+Larvae<- merge(x=Larvae, y=FemAdults, by.x= "FemaleID", by.y="ParentBlockID", all.x=TRUE)
+Larvae<- merge(x=Larvae, y=Larvae_WC, by= "JarID", all.x=TRUE)
+Larvae$JarSeatable<- as.factor(Larvae$JarSeatable)#make seatable a factor
+
+#Fourth dataframe will be one line per Jar, includes all data for the jar, including the average larvae size per jar and cilia
+LarvByJar<-merge(x=Larvae_Calcification, y=Larvae_Cilia, by="JarID", all.x=TRUE, all.y=TRUE)
+LarvByJar<- merge(x=LarvByJar, y=Barcode_Jar, by="JarID", all.x=TRUE)
+LarvByJar<- merge(x=LarvByJar, y=Fert_QG_long, by.x=c("JarID", "CrossID"), by.y=c("JarID","CrossID"), all.x=TRUE)
+LarvByJar<- merge(x=LarvByJar, y=Cross, by="CrossID", all.x=TRUE)
+LarvByJar<- merge(x=LarvByJar, y=FemAdults, by.x="FemaleID", by.y="ParentBlockID", all.x=TRUE)
+#get the means for larvae morphology and add to LarvByJar
+MeanLarvMorph<- ddply(Larvae_Morphology, .(JarID), numcolwise(mean, na.rm=T))
+SELarvMorph<- ddply(Larvae_Morphology, .(JarID), numcolwise(se, na.rm=T)) #get standard error of larvae size
+MeanLarvMorph<- full_join(MeanLarvMorph,SELarvMorph, by=c("JarID", "JarID"),suffix=c("","SE")) #join the mean and se larvae data
+LarvByJar<- merge(x=LarvByJar, y=MeanLarvMorph, by="JarID", all.x=TRUE)
+LarvByJar<- merge(x=LarvByJar, y=Larvae_WC, by="JarID", all.x=TRUE)
+```
+
+Visualize the data for eggs to start
+```{r}
+ggplot(Eggs, aes(x=EggDiameteruM, color=ParentTrt))+
+  geom_histogram(alpha=0.5, position="identity") +
+  facet_grid(~BlockID)
+#we can see that the egg data are slightly left skewed 
+eggmeans<- aggregate(EggDiameteruM~ParentTrt, data=Eggs, FUN=mean) #400 = 61.7; 2800= 62.4
+eggmedians<- aggregate(EggDiameteruM~ParentTrt, data=Eggs, FUN=median)#400 = 62.4; 2800= 62.5
+#is it worth using the median for egg size instead of the mean? they look very similar; I am going to use the median to start because skewness seems large
+
+```
+
+Visualize the data for larvae morphology to start
+```{r}
+ggplot(Larvae, aes(x=LarvaeDiamum, color=JarTrt))+
+  geom_histogram(alpha=0.5, position="identity") +
+  facet_grid(ParentTrt~BlockID.x)
+#we can see that the larvae data are relatively normally distributed from B1, but not B2
+larvmeans<- aggregate(LarvaeDiamum~ParentTrt*JarTrt, data=Larvae, FUN=mean)#CP/CL : 75.24389; EP/CL: 75.46671; CP/EL: 65.47536; EP/EL: 66.48770
+larvmedians<- aggregate(LarvaeDiamum~ParentTrt*JarTrt, data=Larvae, FUN=median)#CP/CL : 75.29579; EP/CL: 75.52886; CP/EL: 65.27141; EP/EL: 66.86843
+#I think we can use the mean for these data 
+
+```
+
+Look at relationship between adult size and egg sizes in the Eggs dataframe
+```{r}
+#first look at distribution of adults among treatments
+ggplot(FemAdults, aes(x=ParentTrt, y=AdultLength, color=ParentTrt))+
+  geom_boxplot() +
+  facet_grid(~BlockID)
+#oysters look like they were well distributed in the two treatments
+
+#now look at the relationship between egg size and adult size
+ggplot(FemAdults,
+       aes(fill = ParentTrt, y = EggDiameteruM, x = AdultLength)) +
+  geom_point(aes( colour=ParentTrt)) +
+  ggtitle("Egg diameter by adult length")+ 
+  ylab("Egg Diameter (um)")+
+  facet_grid(~BlockID)+
+  theme_classic()
+
+#use linear mixed model to look at potential relationships
+eggdiam1<- lmer(EggDiameteruM~AdultLength*ParentTrt*BlockID + (1|TrtTankID) + (1|AccTankID) + (1|EggFemaleID), data=Eggs, REML=FALSE)
+
+#check assumptions of the LMER
+#Assumption 1: Linearity
+plot(resid(eggdiam1)~Eggs$AdultLength)
+plot(resid(eggdiam1)~Eggs$ParentTrt)
+plot(resid(eggdiam1)~Eggs$BlockID)
+plot(resid(eggdiam1)~Eggs$TrtTankID)
+plot(resid(eggdiam1)~Eggs$AccTankID)
+plot(resid(eggdiam1)~Eggs$EggFemaleID)
+#does not appear to violate the assumption of linearity
+
+#Assumption 2: Equal Variance
+plot(eggdiam1)
+#there does not appear to be a pattern, so meets assumption
+
+#Assumption 3: Residuals are normally distributed
+qqnorm(resid(eggdiam1))
+qqline(resid(eggdiam1))
+#data do not appear to meet the assumption of normality
+hist(residuals(eggdiam1))
+shapiro.test(residuals(eggdiam1))#residuals do not meet the assumption of normality
+
+#try square transformation since data were left skewed 
+Eggs$EggDiameteruM2<- (Eggs$EggDiameteruM)^2
+hist(Eggs$EggDiameteruM2)#these data look much better
+#use the transformed data for the model
+teggdiam1<- lmer(EggDiameteruM2~AdultLength*ParentTrt*BlockID + (1|TrtTankID) + (1|AccTankID) + (1|EggFemaleID), data=Eggs, REML=FALSE)
+#check the assumption of normality
+shapiro.test(residuals(teggdiam1))#residuals do not meet the assumption of normality
+#looks like the square transformation did not work, but it did reduce the skewness
+skewness(Eggs$EggDiameteruM2)
+
+#use the transformed data for the model
+cubeeggdiam1<- lmer((EggDiameteruM^(1/3))~AdultLength*ParentTrt*BlockID + (1|TrtTankID) + (1|AccTankID) + (1|EggFemaleID), data=Eggs, REML=FALSE)
+#check assumption of normality
+shapiro.test(residuals(cubeeggdiam1))#residuals do not meet the assumption of normality
+#looks like the square transformation did not work, but it did reduce the skewness
+skewness(Eggs$EggDiameteruM3rt) #cube root makes it much worse than the square transformation
+
+#try log transformation
+logeggdiam1<- lmer(log(EggDiameteruM)~AdultLength*ParentTrt*BlockID + (1|TrtTankID) + (1|AccTankID) + (1|EggFemaleID), data=Eggs, REML=FALSE)
+#check assumption of normality
+shapiro.test(residuals(logeggdiam1))#residuals do not meet the assumption of normality
+#looks like the log transformation did not work
+skewness(log(Eggs$EggDiameteruM)) #log transformation makes it much worse than the square transformation
+
+#I don't know what the best next step is for these data; Camila had decided on an egg size cut off, so should I do the same? 
+
+#look at the egg areas, not just the egg diameters
+#use linear mixed model to look at potential relationships
+eggarea1<- lmer(EggAreauM2~ParentTrt*BlockID + (1|TrtTankID) + (1|AccTankID) + (1|EggFemaleID), data=Eggs, REML=FALSE)
+
+#check assumptions of the LMER
+#Assumption 1: Linearity
+plot(resid(eggarea1)~Eggs$AdultLength)
+plot(resid(eggarea1)~Eggs$ParentTrt)
+plot(resid(eggarea1)~Eggs$BlockID)
+plot(resid(eggarea1)~Eggs$TrtTankID)
+plot(resid(eggarea1)~Eggs$AccTankID)
+plot(resid(eggarea1)~Eggs$EggFemaleID)
+#does not appear to violate the assumption of linearity
+
+#Assumption 2: Equal Variance
+plot(eggarea1)
+#there does not appear to be a pattern, so meets assumption
+
+#Assumption 3: Residuals are normally distributed
+qqnorm(resid(eggarea1))
+qqline(resid(eggarea1))
+#data do not appear to meet the assumption of normality
+hist(residuals(eggarea1))
+shapiro.test(residuals(eggarea1))#residuals do not meet the assumption of normality
+
+#try a square transformation
+eggarea2<- lmer((EggAreauM2^2)~AdultLength*ParentTrt*BlockID + (1|TrtTankID) + (1|AccTankID) + (1|EggFemaleID), data=Eggs, REML=FALSE)
+
+shapiro.test(residuals(eggarea2))#residuals still do not meet assumption of normality
+
+#I don't know what to do with these data it seems it doesn't matter if you use diameter or area.
+```
+
+Look at relationship between larvae size and egg size
+```{r}
+ggplot(Larvae,
+       aes(fill = ParentTrt, y = LarvaeDiamum, x = EggDiameteruM)) +
+  geom_point(aes( shape=JarTrt, colour=ParentTrt)) +
+  ggtitle("Larvae diameter by egg diameter")+ 
+  ylab("Larvae Diameter (um)")+
+  facet_grid(~JarTrt)+
+  theme_classic()
+
+#start with a simple linear model 
+lm1<- lm(LarvaeDiamum~ParentTrt*JarTrt+EggDiameteruM, data=Larvae)
+par(mfcol=c(2,2))
+plot(lm1) #does not appear to meet assumptions of normality, try transforming both x and y
+par(mfcol=c(1,1))
+
+#plot the residuals of lm1 vs. Female and Male ID
+plot(resid(lm1)~Larvae$FemaleID)
+plot(resid(lm1)~Larvae$MaleID)
+#does not seem to be a problem
+
+#look for autocorrelation
+matLarvae<- data.matrix(Larvae,rownames.force=NA)#make a matrix from the dataframe
+#now create a correlation matrix 
+lm1corr<- cor(matLarvae, method=c("pearson"))
+correlation1<- rcorr(matLarvae, type= c("pearson"))
+#correlation1 #look at the correlation matrix that was produced
+
+#create a function to format the correlation matrix to a table with columns containing: row names; column names; correlation coefficients; and p-values of the correlations
+flattenCorrMatrix<- function(cormat, pmat){
+  ut<- upper.tri(cormat)
+  data.frame(
+    row=rownames(cormat) [row(cormat)[ut]],
+    column=rownames(cormat)[col(cormat)[ut]],
+    cor=(cormat)[ut],
+    p=pmat[ut]
+  )
+}
+
+corrlm1<- flattenCorrMatrix(correlation1$r,correlation1$P)
+#try to visualize the correlation matrix
+corrlm1.coeff<- correlation1$r
+corrlm1.p<- correlation1$P
+#corrplot(lm1corr, type="upper",tl.col="black", tl.srt=45, mar=c(.01,.01,.01,.01)) #can't really see what is going on because there are so many points
+#write a csv of the matrix and remove all of the stuff that I don't care about for correlation; there must be a better way to do this in r, but I have been struggling for a while with this problem. 
+#write.csv(lm1corr, "~/R/GitHub/LarvaeTransGen2018/data//corrlm1.csv")
+#lm1corr<- read.csv("corrlm1.csv")
+#matlm1corr<- as.matrix(lm1corr)
+#now plot the correlation
+#corrplot(matlm1corr, is.corr=FALSE)# this is not working. Katie, do you have any ideas? 
+
+```
+
+Move on to next linear model to at least get the code down
+```{r}
+lm2<-lmer(LarvaeDiamum~ParentTrt*JarTrt + (1|FemaleID)+(1|MaleID), data=Larvae)
+#check assumptions for lm2
+#Assumption 1: linearity: 
+plot(resid(lm2)~Larvae$ParentTrt)
+plot(resid(lm2)~Larvae$JarTrt) 
+#seem to meet assumption of linearity
+
+#Assumption 2: Homoscedasticity
+plot(lm2)# seems to meet assumption of homoscedasticity but check with Levene's test: 
+leveneTest(resid(lm2)~Larvae$ParentTrt*Larvae$JarTrt, center=mean) #p<0.05 so does not meet assumption of homoscedasticity
+
+#Assumption 3: residuals are normally distributed
+qqnorm(resid(lm2))
+qqline(resid(lm2)) #does not meet assumption of normality
+
+#will need to try to transform the data. I have been using the Larvae dataframe, not the LarbyJar dataframe. Is that the right call? 
+
+lm2t<-lmer(log(LarvaeDiamum)~ParentTrt*JarTrt + (1|FemaleID)+(1|MaleID), data=Larvae)
+#check assumptions for lm2
+#Assumption 1: linearity: 
+plot(resid(lm2t)~Larvae$ParentTrt)
+plot(resid(lm2t)~Larvae$JarTrt) 
+#seem to meet assumption of linearity
+
+#Assumption 2: Homoscedasticity
+plot(lm2t)# seems to meet assumption of homoscedasticity but check with Levene's test: 
+leveneTest(resid(lm2t)~Larvae$ParentTrt*Larvae$JarTrt, center=mean) #p<0.05 still does not meet assumption of homoscedasticity
+
+#Assumption 3: residuals are normally distributed
+qqnorm(resid(lm2t))
+qqline(resid(lm2t)) #still does not meet assumption of normality
+
+#currently does not meet assumptions, but still write the code for looking at residuals for lm2 
+plot(resid(lm2t)~Larvae$CrossID) # I don't see anything that would suggest we should account for this. 
+abline(0,0)
+plot(resid(lm2t)~Larvae$JarID) #some of the jars have unusually high or low resids, so will have to account for this. 
+abline(0,0)
+plot(resid(lm2t)~Larvae$TimeFilter) #we may want to account for this
+abline(0,0)
+plot(resid(lm2t)~Larvae$BlockID.x) #does not seem to need to be accounted for
+
+#make a new model that accounts for JarID and TimeFilter then check assumptions again
+lm3 <- lmer(LarvaeDiamum~ParentTrt*JarTrt + (1|FemaleID)+(1|MaleID) + (1|JarID) + (1|TimeFilter), data=Larvae)
+
+#check assumptions for lm3
+#Assumption 1: linearity: 
+plot(resid(lm3)~Larvae$ParentTrt)
+plot(resid(lm3)~Larvae$JarTrt) 
+#seem to meet assumption of linearity
+
+#Assumption 2: Homoscedasticity
+plot(lm3)# seems to meet assumption of homoscedasticity but check with Levene's test: 
+leveneTest(resid(lm3)~Larvae$ParentTrt*Larvae$JarTrt, center=mean) #p<0.05 still does not meet assumption of homoscedasticity
+
+#Assumption 3: residuals are normally distributed
+qqnorm(resid(lm3))
+qqline(resid(lm3)) #still does not meet assumption of normality
+
+#try transforming the data again
+lm3t <- lmer(log(LarvaeDiamum)~ParentTrt*JarTrt + (1|FemaleID)+(1|MaleID) + (1|JarID) + (1|TimeFilter), data=Larvae)
+
+#check assumptions for lm3
+#Assumption 1: linearity: 
+plot(resid(lm3t)~Larvae$ParentTrt)
+plot(resid(lm3t)~Larvae$JarTrt) 
+#seem to meet assumption of linearity
+
+#Assumption 2: Homoscedasticity
+plot(lm3t)# seems to meet assumption of homoscedasticity but check with Levene's test: 
+leveneTest(resid(lm3t)~Larvae$ParentTrt*Larvae$JarTrt, center=mean) #p<0.05 still does not meet assumption of homoscedasticity
+
+#Assumption 3: residuals are normally distributed
+qqnorm(resid(lm3t))
+qqline(resid(lm3t)) #still doesn't meet assumption of normality
+
+```
+
+Retry the above models but use the LarvByJar dataset
+```{r}
+ggplot(LarvByJar,
+       aes(fill = ParentTrt, y = LarvaeDiamum, x = EggDiameteruM)) +
+  geom_point(aes( shape=JarTrt, colour=ParentTrt)) +
+  ggtitle("Larvae diameter by egg diameter")+ 
+  ylab("Larvae Diameter (um)")+
+  facet_grid(~JarTrt)+
+  theme_classic()
+
+#start with a simple linear model 
+jar1<- lm(LarvaeDiamum~ParentTrt*JarTrt+EggDiameteruM, data=LarvByJar, na.action="na.exclude")
+par(mfcol=c(2,2))
+plot(jar1) #does not appear to meet assumptions of normality, try transforming
+par(mfcol=c(1,1))
+
+#plot the residuals of lm1 vs. Female and Male ID
+plot(resid(jar1)~LarvByJar$FemaleID)
+abline(0,0)
+plot(resid(jar1)~LarvByJar$MaleID)
+abline(0,0)
+#we will need to account for female and male ID
+
+jar2<-lmer(LarvaeDiamum~ParentTrt*JarTrt + (1|FemaleID)+(1|MaleID), data=LarvByJar, na.action = "na.exclude")
+#check assumptions for lm2
+#Assumption 1: linearity: 
+plot(resid(jar2)~LarvByJar$ParentTrt)
+plot(resid(jar2)~LarvByJar$JarTrt) 
+#seem to meet assumption of linearity
+
+#Assumption 2: Homoscedasticity
+plot(jar2)# seems to meet assumption of homoscedasticity but check with Levene's test: 
+leveneTest(resid(jar2)~LarvByJar$ParentTrt*LarvByJar$JarTrt, center=mean) #p<0.05 so does not meet assumption of homoscedasticity
+
+#Assumption 3: residuals are normally distributed
+qqnorm(resid(jar2))
+qqline(resid(jar2)) #does not meet assumption of normality
+
+#will need to try to transform the data. I have been using the Larvae dataframe, not the LarbyJar dataframe. Is that the right call? 
+
+jar2t<-lmer(log(LarvaeDiamum)~ParentTrt*JarTrt + (1|FemaleID)+(1|MaleID), data=LarvByJar, na.action= "na.exclude")
+#check assumptions for lm2
+#Assumption 1: linearity: 
+plot(resid(jar2t)~LarvByJar$ParentTrt)
+plot(resid(jar2t)~LarvByJar$JarTrt) 
+#seem to meet assumption of linearity
+
+#Assumption 2: Homoscedasticity
+plot(jar2t)# seems to meet assumption of homoscedasticity but check with Levene's test: 
+leveneTest(resid(jar2t)~LarvByJar$ParentTrt*LarvByJar$JarTrt, center=mean) #p<0.05 still does not meet assumption of homoscedasticity
+
+#Assumption 3: residuals are normally distributed
+qqnorm(resid(jar2t))
+qqline(resid(jar2t)) #still does not meet assumption of normality
+
+#currently does not meet assumptions, but still write the code for looking at residuals for jar2 
+plot(resid(jar2t)~LarvByJar$CrossID) # It seems that we will want to account for this. 
+abline(0,0)
+plot(resid(jar2t)~LarvByJar$TimeFilter) #we will want to account for this
+abline(0,0)
+plot(resid(jar2t)~LarvByJar$BlockID.x)#I think we will need to account for this
+
+#make a new model that accounts for CrossID, TimeFilter, and block then check assumptions again
+jar3 <- lmer(LarvaeDiamum~ParentTrt*JarTrt + (1|FemaleID)+(1|MaleID) + (1|CrossID) + (1|TimeFilter) +(1|BlockID.x), data=LarvByJar, na.action="na.exclude")
+
+#check assumptions for lm3
+#Assumption 1: linearity: 
+plot(resid(jar3)~LarvByJar$ParentTrt)
+plot(resid(jar3)~LarvByJar$JarTrt) 
+#seem to meet assumption of linearity
+
+#Assumption 2: Homoscedasticity
+plot(jar3)# seems to meet assumption of homoscedasticity but check with Levene's test: 
+leveneTest(resid(jar3)~LarvByJar$ParentTrt*LarvByJar$JarTrt, center=mean) #p<0.05 does not meet assumption of homoscedasticity
+
+#Assumption 3: residuals are normally distributed
+qqnorm(resid(jar3))
+qqline(resid(jar3)) #does not meet assumption of normality
+
+```
+
+
+Subset the data to only have Block 1 to see if that might resolve some of the abnormality problems
+```{r}
+B1<- subset(Larvae, BlockID.x =="B1")
+ggplot(B1,
+       aes(fill = ParentTrt, y = LarvaeDiamum, x = EggDiameteruM)) +
+  geom_point(aes( shape=JarTrt, colour=ParentTrt)) +
+  ggtitle("Larvae diameter by egg diameter")+ 
+  ylab("Larvae Diameter (um)")+
+  facet_grid(~JarTrt)+
+  theme_classic()
+
+#start with a simple linear model 
+larv1<- lm(LarvaeDiamum~ParentTrt*JarTrt+EggDiameteruM, data=B1)
+par(mfcol=c(2,2))
+plot(larv1) #does not seem to be normally distributed
+par(mfcol=c(1,1))
+
+#plot the residuals of lm1 vs. Female and Male ID
+plot(resid(larv1)~B1$FemaleID)
+plot(resid(larv1)~B1$MaleID)
+#does not seem to be a problem
+
+#look for autocorrelation
+matB1<- data.matrix(B1,rownames.force=NA)#make a matrix from the dataframe
+#now create a correlation matrix 
+larv1corr<- cor(matB1, method=c("pearson"))
+corrB1<- rcorr(matB1, type= c("pearson"))
+#corrB1 #look at the correlation matrix that was produced
+
+
+corrB1<- flattenCorrMatrix(corrB1$r,corrB1$P)
+#try to visualize the correlation matrix
+corrB1.coeff<- corrB1$r
+corrB1.p<- corrB1$P
+
+```
+
+Move on to next linear model to at least get the code down
+```{r}
+B1_2<-lmer(LarvaeDiamum~ParentTrt*JarTrt + (1|FemaleID)+(1|MaleID), data=B1)
+#check assumptions for B1_2
+#Assumption 1: linearity: 
+plot(resid(B1_2)~B1$ParentTrt)
+plot(resid(B1_2)~B1$JarTrt) 
+#seem to meet assumption of linearity
+
+#Assumption 2: Homoscedasticity
+plot(B1_2)# seems to meet assumption of homoscedasticity but check with Levene's test: 
+leveneTest(resid(B1_2)~B1$ParentTrt*B1$JarTrt, center=mean) #p<0.05 so does not meet assumption of homoscedasticity
+
+#Assumption 3: residuals are normally distributed
+qqnorm(resid(B1_2))
+qqline(resid(B1_2)) #does not meet assumption of normality
+
+#will need to try to transform the data.
+
+B1_2t<-lmer(log(LarvaeDiamum)~ParentTrt*JarTrt + (1|FemaleID)+(1|MaleID), data=B1)
+#check assumptions for B1_2t
+#Assumption 1: linearity: 
+plot(resid(B1_2t)~B1$ParentTrt)
+plot(resid(B1_2t)~B1$JarTrt) 
+#seem to meet assumption of linearity
+
+#Assumption 2: Homoscedasticity
+plot(B1_2t)# seems to meet assumption of homoscedasticity but check with Levene's test: 
+leveneTest(resid(B1_2t)~B1$ParentTrt*B1$JarTrt, center=mean) #p<0.05 still does not meet assumption of homoscedasticity
+
+#Assumption 3: residuals are normally distributed
+qqnorm(resid(B1_2t))
+qqline(resid(B1_2t)) #looks better maybe
+
+#code for looking at residuals for B1_2t 
+plot(resid(B1_2t)~B1$CrossID) # I don't see anything that would suggest we should account for this. 
+abline(0,0)
+plot(resid(B1_2t)~B1$JarID)
+abline(0,0)
+plot(resid(B1_2t)~B1$TimeFilter) #we may want to account for this
+abline(0,0)
+plot(resid(B1_2t)~B1$BlockID.x) #does not seem to need to be accounted for
+
+#make a new model that accounts for JarID and TimeFilter then check assumptions again
+B1_3 <- lmer(LarvaeDiamum~ParentTrt*JarTrt + (1|FemaleID)+(1|MaleID) + (1|JarID) + (1|TimeFilter), data=B1)
+
+#check assumptions for lm3
+#Assumption 1: linearity: 
+plot(resid(B1_3)~B1$ParentTrt)
+plot(resid(B1_3)~B1$JarTrt) 
+#seem to meet assumption of linearity
+
+#Assumption 2: Homoscedasticity
+plot(B1_3)# seems to meet assumption of homoscedasticity but check with Levene's test: 
+leveneTest(resid(B1_3)~B1$ParentTrt*B1$JarTrt, center=mean) #p<0.05 does not meet assumption of homoscedasticity
+
+#Assumption 3: residuals are normally distributed
+qqnorm(resid(B1_3))
+qqline(resid(B1_3)) #still does not meet assumption of normality
+
+#try transforming the data again
+B1_3t <- lmer(log(LarvaeDiamum)~ParentTrt*JarTrt + (1|FemaleID)+(1|MaleID) + (1|JarID) + (1|TimeFilter), data=B1)
+
+#check assumptions for lm3
+#Assumption 1: linearity: 
+plot(resid(B1_3t)~B1$ParentTrt)
+plot(resid(B1_3t)~B1$JarTrt) 
+#seem to meet assumption of linearity
+
+#Assumption 2: Homoscedasticity
+plot(B1_3t)# seems to meet assumption of homoscedasticity but check with Levene's test: 
+leveneTest(resid(B1_3t)~B1$ParentTrt*B1$JarTrt, center=mean) #p<0.05 still does not meet assumption of homoscedasticity
+
+#Assumption 3: residuals are normally distributed
+qqnorm(resid(B1_3t))
+qqline(resid(B1_3t)) #still doesn't meet assumption of normality
+
+```
+
+I want to try to do the stats with the pH values from the jars. I don't have the pH values for the adult tank water chem yet
+
+```{r}
+B1tlm <- lmer(log(LarvaeDiamum)~ParentTrt*JarpH + (1|FemaleID)+(1|MaleID) + (1|JarID) + (1|TimeFilter), data=B1)
+
+#check assumptions for lm3
+#Assumption 1: linearity: 
+plot(resid(B1tlm)~B1$ParentTrt)
+plot(resid(B1tlm)~B1$JarTrt) 
+#seem to meet assumption of linearity
+
+#Assumption 2: Homoscedasticity
+plot(B1tlm)# seems to meet assumption of homoscedasticity but check with Levene's test: 
+leveneTest(resid(B1tlm)~B1$ParentTrt*B1$JarTrt, center=mean) #p<0.05 still does not meet assumption of homoscedasticity
+
+#Assumption 3: residuals are normally distributed
+qqnorm(resid(B1tlm))
+qqline(resid(B1tlm)) #doesn't meet assumption of normality
+```
+
+
+
+BELOW CODE HASN'T BEEN CHECKED IN MARCH
+
+Subset data by larvae treatment and parent treatment
+
 #subset the data into exposed and control parent treatments
 exppar <- LarvaeMorph %>%
   filter(CrossType == "Exposed")
@@ -83,7 +590,7 @@ explar <- LarvaeMorph %>%
 conlar <- LarvaeMorph %>%
   filter(JarTrt == "Control")
 
-<<<<<<< HEAD
+
 #subset the data into exposed and control parent treatments for calcification data
 expparcalc <- LarvaeCalc %>%
   filter(CrossType == "Exposed")
@@ -95,10 +602,28 @@ explarcalc <- LarvaeCalc %>%
 conlarcalc <- LarvaeCalc %>%
   filter(JarTrt == "Control")
 
-```
+
+
+
+Start by looking at the relationship between egg size and larvae size
+
+
+ggplot(data=LarvaeCalc, aes(x=EggAreauM2, y=SurfaceAreaum2, fill=JarTrt))+
+  geom_point(aes(shape=CrossType, colour=JarTrt))+
+  theme_classic()
+
+egglarvsize<- lm(SurfaceAreaum2~EggAreauM2*JarTrt*CrossType, data=LarvaeCalc)
+plot(egglarvsize) #looks like it meets assumptions
+summary(egglarvsize) #egg area is not significant, but JarTrt is p=0.0389
+
+#need to explore this further, because if we look at length of the larvae then egg area is not signficant, but if we look at oyster surface area, then egg area is significant. 
+
+
+
+
 
 Look at data that might be count or weight outliers 
-```{r}
+
 plot(F1LarvaeCount~PercentFert, data=LarvaeCalc, col=JarTrt)
 ggplot(data=LarvaeCalc, aes(x=mLJarActual, y=F1LarvaeCount))+
   geom_point(aes(shape=JarTrt, colour=PercentFert))
@@ -108,10 +633,9 @@ plot(F1WtPerLarvae~F1LarvaeCount, data=LarvaeCalc, col=JarTrt)
 text(F1WtPerLarvae~F1LarvaeCount, labels=JarID, data=LarvaeCalc, font=2, cex=.9)
 
 
-```
 
 The plots below can be used for all morphology data: length, perimeter, surface area
-```{r}
+
 #plot data by jar that are grouped by cross ID; but use JarSeatable instead of JarID so I can plot both exposed and control jars over one another
 #start with larvae of control parents
 ggplot(data = conpar, aes(x = JarSeatable, y = MaxFeretDiamum)) +
@@ -157,11 +681,9 @@ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), pa
   facet_grid(.~CrossID)
 
 
-```
-
 
 Make boxplots by parental cross, plotting both larvae treatments over one another. Can be used for all morphology parameters: surface area, length, 
-```{r}
+
 ggplot(data = LarvaeMorph, aes(x = CrossID, y = MaxFeretDiamum)) +
   geom_boxplot(aes(colour=JarTrt)) +
   labs(x = "Parental Cross", y = "Shell Length (um)", title = "Larvae lengths") +
@@ -194,14 +716,13 @@ ggplot(data = exlar, aes(x = CrossID, y = MaxFeretDiamum, fill = ParTrt)) +
   scale_y_continuous(breaks = seq(floor(min(larvmorph$MaxFeretDiamum)), 
                                   ceiling(max(larvmorph$MaxFeretDiamum)), 5), limits = c(floor(min(larvmorph$MaxFeretDiamum)), 
                      ceiling(max(larvmorph$MaxFeretDiamum)))) + 
->>>>>>> 4a75465271a6ee09f6a237844bd72d694c6c83a6
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
         panel.background = element_blank(), axis.line = element_line(colour = "black"), panel.border=element_rect(color="black",fill=NA))+
   facet_grid(.~CrossType, scale="free_x")
-```
+
 
 Plot calcification data
-```{r}
+
 #plot data by jar that are grouped by cross ID; but use JarSeatable instead of JarID so I can plot both exposed and control jars over one another
 #start with larvae of control parents
 ggplot(data = conparcalc, aes(x = JarID, y = F1WtPerLarvae)) +
@@ -245,10 +766,9 @@ theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), pa
         panel.background = element_rect(colour="white"), axis.line = element_line(colour = "black")) 
 
 
-```
 
 Make boxplots by parental cross, plotting both larvae treatments over one another.For calcification data; can also be used for cilia counts
-```{r}
+
 ggplot(data = LarvaeCalc, aes(x = CrossID, y = F1WtPerLarvae)) +
   geom_boxplot(aes(colour=JarTrt)) +
   labs(x = "Parental Cross", y = "F1 Weight per larvae (g)", title = "Larvae weights") +
@@ -260,11 +780,11 @@ ggplot(data = LarvaeCalc, aes(x = CrossID, y = F1WtPerLarvae)) +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
         panel.background = element_blank(), axis.line = element_line(colour = "black"), panel.border=element_rect(color="black",fill=NA))+
   facet_grid(.~CrossType, scale="free_x")
-```
+
 
 
 Plots of difference between parental treatments for morphology
-```{r}
+
 crossdiff <- data.frame(tapply(LarvaeMorph$MaxFeretDiamum, list(LarvaeMorph$CrossID, LarvaeMorph$JarTrt), median)) %>%
   rownames_to_column("CrossID") %>%
   mutate(CrossTemp = CrossID) %>%
@@ -297,10 +817,22 @@ ggplot(data = crossdiff, aes(x = ParentTrt, y = Diff, fill = ParentTrt)) +
   theme(legend.position = "none", panel.grid.major = element_blank(), 
         panel.grid.minor = element_blank(), panel.background = element_blank(), 
         axis.line = element_line(colour = "black"))
-```
+
+#get mean of the parent treatments to make a bargraph
+diffmean<- aggregate(Diff~ParentTrt, data=crossdiff, FUN=mean)
+diffse<- aggregate(Diff~ParentTrt, data=crossdiff, FUN=se)
+
+#make a barplot
+ggplot(data = diffmean, aes(x = ParentTrt, y = Diff, fill="grey67")) +
+  geom_bar(stat="identity", position="dodge",aes(fill="grey67"))+
+  scale_fill_manual(values="grey67")+
+  labs(x = "Parent Treatment", y = "Change in Length") +
+  geom_errorbar(aes(ymin= diffmean$Diff-diffse$Diff, ymax=diffmean$Diff+diffse$Diff),width=0.2, position=position_dodge(.9))+
+  theme_classic()
+
 
 Look at differences for calcification
-```{r}
+
 crossdiffcalc <- data.frame(tapply(LarvaeCalc$F1WtPerLarvae, list(LarvaeCalc$CrossID, LarvaeCalc$JarTrt), median)) %>%
   rownames_to_column("CrossID") %>%
   mutate(CrossTemp = CrossID) %>%
@@ -333,10 +865,10 @@ ggplot(data = crossdiffcalc, aes(x = ParentTrt, y = Diff, fill = ParentTrt)) +
   theme(legend.position = "none", panel.grid.major = element_blank(), 
         panel.grid.minor = element_blank(), panel.background = element_blank(), 
         axis.line = element_line(colour = "black"))
-```
+
 
 Make plot that looks at morphology by larvae and parent treatment
-```{r}
+
 par(mar = c(5, 4, 0.5, 0.5), bg = "transparent")
 boxplot(LarvaeMorph$MaxFeretDiamum ~ LarvaeMorph$JarTrt * LarvaeMorph$CrossType, 
         xlim = c(0, 5),
@@ -365,10 +897,10 @@ boxplot(LarvaeMorph$MaxFeretDiamum ~ LarvaeMorph$JarTrt * LarvaeMorph$CrossType,
         names = c("Control", "OA", "Control", "OA"), 
         col = c("powderblue", "red"),
         add = TRUE)
-```
+
 
 Make plot that looks at calcification and cilia by larvae and parent treatment
-```{r}
+
 par(mar = c(5, 4, 0.5, 0.5), bg = "transparent")
 boxplot(LarvaeMorph$PercentCilia ~ LarvaeMorph$JarTrt * LarvaeMorph$CrossType, 
         xlim = c(0, 5),
@@ -399,10 +931,7 @@ boxplot(LarvaeMorph$PercentCilia ~ LarvaeMorph$JarTrt * LarvaeMorph$CrossType,
         add = TRUE)
 
 
-```
 
-
-```{r}
 #export plots
 
 plots.dir.path<- list.files(tempdir(), pattern="rs-graphics", full.names= TRUE)
@@ -411,7 +940,7 @@ file.copy(from=plots.png.paths, to="../results")
 ```
 
 #get plots for means of parent and larvae treatment; use LarvaeCalc dataset because it only has one value per jar
-```{r}
+
  
 #get the data as means for treatments
 meancil<- aggregate(PercentCilia~CrossType*JarTrt, data=LarvaeCalc, FUN= mean)
@@ -435,5 +964,5 @@ leveneTest(aov1)# meets assumption
 
 #since the proportion data do not meet the assumption of normality, try a transformation
 
-```
+
 

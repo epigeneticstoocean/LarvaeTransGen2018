@@ -18,6 +18,7 @@ library(data.table)
 library(gridExtra)
 library(lattice)
 library(optimx)
+library(nlme)
 ```
 
 # Load data
@@ -161,4 +162,7 @@ area4 = lmer(sqrt(SurfaceAreaum2) ~ JarTrt * 1 + (1|MaleID) +  (1|FemaleID) + (1
 anova(area1, area4) # significant adult effect
 
 summary(area1)
+#get p-values for lmm area1
+
+lme1<- lme(sqrt(SurfaceAreaum2) ~ JarTrt * CrossType, random = ~MaleID +FemaleID +CrossID +JarSeatable, na.action=na.exclude, data = LarvaeMorph)
 ```
