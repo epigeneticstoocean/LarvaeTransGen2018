@@ -1,436 +1,437 @@
-DateCount,Filter100um1,Filter100um2,Filter10um1,Filter10um2,Filter20um1,Filter20um2,Filter20um3,Filter20umPercDiff,FilterRinse,HClAdded,JarID,LarvaeCountsNotes,NumPhotos,NumSWR,Objective,PercentAbnormal,PersonFilterCount,PersonPhotos,PhotoNotes,PresenceJunk,PresenceZopl,ProtocolVersion,SWRAbnormal,SWRCountTotal,SWRD,SWRFacingAway,SWRFacingAwayAbnormal,SWRRound,SWRStored,SWRTotal,SWRType,SWRUnsure,Total1mL,TotalLarvae
-20180714,0,0,1,1,263,270,249,-0.02661597,DI,TRUE,J005_B1,,28,1,20X,,Camila,Camila,,NA,NA,v1,4,FALSE,98,0,0,0,DI,102,plastic,0,102,368.5
-20180719,,,,,,,,0,DI,TRUE,J288_B1,,20,,10X,,,Brett?,,NA,NA,v1,,FALSE,,0,0,,DI,,plastic,0,0,0
-20180720,0,0,0,0,460,446,0,0.030434783,DI,TRUE,J003_B1,,26,1,10X,,Katie,Brett,,NA,NA,v1,9,FALSE,30,0,0,0,DI,39,plastic,0,39,492
-20180720,0,0,1,1,90,89,0,0.011111111,DI,TRUE,J014_B1,,25,2,10X,,Katie,Katie,,NA,NA,v1,8,FALSE,639,0,0,0,DI,647,plastic,0,647,736.5
-20180821,9,6,0,0,460,461,362,-0.002173913,DI,TRUE,J007_B1,,30,1,20X,,Camila,Camila,,NA,NA,v1,7,FALSE,549,0,0,0,DI,556,plastic,0,556,1024
-20180821,0,0,0,0,772,779,971,-0.009067358,DI,TRUE,J008_B1,"accidentally used 40% formalin after taking the pictures and counting. filter used for SEM, not available for recount",30,1,20X,,Camila,Camila,,NA,NA,v1,5,FALSE,169,0,0,0,DI,174,plastic,0,174,949.5
-20180823,4,4,1,0,73,75,0,-0.02739726,DI,TRUE,J004_B1,"filter used for SEM, not available for recount",30,1,20X,,Camila,Camila,,NA,NA,v1,4,FALSE,425,0,0,0,DI,429,plastic,0,429,507
-20180823,3,3,1,0,34,36,0,-0.058823529,DI,TRUE,J006_B1,,30,1,20X,,Camila,Camila,,NA,NA,v1,0,FALSE,509,0,0,0,DI,509,plastic,0,509,547
-20180824,0,0,2,2,418,421,389,-0.007177033,DI,TRUE,J009_B1,"Storage falcon tube used to test turbidity meter and then for filter testing, no sample left",30,1,20X,,Peter,Camila,,NA,NA,v1,9,FALSE,905,0,0,0,DI,914,plastic,0,914,1333.5
-20180827,4,5,1,1,295,309,335,-0.047457627,DI,TRUE,J010_B1,,30,1,20X,,Camila,Camila,,NA,NA,v1,4,FALSE,1434,0,0,0,DI,1438,plastic,0,1438,1744.5
-20180827,2,1,2,3,205,201,0,0.019512195,DI,TRUE,J011_B1,"filter used for SEM, not available for recount",30,1,20X,,Camila,Camila,,NA,NA,v1,3,FALSE,650,0,0,0,DI,653,plastic,0,653,857.5
-20180827,1,1,0,0,396,406,0,-0.025252525,DI,TRUE,J012_B1,"filter used for SEM, not available for recount",30,1,20X,,Camila,Camila,,NA,NA,v1,6,FALSE,110,0,0,0,DI,116,plastic,0,116,518
-20180828,0,0,0,0,227,225,212,0.008810573,DI,TRUE,J013_B1,,30,1,20X,,Camila,Camila,,NA,NA,v1,3,FALSE,582,0,0,0,DI,585,plastic,0,585,811
-20180829,1,1,0,0,396,395,0,0.002525253,DI,TRUE,J015_B1,,30,1,20X,,Camila,Camila,,NA,NA,v1,7,FALSE,320,0,0,0,DI,327,plastic,0,327,723.5
-20180830,5,5,0,0,482,491,0,-0.018672199,DI,TRUE,J016_B1,,27,1,20X,,Camila,Camila,,NA,NA,v1,5,FALSE,361,0,0,0,DI,366,plastic,0,366,857.5
-20180830,4,4,0,0,460,441,369,0.041304348,DI,TRUE,J017_B1,,30,1,20X,,Camila,Camila,,NA,NA,v1,4,FALSE,155,0,0,0,DI,159,plastic,0,159,613.5
-20180830,2,2,0,0,210,207,191,0.014285714,DI,TRUE,J018_B1,,30,1,20X,,Camila,Camila,,NA,NA,v1,11,FALSE,263,0,0,0,DI,274,plastic,0,274,484.5
-20180831,3,3,0,0,476,487,526,-0.023109244,DI,TRUE,J019_B1,,30,1,20X,,Camila,Camila,,NA,NA,v1,2,FALSE,233,0,0,0,DI,235,plastic,0,235,719.5
-20180904,2,2,0,0,423,412,0,0.026004728,DI,TRUE,J020_B1,,30,1,20X,,Camila,Camila,,NA,NA,v1,0,FALSE,74,0,0,0,DI,74,plastic,0,74,493.5
-20180904,2,2,0,0,411,419,0,-0.01946472,DI,TRUE,J021_B1,,30,1,20X,,Camila,Camila,,NA,NA,v1,17,FALSE,249,0,0,0,DI,266,plastic,0,266,683
-20180905,5,5,0,0,265,266,0,-0.003773585,DI,TRUE,J022_B1,,30,1,20X,,Camila,Camila,,NA,NA,v1,22,FALSE,123,0,0,0,DI,145,plastic,0,145,415.5
-20180905,1,1,0,0,252,255,0,-0.011904762,DI,TRUE,J023_B1,Lots of large larvae like photo #30,30,1,20X,,Camila,Camila,,NA,NA,v1,3,FALSE,438,0,0,0,DI,441,plastic,0,441,695.5
-20180906,3,3,0,0,228,232,0,-0.01754386,DI,TRUE,J024_B1,,31,1,20X,,Camila,Camila,,NA,NA,v1,7,FALSE,114,0,0,0,DI,121,plastic,0,121,354
-20180907,4,4,0,0,162,163,0,-0.00617284,DI,TRUE,J025_B1,"Accidentally forgot to count the larvae on the slide before putting it back into the falcon tube, so I just counted them on the filter, so there is no abnormal data",34,1,20X,,Camila,Camila,3 abnormal larvae photographed,NA,NA,v1,3,FALSE,369,0,0,0,DI,372,plastic,0,372,538.5
-20180910,8,8,0,0,88,84,81,0.045454545,DI,TRUE,J026_B1,,32,1,20X,,Camila,Camila,2 abnormal larvae photographed,NA,NA,v1,16,FALSE,1255,0,0,0,DI,1271,plastic,0,1271,1365
-20180910,9,10,0,0,240,249,227,-0.0375,DI,TRUE,J027_B1,,31,1,20X,,Camila,Camila,1-2 abnormal larvae photographed,NA,NA,v1,12,FALSE,135,0,0,0,DI,147,plastic,0,147,401
-20180910,7,9,0,0,231,237,0,-0.025974026,DI,TRUE,J028_B1,,31,1,20X,,Camila,Camila,1 abnormal larva photographed,NA,NA,v1,3,FALSE,195,0,0,0,DI,198,plastic,0,198,440
-20180910,5,5,0,0,183,192,0,-0.049180328,DI,TRUE,J029_B1,,30,1,20X,,Camila,Camila,,NA,NA,v1,1,FALSE,262,0,0,0,DI,263,plastic,0,263,455.5
-20180911,3,3,0,0,249,249,0,0,DI,TRUE,J030_B1,,30,1,20X,,Camila,Camila,,NA,NA,v1,3,FALSE,169,0,0,0,DI,172,plastic,0,172,424
-20180911,3,4,0,0,72,71,66,0.013888889,DI,TRUE,J032_B1,,30,1,20X,,Camila,Camila,,NA,NA,v1,1,FALSE,370,0,0,0,DI,371,plastic,0,371,446
-20180912,4,4,0,0,345,330,0,0.043478261,DI,TRUE,J033_B1,,31,1,20X,,Camila,Camila,,NA,NA,v1,7,FALSE,81,0,0,0,DI,88,plastic,0,88,429.5
-20180913,4,4,0,0,472,454,0,0.038135593,DI,TRUE,J034_B1,,32,2,20X,,Camila,Camila,,NA,NA,v1,1,FALSE,66,0,0,0,DI,67,plastic,0,67,534
-20180913,2,2,1,1,362,373,0,-0.03038674,DI,TRUE,J035_B1,,30,1,20X,,Camila,Camila,,NA,NA,v1,0,FALSE,251,0,0,0,DI,251,plastic,0,251,620.5
-20180913,7,7,1,1,285,278,0,0.024561404,DI,TRUE,J036_B1,,30,1,20X,,Camila,Camila,,NA,NA,v1,5,FALSE,185,0,0,0,DI,190,plastic,0,190,478.5
-20180914,3,3,0,0,392,400,438,-0.020408163,DI,TRUE,J037_B1,"Had to count the filter 4 times, the 4th count was 372",30,1,20X,,Camila,Camila,,NA,NA,v1,4,FALSE,272,0,0,0,DI,276,plastic,0,276,675
-20180914,18,19,0,0,376,381,0,-0.013297872,DI,TRUE,J038_B1,,30,1,20X,,Camila,Camila,4 abnormal larvae photographed,NA,NA,v1,22,FALSE,272,0,0,0,DI,294,plastic,0,294,691
-20180914,1,1,0,0,273,267,0,0.021978022,DI,TRUE,J039_B1,Replaced the 100 micron filter ,30,1,20X,,Camila,Camila,,NA,NA,v1,2,FALSE,182,0,0,0,DI,184,plastic,0,184,455
-20180914,0,0,0,0,260,260,0,0,DI,TRUE,J040_B1,,30,1,20X,,Camila,Camila,1 abnormal larva photographed,NA,NA,v1,3,FALSE,120,0,0,0,DI,123,plastic,0,123,383
-20180917,5,5,0,0,332,330,0,0.006024096,DI,TRUE,J041_B1,upper right had the most larvae,32,1,20X,,Camila,Camila,2 abnormal larvae photographed,NA,NA,v1,8,FALSE,77,0,0,1,DI,86,plastic,0,86,422
-20180917,11,12,0,0,861,846,811909,0.017421603,DI,TRUE,J042_B1,"had to count four times,  lower half of the filter had the most larvae",30,1,20X,,Camila,Camila,,NA,NA,v1,27,FALSE,218,0,0,0,DI,245,plastic,0,245,1110
-20180917,6,6,0,0,485,482,0,0.006185567,DI,TRUE,J043_B1,upper half had the most larvae,30,1,20X,,Camila,Camila,,NA,NA,v1,6,FALSE,334,0,0,0,DI,340,plastic,0,340,829.5
-20180917,3,3,0,0,542,534,0,0.014760148,DI,TRUE,J044_B1,left side had the most larvae,30,1,20X,,Camila,Camila,,NA,NA,v1,1,FALSE,108,0,0,0,DI,109,plastic,0,109,650
-20180918,6,6,0,0,98,97,0,0.010204082,DI,TRUE,J045_B1,upper half had the most larvae,31,1,20X,,Camila,Camila,1 abnormal larva photographed,NA,NA,v1,2,FALSE,191,0,0,0,DI,193,plastic,0,193,296.5
-20180918,4,4,0,0,148,141,0,0.047297297,DI,TRUE,J046_B1,Lower half had the most larvae,31,1,20X,,Camila,Camila,3? abnormal larvae photographed,NA,NA,v1,9,FALSE,44,0,0,0,DI,53,plastic,0,53,201.5
-20180918,6,6,0,0,328,331,382,-0.009146341,DI,TRUE,J049_B1,lower left had the most larvae,30,1,20X,,Camila,Camila,,NA,NA,v1,6,FALSE,192,0,0,0,DI,198,plastic,0,198,533.5
-20180919,8,8,1,1,309,323,292,-0.045307443,DI,TRUE,J050_B1,right side had the most larvae,30,1,20X,,Camila,Camila,,NA,NA,v1,4,FALSE,376,0,0,0,DI,380,plastic,0,380,704
-20180919,3,3,0,0,291,304,0,-0.04467354,DI,TRUE,J051_B1,"upper left had the most larvae, they were more faint in color than other filters have been, maybe they didn't get enought neutral red dye?",30,1,20X,,Camila,Camila,,NA,NA,v1,0,FALSE,404,0,0,0,DI,404,plastic,0,404,704.5
-20180919,4,4,0,0,448,470,0,-0.049107143,DI,TRUE,J052_B1,right side had the most larvae,33,1,20X,,Camila,Camila,"3 ""facing away"" larvae photographed; many ""facing away"" larvae in subsample",NA,NA,v1,4,FALSE,102,0,0,0,DI,106,plastic,0,106,569
-20180919,4,4,0,0,272,274,0,-0.007352941,DI,TRUE,J053_B1,upper left had the most larvae,32,1,20X,,Camila,Camila,2 abnormal larvae photographed,NA,NA,v1,2,FALSE,449,0,0,1,DI,452,plastic,0,452,729
-20180919,3,3,0,0,191,194,206,-0.015706806,DI,TRUE,J054_B1,upper right had the most larvae,30,1,20X,,Camila,Camila,"many ""facing away"" larvae in subsample",NA,NA,v1,5,FALSE,493,0,0,0,DI,498,plastic,0,498,693.5
-20180919,1,1,0,0,396,380,0,0.04040404,DI,TRUE,J055_B1,upper left had the most larvae,30,1,20X,,Camila,Camila,,NA,NA,v1,3,FALSE,253,0,0,0,DI,256,plastic,0,256,645
-20180920,2,2,0,0,384,394,0,-0.026041667,DI,TRUE,J056_B1,Lower half had the most larvae,30,1,20X,,Camila,Camila,,NA,NA,v1,7,FALSE,874,0,0,0,DI,881,plastic,0,881,1272
-20180924,3,3,0,0,272,268,0,0.014705882,DI,TRUE,J057_B1,"lower right had the most larvae, storage falcon tube used to test tubidity meter",30,1,20X,,Camila,Camila,,NA,NA,v1,10,FALSE,96,0,0,0,DI,106,plastic,0,106,379
-20180924,0,0,0,0,141,139,152,0.014184397,DI,TRUE,J058_B1,upper right had the most larvae,30,1,20X,,Camila,Camila,,NA,NA,v1,5,FALSE,373,0,0,0,DI,378,plastic,0,378,518
-20180924,1,1,0,0,267,260,0,0.026217228,DI,TRUE,J059_B1,lower left had the most larvae,30,2,20X,,Camila,Camila,,NA,NA,v1,3,FALSE,79,0,0,0,DI,82,plastic,0,82,346.5
-20180924,5,6,0,0,348,355,327,-0.020114943,DI,TRUE,J060_B1,right side had the most larvae,30,1,20X,,Camila,Camila,,NA,NA,v1,10,FALSE,96,0,0,0,DI,106,plastic,0,106,463
-20180924,5,5,0,0,67,69,0,-0.029850746,DI,TRUE,J061_B1,lower right had the most larvae,30,1,20X,,Camila,Camila,,NA,NA,v1,1,FALSE,648,0,0,0,DI,649,plastic,0,649,722
-20180925,3,4,0,0,242,235,0,0.02892562,DI,TRUE,J062_B1,upper right had the most larvae,30,1,20X,,Camila,Camila,,NA,NA,v1,13,FALSE,242,0,0,0,DI,255,plastic,0,255,497
-20180925,1,1,0,0,240,239,0,0.004166667,DI,TRUE,J063_B1,lower left had the most larvae,30,1,20X,,Camila,Camila,,NA,NA,v1,4,FALSE,455,0,0,0,DI,459,plastic,0,459,699.5
-20180925,0,0,0,0,327,332,0,-0.01529052,DI,TRUE,J064_B1,upper left had the most larvae,30,1,20X,,Camila,Camila,,NA,NA,v1,2,FALSE,183,0,0,0,DI,185,plastic,0,185,514.5
-20180925,0,0,0,0,259,251,0,0.030888031,DI,TRUE,J065_B1,lower right had the most larvae,30,1,20X,,Camila,Camila,,NA,NA,v1,10,FALSE,158,0,0,0,DI,168,plastic,0,168,423
-20180926,1,1,0,0,323,314,301,0.027863777,DI,TRUE,J066_B1,lower right had the most larvae,30,1,20X,,Camila,Camila,,NA,NA,v1,11,FALSE,170,0,0,0,DI,181,plastic,0,181,500.5
-20180926,3,3,0,0,276,285,0,-0.032608696,DI,TRUE,J067_B1,upper left had the most larvae,30,1,20X,,Camila,Camila,,NA,NA,v1,3,FALSE,553,0,0,0,DI,556,plastic,0,556,839.5
-20180926,3,3,0,0,570,573,542,-0.005263158,DI,TRUE,J068_B1,upper left had the most larvae ,30,1,20X,,Camila,Camila,,NA,NA,v1,9,FALSE,110,0,0,0,DI,119,plastic,0,119,693.5
-20180926,1,1,0,0,82,79,92,0.036585366,DI,TRUE,J069_B1,left side had the most larvae,30,1,20X,,Camila,Camila,,NA,NA,v1,3,FALSE,670,0,0,0,DI,673,plastic,0,673,754.5
-20180927,3,4,0,0,274,278,0,-0.01459854,DI,TRUE,J070_B1,upper right had the most larvae,38,1,20X,,Camila,Camila,,NA,NA,v1,8,FALSE,141,63,0,0,DI,212,plastic,0,149,491.5
-20180927,0,0,0,0,143,143,0,0,DI,TRUE,J071_B1,upper right had the most larvae,32,2,20X,,Camila,Camila,,NA,NA,v1,2,FALSE,37,3,0,0,DI,42,plastic,0,39,185
-20180927,0,0,0,0,114,115,0,-0.00877193,DI,TRUE,J072_B1,Lower half had the most larvae,31,1,20X,,Camila,Camila,,NA,NA,v1,1,FALSE,48,27,0,0,DI,76,plastic,0,49,190.5
-20180927,5,5,0,0,920,961,0,-0.044565217,DI,TRUE,J073_B1,right side had the most larvae,35,1,20X,,Camila,Camila,,NA,NA,v1,4,FALSE,420,295,0,0,DI,728,plastic,9,424,1673.5
-20180928,5,6,0,0,505,516,460,-0.021782178,DI,TRUE,J074_B1,upper left had the most larvae,35,1,20X,,Camila,Camila,,NA,NA,v1,5,FALSE,1865,51,0,0,DI,1928,plastic,7,1870,2444
-20180928,2,2,0,0,226,222,0,0.017699115,DI,TRUE,J076_B1,upper middle had the most larvae,32,1,20X,,Camila,Camila,,NA,NA,v1,0,FALSE,248,56,2,0,DI,307,plastic,1,248,533
-20180928,1,1,1,1,334,337,0,-0.008982036,DI,TRUE,J077_B1,Lower half had the most larvae,31,1,20X,,Camila,Camila,,NA,NA,v1,1,FALSE,118,4,0,0,DI,123,plastic,0,119,459.5
-20180928,1,1,0,0,245,234,165180,0.044897959,DI,TRUE,J078_B1,,46,1,20X,,Camila,Camila,,NA,NA,v1,2,FALSE,156,149,2,0,DI,309,plastic,0,158,549.5
-20181001,3,3,0,0,507,488,464,0.037475345,DI,TRUE,J079_B1,lower right had the most larvae,44,1,20X,,Camila,Camila,,NA,NA,v1,11,FALSE,205,54,4,0,DI,279,plastic,5,216,779.5
-20181001,3,3,0,0,297,296,219234,0.003367003,DI,TRUE,J080_B1,lower right had the most larvae,43,1,20X,,Camila,Camila,,NA,NA,v1,13,FALSE,633,25,2,0,DI,680,plastic,7,646,979.5
-20181001,3,3,0,0,267,262,0,0.018726592,DI,TRUE,J081_B1,"lower left had the most larvae, storage falcon tube used to test tubidity meter",39,1,20X,,Camila,Camila,,NA,NA,v1,6,FALSE,213,177,6,0,DI,403,plastic,1,219,670.5
-20181002,1,1,0,0,625,626,0,-0.0016,DI,TRUE,J082_B1,right side had the most larvae,32,1,20X,,Camila,Camila,,NA,NA,v1,2,FALSE,171,4,1,0,DI,178,plastic,0,173,804.5
-20181002,6,8,0,0,439,435,464,0.009111617,DI,TRUE,J083_B1,upper right had the most larvae,37,1,20X,,Camila,Camila,,NA,NA,v1,7,FALSE,291,126,15,0,DI,444,plastic,5,298,888
-20181004,0,0,0,0,166,169,203,-0.018072289,DI,TRUE,J084_B1,upper left had the most larvae,37,1,20X,,Camila,Camila,,NA,NA,v1,7,FALSE,664,58,2,0,DI,734,plastic,3,671,901.5
-20181004,2,2,0,0,136,137,128,-0.007352941,DI,TRUE,J085_B1,,30,1,20X,,Camila,Camila,,NA,NA,v1,3,FALSE,124,41,1,0,DI,171,plastic,2,127,309.5
-20181004,1,1,0,0,64,65,0,-0.015625,DI,TRUE,J086_B1,,30,1,20X,,Camila,Camila,,NA,NA,v1,2,FALSE,304,9,0,0,DI,316,plastic,1,306,381.5
-20181004,0,0,0,0,213,204,225,0.042253521,DI,TRUE,J087_B1,upper right,40,1,20X,,Camila,Camila,,NA,NA,v1,0,FALSE,100,79,1,0,DI,182,plastic,2,100,390.5
-20181004,0,0,0,0,143,142,0,0.006993007,DI,TRUE,J088_B1,upper right,30,1,20X,,Camila,Camila,,NA,NA,v1,3,FALSE,169,4,0,0,DI,176,plastic,0,172,318.5
-20181005,0,0,0,0,54,53,0,0.018518519,DI,TRUE,J089_B1,lower right,30,1,20X,,Camila,Camila,,NA,NA,v1,2,FALSE,378,3,0,0,DI,383,plastic,0,380,436.5
-20181005,0,0,0,0,121,117,0,0.033057851,DI,TRUE,J090_B1,upper right,30,1,20X,,Camila,Camila,,NA,NA,v1,4,FALSE,219,72,3,0,DI,299,plastic,1,223,418
-20181005,0,0,0,0,101,102,0,-0.00990099,DI,TRUE,J091_B1,lower right,33,1,20X,,Camila,Camila,,NA,NA,v1,3,FALSE,348,17,0,0,DI,369,plastic,1,351,470.5
-20181005,0,0,1,1,282,288,0,-0.021276596,DI,TRUE,J092_B1,upper right,34,1,20X,,Camila,Camila,,NA,NA,v1,4,FALSE,572,7,0,0,DI,583,plastic,0,576,868
-20181011,0,0,2,2,151,155,0,-0.026490066,DI,TRUE,J093_B1,upper right,30,1,20X,,Camila,Camila,,NA,NA,v1,3,FALSE,348,17,0,0,DI,369,plastic,1,351,522
-20181012,1,1,0,0,207,198,0,0.043478261,DI,TRUE,J094_B1,upper left,30,1,20X,,Camila,Camila,,NA,NA,v1,7,FALSE,489,14,1,0,DI,511,plastic,0,496,714.5
-20181012,1,1,0,0,237,230,0,0.029535865,DI,TRUE,J095_B1,lower left,30,1,20X,,Camila,Camila,,NA,NA,v1,3,FALSE,603,8,0,0,DI,614,plastic,0,606,848.5
-20181012,3,3,0,0,364,355,0,0.024725275,DI,TRUE,J096_B1,upper right,30,1,20X,,Camila,Camila,,NA,NA,v1,10,FALSE,145,62,5,0,DI,222,plastic,0,155,584.5
-20181012,3,3,0,0,262,256,239,0.022900763,DI,TRUE,J097_B1,lower left,30,1,20X,,Camila,Camila,,NA,NA,v1,5,FALSE,181,29,1,0,DI,216,plastic,0,186,478
-20181012,0,0,0,0,505,503,551,0.003960396,DI,TRUE,J098_B1,upper right,30,1,20X,,Camila,Camila,,NA,NA,v1,15,FALSE,330,112,2,0,DI,459,plastic,0,345,963
-20181015,1,1,0,0,169,168,182,0.00591716,DI,TRUE,J099_B1,upper right,30,1,20X,,Camila,Camila,,NA,NA,v1,3,FALSE,747,3,0,0,DI,754,plastic,1,750,923.5
-20181015,3,3,0,0,448,440,0,0.017857143,DI,TRUE,J100_B1,upper left,30,1,20X,,Camila,Camila,,NA,NA,v1,8,FALSE,201,58,3,4,DI,274,plastic,0,213,721
-20181016,3,3,0,0,156,153,0,0.019230769,DI,TRUE,J101_B1,lower left,30,1,20X,,Camila,Camila,,NA,NA,v1,1,FALSE,32,5,0,1,DI,39,plastic,0,34,196.5
-20181016,3,3,0,0,115,113,0,0.017391304,DI,TRUE,J102_B1,upper left,30,1,20X,,Camila,Camila,,NA,NA,v1,3,FALSE,49,24,0,0,DI,76,plastic,0,52,193
-20181016,2,2,0,0,97,97,0,0,DI,TRUE,J104_B1,lower left,30,1,20X,,Camila,Camila,,NA,NA,v1,4,FALSE,259,4,0,0,DI,267,plastic,0,263,366
-20181016,0,0,0,0,363,358,342,0.013774105,DI,TRUE,J105_B1,upper right,30,1,20X,,Camila,Camila,,NA,NA,v1,7,FALSE,250,92,5,1,DI,356,plastic,1,258,716.5
-20181102,5,5,0,0,175,178,0,-0.017142857,DI,TRUE,J106_B1,larvae poured onto 10 micron filter by accident ,30,1,20X,,Camila,Camila,,NA,NA,v1,4,FALSE,149,75,1,0,DI,229,plastic,0,153,410.5
-20181102,0,0,1,1,257,268,286,-0.042801556,DI,TRUE,J107_B1,,30,1,20X,,Camila,Camila,,NA,NA,v1,2,FALSE,134,9,1,0,DI,146,plastic,0,136,408.5
-20181105,0,0,0,0,227,220,0,0.030837004,DI,TRUE,J108_B1,,30,1,20X,,Camila,Camila,,NA,NA,v1,28,FALSE,225,49,2,0,DI,304,plastic,0,253,527.5
-20181105,0,0,0,0,227,225,0,0.008810573,DI,TRUE,J109_B1,,30,1,20X,,Camila,Camila,,NA,NA,v1,2,FALSE,109,3,0,0,DI,114,plastic,0,111,340
-20181106,3,3,0,0,208,209,219,-0.004807692,DI,TRUE,J110_B1,,30,1,20X,,Camila,Camila,,NA,NA,v1,8,FALSE,47,25,1,0,DI,81,plastic,0,55,292.5
-20181106,1,1,0,0,364,359,0,0.013736264,DI,TRUE,J111_B1,larvae were very light on the filter,30,1,20X,,Camila,Camila,,NA,NA,v1,2,FALSE,356,5,0,0,DI,363,plastic,0,358,725.5
-20181107,0,0,0,0,317,322,0,-0.015772871,DI,TRUE,J112_B1,,30,1,20X,,Camila,Camila,,NA,NA,v1,32,FALSE,251,114,3,1,DI,401,plastic,0,284,720.5
-20181107,3,3,0,0,453,454,510,-0.002207506,DI,TRUE,J113_B1,,30,1,20X,,Camila,Camila,,NA,NA,v1,14,FALSE,429,20,0,0,DI,464,plastic,1,443,920.5
-20181113,0,0,1,1,470,470,0,0,DI,TRUE,J114_B1,tons of larvae on the sides of the filter,30,1,20X,,Camila,Camila,,NA,NA,v1,49,FALSE,715,181,4,0,DI,949,plastic,0,764,1419
-20181113,0,0,0,0,433,428,0,0.011547344,DI,TRUE,J115_B1,,30,1,20X,,Camila,Camila,,NA,NA,v1,19,FALSE,1049,28,0,0,DI,1096,plastic,0,1068,1526.5
-20181113,1,1,0,0,878,917,837,-0.044419134,DI,FALSE,J116_B1,,30,1,20X,,Camila,Camila,,NA,NA,v1,13,FALSE,118,131,6,0,DI,268,plastic,0,131,1166.5
-20181114,0,0,0,0,344,341,0,0.00872093,DI,FALSE,J117_B1,"recounted filter when dry: 333, storage falcon tube used to look at larvae again so more DI and formalin was added",30,1,20X,,Camila,Camila,,NA,NA,v1,4,FALSE,543,12,0,0,DI,559,plastic,0,547,901.5
-20181114,1,1,0,0,542,542,0,0,DI,FALSE,J118_B1,"recounted filter when dry: 416, 422",30,1,20X,,Camila,Camila,,NA,NA,v1,12,FALSE,192,67,1,0,DI,272,plastic,0,204,815
-20181114,1,1,0,0,281,293,0,-0.042704626,DI,FALSE,J119_B1,recounted filter when dry: 282,30,1,20X,,Camila,Camila,,NA,NA,v1,2,FALSE,265,5,0,0,DI,272,plastic,0,267,560
-20181115,1,1,0,0,444,435,0,0.02027027,DI,FALSE,J120_B1,,30,1,20X,,Camila,Camila,,NA,NA,v1,6,FALSE,68,29,0,0,DI,104,plastic,1,74,544.5
-20181116,0,0,0,0,177,183,0,-0.033898305,DI,FALSE,J121_B1,lots of debris on filter,31,1,20X,,Camila,Camila,abnormal photos: 13,NA,NA,v1,0,TRUE,0,0,0,0,DI,600,plastic,0,,780
-20181116,3,3,1,1,733,748,0,-0.020463847,DI,FALSE,J122_B1,,39,1,20X,,Camila,Camila,"abnormal photos: 7, 9, 10, 16, 18, 19, 28, 31, 34",NA,NA,v1,0,TRUE,0,0,0,0,DI,176,plastic,0,0,919.5
-20181116,1,1,0,0,245,254,0,-0.036734694,SFSW,FALSE,J123_B1,recounted filter when dry: 265,30,1,20X,,Camila,Camila,,NA,NA,v1,0,TRUE,0,0,0,0,SFSW,578,plastic,0,0,828.5
-20181116,0,0,0,0,577,596,0,-0.032928943,SFSW,FALSE,J124_B1,,31,1,20X,,Camila,Camila,abnormal photo: 5,NA,NA,v1,0,TRUE,0,0,0,0,SFSW,129,plastic,0,0,715.5
-20181116,0,0,0,0,168,166,179,0.011904762,SFSW,FALSE,J125_B1,,30,1,20X,,Camila,Camila,,NA,NA,v1,0,TRUE,0,0,0,0,SFSW,336,plastic,0,0,503
-20181119,2,2,1,1,331,321,0,0.03021148,SFSW,FALSE,J126_B1,,38,1,20X,,Camila,Camila,"abnormal photos: 1, 2, 8, 13, 24, 27 (open?), 31, 34 (velum)",NA,NA,v1,0,TRUE,0,0,0,0,SFSW,154,plastic,0,0,482
-20181119,4,4,0,0,399,405,0,-0.015037594,SFSW,FALSE,J127_B1,,35,1,20X,,Camila,Camila,"abnormal photos: 4, 13, 17, 22, 29",NA,NA,v1,0,TRUE,0,0,0,0,SFSW,177,plastic,0,0,583
-20181119,13,12,1,1,453,445,0,0.017660044,SFSW,FALSE,J128_B1,,30,1,20X,,Camila,Camila,,NA,NA,v1,0,TRUE,0,0,0,0,SFSW,243,plastic,0,0,704.5
-20181119,0,0,0,0,50,50,0,0,SFSW,FALSE,J129_B1,,30,1,20X,,Camila,Camila,,NA,NA,v1,0,TRUE,0,0,0,0,SFSW,696,plastic,0,0,746
-20181119,0,0,0,0,681,694,0,-0.019089574,SFSW,FALSE,J130_B1,"extra counts at different magnifications: at 2.0x=705, 1.0x=590, 1.0x= 554",30,1,20X,,Camila,Camila,abnormal photo: 16,NA,NA,v1,0,TRUE,0,0,0,0,SFSW,1003,plastic,0,0,1690.5
-20181126,1,1,1,1,453,452,482,0.002207506,SFSW,FALSE,J131_B1,,30,1,20X,,Camila,Camila,,NA,NA,v1,0,TRUE,0,0,0,0,SFSW,212,plastic,0,0,665.5
-20181126,3,3,0,0,487,474,462,0.026694045,DI,FALSE,J132_B1,,35,1,20X,,Camila,Camila,"abnormal photos: 1, 8, 11, 19, 26",NA,NA,v1,0,TRUE,0,0,0,0,SFSW,226,plastic,0,0,709.5
-20181126,2,2,0,0,200,197,0,0.015,DI,FALSE,J133_B1,,30,1,20X,,Camila,Camila,,NA,NA,v1,0,TRUE,0,0,0,0,SFSW,267,plastic,0,0,467.5
-20181127,2,2,0,0,253,246,0,0.027667984,DI,FALSE,J134_B1,,33,1,20X,,Camila,Camila,"abnormal photos: 3, 17, 20",NA,NA,v1,0,TRUE,0,0,0,0,SFSW,83,plastic,0,0,334.5
-20181127,1,1,0,0,256,255,0,0.00390625,DI,FALSE,J135_B1,,31,1,20X,,Camila,Camila,abnormal photos: 9,NA,NA,v1,0,TRUE,0,0,0,0,SFSW,106,plastic,0,0,362.5
-20181127,0,0,0,0,323,318,0,0.015479876,DI,FALSE,J136_B1,"Had to use 3 swr slides because the majority of the larvae on the first slide were the wrong orientation and there were not enough for all the photos, on the first slide there were 71 larvae, 20 on the second and 11 on the third",38,3,20X,,Camila,Camila,"abnormal photos: 6, 7, 11, 19, 21, 26, 28, 34",NA,NA,v1,0,TRUE,0,0,0,0,SFSW,102,plastic,0,0,422.5
-20181127,1,1,0,0,179,175,0,0.022346369,DI,FALSE,J137_B1,,31,1,20X,,Camila,Camila,abnormal photos: 8,NA,NA,v1,0,TRUE,0,0,0,0,SFSW,211,plastic,0,0,389
-20181128,9,11,0,0,355,360,376,-0.014084507,DI,FALSE,J138_B1,,39,1,20X,,Camila,Camila,"abnormal photos: 4, 13, 18, 19, 31, 36; photos 1-3: strange particles on slide",NA,NA,v1,0,TRUE,0,0,0,0,SFSW,250,plastic,0,0,617.5
-20181128,2,2,1,1,361,368,382,-0.019390582,DI,FALSE,J139_B1,,30,1,20X,,Camila,Camila,,NA,NA,v1,0,TRUE,0,0,0,0,SFSW,379,plastic,0,0,745.5
-20181128,0,0,1,1,357,360,380,-0.008403361,DI,FALSE,J140_B1,,40,1,20X,,Camila,Camila,"abnormal photos: 7, 11, 12, 18, 23, 25, 31, 36, 37, 38",NA,NA,v1,0,TRUE,0,0,0,0,SFSW,207,plastic,0,0,565.5
-20181128,1,1,0,0,158,164,0,-0.037974684,DI,FALSE,J141_B1,relooked at the larvae again and so more SFSW and formalin was added,30,1,20X,,Camila,Camila,,NA,NA,v1,0,TRUE,0,0,0,0,SFSW,616,plastic,0,0,778
-20181128,4,4,0,0,431,415,0,0.03712297,DI,FALSE,J142_B1,,36,1,20X,,Camila,Camila,"abnormal photos: 6, 9, 21, 26, 29, 33",NA,NA,v1,0,TRUE,0,0,0,0,SFSW,165,plastic,0,0,592
-20181130,1,1,0,0,110,114,0,-0.036363636,100% ETOH,FALSE,J143_B1,I believe that some of the larvae stuck to the filter stacks when filtering because the pressure of the ethanol was not as strong as when I rinse with water,30,1,20X,,Camila,Camila,,NA,NA,v1,0,TRUE,0,0,0,0,100% ETOH,824,plastic,0,0,937
-20181203,1,1,0,0,125,123,0,0.016,100% ETOH,FALSE,J144_B1,,30,1,20X,,Camila,Camila,,NA,NA,v1,0,TRUE,0,0,0,0,100% ETOH,599,plastic,0,0,724
-20181206,0,0,0,0,0,0,0,0,95% ETOH,FALSE,J145_B1,"For the filter we tested the suction filtration device, but the suction didn't form because the rubber stopper was cracked so Isaac took it off and the entire sample fell out onto the counter/floor",43,1,20X,,Camila/Isaac,Camila,,NA,NA,v1,0,TRUE,0,0,0,0,95%ETOH,98,plastic,0,0,0
-20190110,,,0,0,,,0,0,,FALSE,J146_B1,,31,1,20X,,,Ffion,abnormal photos: 5,NA,NA,v1_5,0,,0,0,0,0,,254,plastic,0,0,254
-20190111,,,0,0,,,0,0,,FALSE,J147_B1,,26,1,20X,,,Ffion,"abnormal photos: 31, 43",NA,NA,v1_5,0,,0,0,0,0,,103,plastic,0,0,103
-20190114,,,0,0,,,0,0,,FALSE,J148_B1,,25,1,20X,,,Ffion,abnormal photos: 21,NA,NA,v1_5,0,,0,0,0,0,,187,plastic,0,0,187
-20190114,,,0,0,,,0,0,,FALSE,J149_B1,,33,1,20X,,,Ffion,"abnormal photos: 5, 7, 26, 33",NA,NA,v1_5,0,,0,0,0,0,,457,plastic,0,0,457
-20190115,,,0,0,,,0,0,,FALSE,J152_B1,,33,1,20X,,,Ffion,abnormal photos: 2?,NA,NA,v1_5,0,,0,0,0,0,,164,plastic,0,0,164
-20190115,,,0,0,,,0,0,,FALSE,J153_B1,,30,1,20X,,,Ffion,,NA,NA,v1_5,0,,0,0,0,0,,327,plastic,0,0,327
-20190116,,,0,0,,,0,0,,FALSE,J154_B1,,32,1,20X,,,Ffion,"abnormal photos: 18, 33",NA,NA,v1_5,0,,0,0,0,0,,423,plastic,0,0,423
-20190116,,,0,0,,,0,0,,FALSE,J155_B1,,30,1,20X,,,Ffion,,NA,NA,v1_5,0,,0,0,0,0,,129,plastic,0,0,129
-20190117,,,0,0,,,0,0,,FALSE,J156_B1,,30,1,20X,,,Ffion,,NA,NA,v1_5,0,,0,0,0,0,,187,plastic,0,0,187
-20190117,,,0,0,,,0,0,,FALSE,J157_B1,,30,1,20X,,,Ffion,,NA,NA,v1_5,0,,0,0,0,0,,475,plastic,0,0,475
-20190117,,,0,0,,,0,0,,FALSE,J158_B1,,30,1,20X,,,Ffion,,NA,NA,v1_5,0,,0,0,0,0,,149,plastic,0,0,149
-20190117,,,0,0,,,0,0,,FALSE,J159_B1,,30,1,20X,,,Ffion,,NA,NA,v1_5,0,,0,0,0,0,,314,plastic,0,0,314
-20190118,,,0,0,,,0,0,,FALSE,J160_B1,,30,1,20X,,,Ffion,,NA,NA,v1_5,0,,0,0,0,0,,131,plastic,0,0,131
-20190118,,,0,0,,,0,0,,FALSE,J161_B1,,30,1,20X,,,Ffion,,NA,NA,v1_5,0,,0,0,0,0,,361,plastic,0,0,361
-20190118,,,0,0,,,0,0,,FALSE,J162_B1,,30,1,20X,,,Ffion,,NA,NA,v1_5,0,,0,0,0,0,,273,plastic,0,0,273
-20190118,,,0,0,,,0,0,,FALSE,J163_B1,,30,1,20X,,,Ffion,,NA,NA,v1_5,0,,0,0,0,0,,92,plastic,0,0,92
-20190122,,,0,0,,,0,0,,FALSE,J164_B1,,30,1,20X,,,Ffion,,NA,NA,v1_5,0,,0,0,0,0,,179,plastic,0,0,179
-20190122,,,0,0,,,0,0,,FALSE,J165_B1,,30,1,20X,,,Ffion,,NA,NA,v1_5,0,,0,0,0,0,,307,plastic,0,0,307
-20190123,,,0,0,,,0,0,,FALSE,J166_B1,,30,1,20X,,,Ffion,,NA,NA,v1_5,0,,0,0,0,0,,166,plastic,0,0,166
-20190123,,,0,0,,,0,0,,FALSE,J167_B1,flag as outlier,30,1,20X,,,Ffion,,NA,NA,v1_5,0,,0,0,0,0,,1792,plastic,0,0,1792
-20190123,,,0,0,,,0,0,,FALSE,J168_B1,,30,1,20X,,,Ffion,,NA,NA,v1_5,0,,0,0,0,0,,292,plastic,0,0,292
-20190124,,,0,0,,,0,0,,FALSE,J169_B1,,30,1,20X,,,Ffion,,NA,NA,v1_5,0,,0,0,0,0,,595,plastic,0,0,595
-20190124,,,0,0,,,0,0,,FALSE,J170_B1,,30,1,20X,,,Ffion,,NA,NA,v1_5,0,,0,0,0,0,,224,plastic,0,0,224
-20190124,,,0,0,,,0,0,,FALSE,J171_B1,,30,1,20X,,,Ffion,,NA,NA,v1_5,0,,0,0,0,0,,275,plastic,0,0,275
-20190124,,,0,0,,,0,0,,FALSE,J172_B1,,30,1,20X,,,Ffion,,NA,NA,v1_5,0,,0,0,0,0,,391,plastic,0,0,391
-20190125,,,0,0,,,0,0,,FALSE,J173_B1,,30,1,20X,,,Ffion,,NA,NA,v1_5,0,,0,0,0,0,,465,plastic,0,0,465
-20190125,,,0,0,,,0,0,,FALSE,J174_B1,,30,1,20X,,,Ffion,,NA,NA,v2,0,,0,0,0,0,,0,plastic,0,0,0
-20190128,,,,,,,,0,,FALSE,J175_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,plastic,0,0,
-20190128,,,,,,,,,,FALSE,J176_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,plastic,0,,
-20190128,,,,,,,,0,,FALSE,J177_B1,,30,1,20X,,,Ffion,many deformed larvae,NA,NA,,0,,0,0,0,0,,0,plastic,0,0,
-20190128,,,,,,,,0,,FALSE,J178_B1,,30,2,20X,,,Ffion,"13 photos first slide, ~20 larvae total on first slide",NA,NA,,0,,0,0,0,0,,0,plastic,0,0,
-20190128,,,,,,,,0,,FALSE,J179_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,plastic,0,0,
-20190128,,,,,,,,0,,FALSE,J180_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,plastic,0,0,
-20190129,,,,,,,,0,,FALSE,J181_B1,,10,1,20X,,,Ffion,only 10 photos appear in folder,NA,NA,,0,,0,0,0,0,,0,plastic,0,0,
-20190129,,,,,,,,0,,FALSE,J182_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,plastic,0,0,
-20190130,,,,,,,,0,,FALSE,J185_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190130,,,,,,,,0,,FALSE,J186_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190130,,,,,,,,0,,FALSE,J187_B1,,30,2,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190131,,,,,,,,0,,FALSE,J188_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190131,,,,,,,,0,,FALSE,J190_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190131,,,,,,,,0,,FALSE,J191_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190131,,,,,,,,0,,FALSE,J192_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190131,,,,,,,,0,,FALSE,J193_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190131,,,,,,,,0,,FALSE,J195_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190131,,,,,,,,0,,FALSE,J197_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190201,,,,,,,,0,,FALSE,J198_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190201,,,,,,,,0,,FALSE,J199_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190201,,,,,,,,0,,FALSE,J200_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190201,,,,,,,,0,,FALSE,J201_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190201,,,,,,,,0,,FALSE,J202_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190201,,,,,,,,0,,FALSE,J203_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190201,,,,,,,,0,,FALSE,J204_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190204,,,,,,,,0,,FALSE,J205_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190204,,,,,,,,0,,FALSE,J207_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190205,,,,,,,,0,,FALSE,J208_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190205,,,,,,,,0,,FALSE,J209_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190205,,,,,,,,0,,FALSE,J210_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190205,,,,,,,,0,,FALSE,J211_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190205,,,,,,,,0,,FALSE,J212_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190206,,,,,,,,0,,FALSE,J223_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190207,,,,,,,,0,,FALSE,J213_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190207,,,,,,,,0,,FALSE,J214_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190207,,,,,,,,0,,FALSE,J215_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190207,,,,,,,,0,,FALSE,J216_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190207,,,,,,,,0,,FALSE,J217_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190208,,,,,,,,0,,FALSE,J218_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190208,,,,,,,,0,,FALSE,J219_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190211,,,,,,,,0,,FALSE,J220_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190211,,,,,,,,0,,FALSE,J221_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190211,,,,,,,,0,,FALSE,J222_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190211,,,,,,,,0,,FALSE,J224_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190211,,,,,,,,0,,FALSE,J225_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190211,,,,,,,,0,,FALSE,J226_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190211,,,,,,,,0,,FALSE,J227_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190212,,,,,,,,0,,FALSE,J228_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190212,,,,,,,,0,,FALSE,J229_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190212,,,,,,,,0,,FALSE,J230_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190212,,,,,,,,0,,FALSE,J231_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190212,,,,,,,,0,,FALSE,J232_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190214,,,,,,,,0,,FALSE,J233_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190214,,,,,,,,0,,FALSE,J234_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190214,,,,,,,,0,,FALSE,J235_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190214,,,,,,,,0,,FALSE,J236_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190214,,,,,,,,0,,FALSE,J237_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190214,,,,,,,,0,,FALSE,J238_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190214,,,,,,,,0,,FALSE,J239_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190215,,,,,,,,0,,FALSE,J240_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190215,,,,,,,,0,,FALSE,J241_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190215,,,,,,,,0,,FALSE,J243_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190215,,,,,,,,0,,FALSE,J244_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190215,,,,,,,,0,,FALSE,J245_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190215,,,,,,,,0,,FALSE,J246_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190215,,,,,,,,0,,FALSE,J247_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190215,,,,,,,,0,,FALSE,J248_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190215,,,,,,,,0,,FALSE,J249_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190215,,,,,,,,0,,FALSE,J250_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190220,,,,,,,,0,,FALSE,J251_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190220,,,,,,,,0,,FALSE,J252_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190220,,,,,,,,0,,FALSE,J253_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190220,,,,,,,,0,,FALSE,J254_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190220,,,,,,,,0,,FALSE,J255_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190220,,,,,,,,0,,FALSE,J256_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190220,,,,,,,,0,,FALSE,J257_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190220,,,,,,,,0,,FALSE,J258_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190221,,,,,,,,0,,FALSE,J259_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190221,,,,,,,,0,,FALSE,J260_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190221,,,,,,,,0,,FALSE,J261_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190221,,,,,,,,0,,FALSE,J262_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190221,,,,,,,,0,,FALSE,J263_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190221,,,,,,,,0,,FALSE,J264_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190221,,,,,,,,0,,FALSE,J265_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190221,,,,,,,,0,,FALSE,J266_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190221,,,,,,,,0,,FALSE,J267_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190221,,,,,,,,0,,FALSE,J268_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190222,,,,,,,,0,,FALSE,J269_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190222,,,,,,,,0,,FALSE,J270_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190225,,,,,,,,0,,FALSE,J271_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190225,,,,,,,,0,,FALSE,J272_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190225,,,,,,,,0,,FALSE,J273_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190226,,,,,,,,0,,FALSE,J274_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190226,,,,,,,,0,,FALSE,J275_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190226,,,,,,,,0,,FALSE,J276_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190226,,,,,,,,0,,FALSE,J277_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190226,,,,,,,,0,,FALSE,J278_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190226,,,,,,,,0,,FALSE,J279_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190226,,,,,,,,0,,FALSE,J280_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190227,,,,,,,,0,,FALSE,J281_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190227,,,,,,,,0,,FALSE,J282_B1,,29,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190227,,,,,,,,0,,FALSE,J283_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190227,,,,,,,,0,,FALSE,J284_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190227,,,,,,,,0,,FALSE,J285_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190227,,,,,,,,0,,FALSE,J286_B1,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190301,,,,,,,,0,,FALSE,J001_B2,,10,2,20X,,,Ffion,all larvae surrounded by precipitate,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190301,,,,,,,,0,,FALSE,J002_B2,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190301,,,,,,,,0,,FALSE,J003_B2,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190301,,,,,,,,0,,FALSE,J004_B2,,53,1,20X,,,Ffion,"non-larvae photos: 3, 12, 17?, 31, 32, 36, 38, 43, 54",NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190301,,,,,,,,0,,FALSE,J005_B2,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190304,,,,,,,,0,,FALSE,J006_B2,,42,1,20X,,,Ffion,"non-larvae photos: 6, 14, 18-20, 29, 33, 34, 36-41, 44, 45, 48, 52?",NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190305,,,,,,,,0,,FALSE,J007_B2,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190305,,,,,,,,0,,FALSE,J008_B2,,75,1,20X,,,Ffion,"most larvae are not D-stage/in correct orientation; non-larvae photos: 32, 53?",NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190305,,,,,,,,0,,FALSE,J009_B2,,16,2,20X,,,Ffion,very few larvae; not all D-stage or in correct orientations; non-larvae photos: 3?,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190305,,,,,,,,0,,FALSE,J010_B2,,30,1,20X,,,Ffion,,NA,NA,,0,,0,0,0,0,,0,glass,0,0,
-20190306,,,,,,,,0,,FALSE,J001_B3,,31,2,20X,,,Ffion,non-larvae photo: 18,,,,0,,0,,,,,0,glass,,0,
-20190306,,,,,,,,0,,FALSE,J002_B3,,32,2,20X,,,Ffion,"many round larvae; non-larvae: 6, 34",,,,0,,0,,,,,0,glass,,0,
-20190306,,,,,,,,0,,FALSE,J003_B3,,30,1,20X,,,Ffion,,,,,0,,0,,,,,0,glass,,0,
-20190306,,,,,,,,0,,FALSE,J004_B3,,25,2,20X,,,Ffion,,,,,0,,0,,,,,0,glass,,0,
-20190306,,,,,,,,0,,FALSE,J005_B3,,30,1,20X,,,Ffion,,,,,0,,0,,,,,0,glass,,0,
-20190306,,,,,,,,0,,FALSE,J006_B3,,30,1,20X,,,Ffion,,,,,0,,0,,,,,0,glass,,0,
-20190307,,,,,,,,0,,FALSE,J007_B3,,38,1,20X,,,Ffion,non-larvae: 26,,,,0,,0,,,,,0,glass,,0,
-20190307,,,,,,,,0,,FALSE,J008_B3,,30,1,20X,,,Ffion,,,,,0,,0,,,,,0,glass,,0,
-20190307,,,,,,,,0,,FALSE,J009_B3,,2,2,20X,,,Ffion,"non-larvae/extremely abnormal: 1, 2; no larvae to trace on either SWR",,,,0,,0,,,,,0,glass,,0,
-20190307,,,,,,,,0,,FALSE,J010_B3,,37,2,20X,,,Ffion,"non-larvae: 8, 12, 17, 19, 21, 30, 31",,,,0,,0,,,,,0,glass,,0,
-20190307,,,,,,,,0,,FALSE,J011_B3,,9,2,20X,,,Ffion,very few larvae; most round or elongated D-shape,,,,0,,0,,,,,0,glass,,0,
-20190308,,,,,,,,0,,FALSE,J012_B3,,10,2,20X,,,Ffion,very few correctly oriented D-stage,,,,0,,0,,,,,0,glass,,0,
-20190308,,,,,,,,0,,FALSE,J013_B3,,7,2,20X,,,Ffion,very few correctly oriented D-stage; no larvae on second SWR,,,,0,,0,,,,,0,glass,,0,
-20190308,,,,,,,,0,,FALSE,J014_B3,,30,1,20X,,,Ffion,,,,,0,,0,,,,,0,glass,,0,
-20190308,,,,,,,,0,,FALSE,J015_B3,,2,2,20X,,,Ffion,non-larvae/extremely abnormal: 1,,,,0,,0,,,,,0,glass,,0,
-20190308,,,,,,,,0,,FALSE,J016_B3,,31,1,20X,,,Ffion,abnormal larvae photos: 18?,,,,0,,0,,,,,0,glass,,0,
-20190308,,,,,,,,0,,FALSE,J017_B3,,7,2,20X,,,Ffion,non-larvae: 5-6; several round larvae; 5-6 at 10x obj,,,,0,,0,,,,,0,glass,,0,
-20190308,,,,,,,,0,,FALSE,J018_B3,,31,1,20X,,,Ffion,non-larvae: 21; copepod photo at 10x obj,,,,0,,0,,,,,0,glass,,0,
-20190322,,,,,,,,,,FALSE,J011_B2,,7,1,20X,0.941176471,,Ffion,[scroll right to confirm guesses],TRUE,TRUE,,16,,1,,,,,17,glass,,,
-20190322,,,,,,,,,,FALSE,J012_B2,,47,1,20X,0.28358209,,Ffion,,TRUE,FALSE,,19,,48,,,,,67,glass,,,
-20190322,,,,,,,,,,FALSE,J016_B2,,30,1,20X,0.006976744,,Ffion,,FALSE,FALSE,,3,,427,,,,,430,glass,,,
-20190322,,,,,,,,,,FALSE,J017_B2,,8,1,20X,0.684210526,,Ffion,,TRUE,TRUE,,13,,6,,,,,19,glass,,,
-20190322,,,,,,,,,,FALSE,J023_B2,,31,1,20X,0.009975062,,Ffion,non-larvae: 3 (10x obj),FALSE,TRUE*,,8,,794,,,,,802,glass,,,
-20190322,,,,,,,,,,FALSE,J024_B2,,5,1,20X,1,,Ffion,,TRUE,TRUE,,2,,0,,,,,2,glass,,,
-20190322,,,,,,,,,,FALSE,J051_B2,,30,1,20X,0.027027027,,Ffion,,FALSE,FALSE,,4,,144,,,,,148,glass,,,
-20190325,,,,,,,,,,FALSE,J053_B2,,11,1,20X,0.818181818,,Ffion,,TRUE,TRUE,,9,,2,,,,,11,glass,,,
-20190325,,,,,,,,,,FALSE,J104_B2,,30,1,20X,0.006666667,,Ffion,,FALSE,FALSE,,1,,149,,,,,150,glass,,,
-20190325,,,,,,,,,,FALSE,J108_B2,,30,1,20X,0.090909091,,Ffion,,FALSE,FALSE,,7,,70,,,,,77,glass,,,
-20190327,,,,,,,,,,FALSE,J114_B2,,30,1,20X,0.28,,Ffion,,TRUE,FALSE,,21,,54,,,,,75,glass,,,
-20190327,,,,,,,,,,FALSE,J120_B2,,7,1,20X,0.769230769,,Ffion,,TRUE,FALSE,,10,,3,,,,,13,glass,,,
-20190327,,,,,,,,,,FALSE,J143_B2,,30,1,20X,0.26344086,,Ffion,,TRUE,FALSE,,49,,137,,,,,186,glass,,,
-20190327,,,,,,,,,,FALSE,J182_B2,,7,1,20X,0.875,,Ffion,,TRUE,FALSE,,7,,1,,,,,8,glass,,,
-20190327,,,,,,,,,,FALSE,J183_B2,,30,1,20X,0.061349693,,Ffion,,TRUE,FALSE,,10,,153,,,,,163,glass,,,
-20190327,,,,,,,,,,FALSE,J192_B2,,30,1,20X,0.007259528,,Ffion,,FALSE,FALSE,,4,,547,,,,,551,glass,,,
-20190327,,,,,,,,,,FALSE,J209_B2,,30,1,20X,0.103202847,,Ffion,,TRUE,FALSE,,29,,252,,,,,281,glass,,,
-20190328,,,,,,,,,,FALSE,J267_B2,,30,1,20X,0.017110266,,Ffion,,TRUE,FALSE,,9,,517,,,,,526,glass,,,
-20190328,,,,,,,,,,FALSE,J286_B2,,30,1,20X,0.0625,,Ffion,,TRUE,FALSE,,7,,105,,,,,112,glass,,,
-20190328,,,,,,,,,,FALSE,J288_B2,,36,1,20X,0.743801653,,Ffion,,TRUE,TRUE,,90,,31,,,,,121,glass,,,
-20190328,,,,,,,,0,,FALSE,J019_B3,,31,1,20X,0.348484849,,Ffion,,TRUE,TRUE,,23,,43,,,,,66,glass,,66,
-20190329,,,,,,,,0,,FALSE,J020_B3,,30,1,20X,0.853211009,,Ffion,,TRUE,FALSE,,93,,16,,,,,109,glass,,109,
-20190329,,,,,,,,,,FALSE,J021_B3,,30,1,20X,0.941176471,,Ffion,,TRUE,TRUE,,48,,3,,,,,51,glass,,,
-20190401,,,,,,,,,,FALSE,J024_B3,,15,1,20X,1,,Ffion,non-larvae: 4,TRUE,TRUE,,14,,0,,,,,14,glass,,,
-20190401,,,,,,,,,,FALSE,J025_B3,,30,1,20X,0.850574713,,Ffion,,TRUE,FALSE,,74,,13,,,,,87,glass,,,
-20190401,,,,,,,,,,FALSE,J031_B3,,30,1,20X,0.218461539,,Ffion,,TRUE,FALSE,,71,,254,,,,,325,glass,,,
-20190401,,,,,,,,,,FALSE,J033_B3,,17,2,20X,0.733333333,,Ffion,"tiny larvae? 6, 8",TRUE,FALSE,,11,,4,,,,,15,glass,,,
-20190401,,,,,,,,0,,FALSE,J037_B3,,16,1,20X,0.866666667,,Ffion,,TRUE,FALSE,,13,,2,,,,,15,glass,,15,
-20190401,,,,,,,,,,FALSE,J103_B3,,30,1,20X,0.556962025,,Ffion,,TRUE,FALSE,,44,,35,,,,,79,glass,,,
-20190401,,,,,,,,0,,FALSE,J104_B3,,30,1,20X,0.292857143,,Ffion,,TRUE,FALSE,,41,,99,,,,,140,glass,,140,
-20190401,,,,,,,,0,,FALSE,J109_B3,,30,1,20X,1,,Ffion,16?,TRUE,TRUE,,51,,0,,,,,51,glass,,51,
-20190402,,,,,,,,,,FALSE,J117_B3,,30,1,20X,0.394557823,,Ffion,,TRUE,FALSE,,58,,89,,,,,147,glass,,,
-20190402,,,,,,,,,,FALSE,J118_B3,,30,1,20X,0.173584906,,Ffion,,TRUE,FALSE,,46,,219,,,,,265,glass,,,
-20190402,,,,,,,,,,FALSE,J119_B3,,30,1,20X,0.56626506,,Ffion,,TRUE,FALSE,,47,,36,,,,,83,glass,,,
-20190402,,,,,,,,,,FALSE,J121_B3,,31,1,20X,0.066176471,,Ffion,28 egg?,TRUE,FALSE,,9,,127,,,,,136,glass,,,
-20190402,,,,,,,,,,FALSE,J144_B3,,30,1,20X,0.794117647,,Ffion,,TRUE,FALSE,,27,,7,,,,,34,glass,,,
-20190403,,,,,,,,,,FALSE,J265_B3,,31,1,20X,0.252336449,,Ffion,,TRUE,FALSE,,27,,80,,,,,107,glass,,,
-20190404,,,,,,,,,,FALSE,J266_B3,,30,1,20X,0.656716418,,Ffion,,TRUE,FALSE,,88,,46,,,,,134,glass,,,
-20190404,,,,,,,,,,FALSE,J270_B3,,30,1,20X,0.204081633,,Ffion,,TRUE,FALSE,,30,,117,,,,,147,glass,,,
-20190404,,,,,,,,,,FALSE,J271_B3,,30,1,20X,0.701754386,,Ffion,,TRUE,FALSE,,80,,34,,,,,114,glass,,,
-20190705,,,,,,,,,,FALSE,J013_B2,,30,2,20X,,,Ffion,,,,,,,,,,,,,glass,,,
-20190705,,,,,,,,0,,FALSE,J018_B2,,30,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190705,,,,,,,,0,,FALSE,J019_B2,,30,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190705,,,,,,,,0,,FALSE,J021_B2,,30,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190705,,,,,,,,,,FALSE,J026_B2,,30,1,20X,,,Ffion,,,,,,,,,,,,,glass,,,
-20190705,,,,,,,,,,FALSE,J027_B2,,30,1,20X,,,Ffion,,,,,,,,,,,,,glass,,,
-20190705,,,,,,,,,,FALSE,J029_B2,,31,1,20X,,,Ffion,last photo copepod,,,,,,,,,,,,glass,,,
-20190715,,,,,,,,,,,J031_B2,,30,1,20X,,,Ffion,,,,,,,,,,,,,glass,,,
-20190715,,,,,,,,,,,J032_B2,,30,1,20X,,,Ffion,,,,,,,,,,,,,glass,,,
-20190816,,,,,,,,,,,J034_B2,,30,1,20X,,,Ffion,,,,,,,,,,,,,glass,,,
-20190816,,,,,,,,,,,J040_B2,,30,1,20X,,,Ffion,,,,,,,,,,,,,glass,,,
-20190816,,,,,,,,0,,,J042_B2,,18,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190816,,,,,,,,0,,,J045_B2,,30,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190816,,,,,,,,0,,,J047_B2,,30,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190816,,,,,,,,0,,,J048_B2,,30,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190826,,,,,,,,,,,J055_B2,,30,1,20X,,,Ffion,,,,,,,,,,,,,glass,,,
-20190826,,,,,,,,,,,J056_B2,,23,1,20X,,,Ffion,,,,,,,,,,,,,glass,,,
-20190826,,,,,,,,0,,,J059_B2,,2,2,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190826,,,,,,,,0,,,J060_B2,,30,1,20X,,,Ffion,sample used for pH tracking,,,,,,,,,,,,glass,,0,
-20190826,,,,,,,,0,,,J065_B2,,30,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190826,,,,,,,,0,,,J067_B2,,21,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190826,,,,,,,,0,,,J068_B2,,30,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190826,,,,,,,,0,,,J069_B2,,30,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190826,,,,,,,,0,,,J081_B2,,31,1,20X,,,Ffion,lots of junk; #17 possible plankton,,,,,,,,,,,,glass,,0,
-20190826,,,,,,,,0,,,J084_B2,,30,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190826,,,,,,,,0,,,J092_B2,,30,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190826,,,,,,,,0,,,J093_B2,,30,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190826,,,,,,,,0,,,J095_B2,,4,3,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190826,,,,,,,,0,,,J097_B2,,30,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190826,,,,,,,,0,,,J099_B2,,31,1,20X,,,Ffion,plankton moult (#21),,,,,,,,,,,,glass,,0,
-20190826,,,,,,,,0,,,J101_B2,,30,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190827,,,,,,,,0,,,J106_B2,,30,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190827,,,,,,,,0,,,J112_B2,,31,1,20X,,,Ffion,plankton moult (#7),,,,,,,,,,,,glass,,0,
-20190827,,,,,,,,0,,,J115_B2,,30,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190827,,,,,,,,0,,,J117_B2,,30,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190827,,,,,,,,0,,,J118_B2,,14,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190827,,,,,,,,0,,,J119_B2,,15,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190827,,,,,,,,0,,,J123_B2,,17,1,20X,,,Ffion,plankton moults (#10-11),,,,,,,,,,,,glass,,0,
-20190828,,,,,,,,0,,,J125_B2,,15,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190828,,,,,,,,0,,,J126_B2,,15,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190828,,,,,,,,0,,,J128_B2,,15,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190828,,,,,,,,0,,,J131_B2,,6,3,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190828,,,,,,,,0,,,J132_B2,,15,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190828,,,,,,,,0,,,J139_B2,,15,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190828,,,,,,,,0,,,J141_B2,,15,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190828,,,,,,,,0,,,J142_B2,,15,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190828,,,,,,,,0,,,J150_B2,,15,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190829,,,,,,,,0,,,J152_B2,,15,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190829,,,,,,,,0,,,J155_B2,,15,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190829,,,,,,,,0,,,J156_B2,,15,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190829,,,,,,,,0,,,J163_B2,,15,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190829,,,,,,,,0,,,J166_B2,,15,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190829,,,,,,,,0,,,J168_B2,,15,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190829,,,,,,,,0,,,J175_B2,,11,3,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190829,,,,,,,,0,,,J176_B2,,15,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190829,,,,,,,,0,,,J177_B2,,15,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190829,,,,,,,,0,,,J179_B2,,2,2,20X,,,Ffion,not sure if #1 is larva,,,,,,,,,,,,glass,,0,
-20190829,,,,,,,,0,,,J184_B2,,15,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190829,,,,,,,,0,,,J186_B2,,15,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190829,,,,,,,,0,,,J189_B2,,15,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190829,,,,,,,,0,,,J191_B2,,15,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190829,,,,,,,,0,,,J193_B2,,15,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190829,,,,,,,,0,,,J194_B2,,15,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190829,,,,,,,,0,,,J197_B2,,15,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190829,,,,,,,,0,,,J199_B2,,15,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190829,,,,,,,,0,,,J201_B2,,15,1,20X,,,Ffion,sample used for pH tracking,,,,,,,,,,,,glass,,0,
-20190829,,,,,,,,0,,,J204_B2,,15,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190829,,,,,,,,0,,,J207_B2,,15,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190829,,,,,,,,0,,,J208_B2,,15,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190829,,,,,,,,0,,,J210_B2,,15,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190829,,,,,,,,0,,,J212_B2,,15,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190829,,,,,,,,0,,,J214_B2,,15,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190829,,,,,,,,0,,,J215_B2,,4,1,20X,,,Ffion,all abnormal,,,,,,,,,,,,glass,,0,
-20190829,,,,,,,,0,,,J221_B2,,15,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190829,,,,,,,,0,,,J223_B2,,15,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190829,,,,,,,,0,,,J226_B2,,15,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190829,,,,,,,,0,,,J228_B2,,15,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190829,,,,,,,,0,,,J234_B2,,15,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190829,,,,,,,,0,,,J236_B2,,15,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190829,,,,,,,,0,,,J237_B2,,15,2,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190829,,,,,,,,0,,,J239_B2,,15,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190829,,,,,,,,0,,,J248_B2,,15,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190829,,,,,,,,0,,,J250_B2,,15,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190829,,,,,,,,0,,,J252_B2,,15,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190829,,,,,,,,0,,,J255_B2,,15,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190829,,,,,,,,0,,,J257_B2,,15,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190829,,,,,,,,0,,,J259_B2,,15,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190830,,,,,,,,0,,,J263_B2,,15,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190830,,,,,,,,0,,,J268_B2,,11,2,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190830,,,,,,,,0,,,J270_B2,,15,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190830,,,,,,,,0,,,J272_B2,,15,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190830,,,,,,,,0,,,J273_B2,,16,1,20X,,,Ffion,what's the deal w/ larvae e.g. #16?,,,,,,,,,,,,glass,,0,
-20190830,,,,,,,,0,,,J278_B2,,16,1,20X,,,Ffion,plankton moult (#6),,,,,,,,,,,,glass,,0,
-20190830,,,,,,,,0,,,J280_B2,,15,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
-20190830,,,,,,,,0,,,J282_B2,,15,1,20X,,,Ffion,sample used for pH tracking,,,,,,,,,,,,glass,,0,
-20190830,,,,,,,,0,,,J283_B2,,15,1,20X,,,Ffion,,,,,,,,,,,,,glass,,0,
+DateCount,Filter100um1,Filter100um2,Filter10um1,Filter10um2,Filter20um1,Filter20um2,Filter20um3,Filter20umPercDiff,FilterRinse,HClAdded,JarID,LarvaeCountsNotes,NumPhotos,NumSWR,Objective,PercentAbnormal,PersonFilterCount,PersonPhotos,PhotoNotes,PresenceJunk,PresenceZopl,SWRAbnormal,SWRCountTotal,SWRD,SWRFacingAway,SWRFacingAwayAbnormal,SWRRound,SWRStored,SWRTotal,SWRType,SWRUnsure,Total1mL,TotalLarvae,OrigTotalLarvae
+20190301,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J001_B2,NA,10,2,20X,NA,NA,Ffion,all larvae surrounded by precipitate,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190306,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J001_B3,NA,31,2,20X,NA,NA,Ffion,non-larvae photo: 18,NA,NA,0,NA,0,NA,NA,NA,NA,0,glass,NA,0,NA,NA
+20190301,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J002_B2,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190306,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J002_B3,NA,32,2,20X,NA,NA,Ffion,"many round larvae; non-larvae: 6, 34",NA,NA,0,NA,0,NA,NA,NA,NA,0,glass,NA,0,NA,NA
+20180720,0,0,0,0,460,446,NA,0.030434783,DI,TRUE,J003_B1,NA,26,1,10X,NA,Katie,Brett,NA,NA,NA,9,FALSE,30,0,0,0,DI,39,plastic,0,39,492,492
+20190301,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J003_B2,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190306,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J003_B3,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,NA,NA,NA,NA,0,glass,NA,0,NA,NA
+20180823,4,4,1,0,73,75,NA,-0.02739726,DI,TRUE,J004_B1,"filter used for SEM, not available for recount",30,1,20X,NA,Camila,Camila,NA,NA,NA,4,FALSE,425,0,0,0,DI,429,plastic,0,429,507.5,507
+20190301,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J004_B2,NA,53,1,20X,NA,NA,Ffion,"non-larvae photos: 3, 12, 17?, 31, 32, 36, 38, 43, 54",NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190306,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J004_B3,NA,25,2,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,NA,NA,NA,NA,0,glass,NA,0,NA,NA
+20180714,0,0,1,1,263,270,249,-0.02661597,DI,TRUE,J005_B1,NA,28,1,20X,NA,Camila,Camila,NA,NA,NA,4,FALSE,98,0,0,0,DI,102,plastic,0,102,369.5,368.5
+20190301,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J005_B2,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190306,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J005_B3,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,NA,NA,NA,NA,0,glass,NA,0,NA,NA
+20180823,3,3,1,0,34,36,NA,-0.058823529,DI,TRUE,J006_B1,NA,30,1,20X,NA,Camila,Camila,NA,NA,NA,0,FALSE,509,0,0,0,DI,509,plastic,0,509,547.5,547
+20190304,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J006_B2,NA,42,1,20X,NA,NA,Ffion,"non-larvae photos: 6, 14, 18-20, 29, 33, 34, 36-41, 44, 45, 48, 52?",NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190306,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J006_B3,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,NA,NA,NA,NA,0,glass,NA,0,NA,NA
+20180821,9,6,0,0,460,461,362,-0.002173913,DI,TRUE,J007_B1,NA,30,1,20X,NA,Camila,Camila,NA,NA,NA,7,FALSE,549,0,0,0,DI,556,plastic,0,556,1024,1024
+20190305,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J007_B2,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190307,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J007_B3,NA,38,1,20X,NA,NA,Ffion,non-larvae: 26,NA,NA,0,NA,0,NA,NA,NA,NA,0,glass,NA,0,NA,NA
+20180821,0,0,0,0,772,779,971,-0.009067358,DI,TRUE,J008_B1,"accidentally used 40% formalin after taking the pictures and counting. filter used for SEM, not available for recount",30,1,20X,NA,Camila,Camila,NA,NA,NA,5,FALSE,169,0,0,0,DI,174,plastic,0,174,949.5,949.5
+20190305,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J008_B2,NA,75,1,20X,NA,NA,Ffion,"most larvae are not D-stage/in correct orientation; non-larvae photos: 32, 53?",NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190307,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J008_B3,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,NA,NA,NA,NA,0,glass,NA,0,NA,NA
+20180824,0,0,2,2,418,421,389,-0.007177033,DI,TRUE,J009_B1,"Storage falcon tube used to test turbidity meter and then for filter testing, no sample left",30,1,20X,NA,Peter,Camila,NA,NA,NA,9,FALSE,905,0,0,0,DI,914,plastic,0,914,1335.5,1333.5
+20190305,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J009_B2,NA,16,2,20X,NA,NA,Ffion,very few larvae; not all D-stage or in correct orientations; non-larvae photos: 3?,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190307,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J009_B3,NA,2,2,20X,NA,NA,Ffion,"non-larvae/extremely abnormal: 1, 2; no larvae to trace on either SWR",NA,NA,0,NA,0,NA,NA,NA,NA,0,glass,NA,0,NA,NA
+20180827,4,5,1,1,295,309,335,-0.047457627,DI,TRUE,J010_B1,NA,30,1,20X,NA,Camila,Camila,NA,NA,NA,4,FALSE,1434,0,0,0,DI,1438,plastic,0,1438,1745.5,1744.5
+20190305,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J010_B2,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190307,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J010_B3,NA,37,2,20X,NA,NA,Ffion,"non-larvae: 8, 12, 17, 19, 21, 30, 31",NA,NA,0,NA,0,NA,NA,NA,NA,0,glass,NA,0,NA,NA
+20180827,2,1,2,3,205,201,NA,0.019512195,DI,TRUE,J011_B1,"filter used for SEM, not available for recount",30,1,20X,NA,Camila,Camila,NA,NA,NA,3,FALSE,650,0,0,0,DI,653,plastic,0,653,860,857.5
+20190322,NA,NA,NA,NA,NA,NA,NA,NA,NA,FALSE,J011_B2,NA,7,1,20X,0.941176471,NA,Ffion,[scroll right to confirm guesses],TRUE,TRUE,16,NA,1,NA,NA,NA,NA,17,glass,NA,NA,NA,NA
+20190307,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J011_B3,NA,9,2,20X,NA,NA,Ffion,very few larvae; most round or elongated D-shape,NA,NA,0,NA,0,NA,NA,NA,NA,0,glass,NA,0,NA,NA
+20180827,1,1,0,0,396,406,NA,-0.025252525,DI,TRUE,J012_B1,"filter used for SEM, not available for recount",30,1,20X,NA,Camila,Camila,NA,NA,NA,6,FALSE,110,0,0,0,DI,116,plastic,0,116,518,518
+20190322,NA,NA,NA,NA,NA,NA,NA,NA,NA,FALSE,J012_B2,NA,47,1,20X,0.28358209,NA,Ffion,NA,TRUE,FALSE,19,NA,48,NA,NA,NA,NA,67,glass,NA,NA,NA,NA
+20190308,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J012_B3,NA,10,2,20X,NA,NA,Ffion,very few correctly oriented D-stage,NA,NA,0,NA,0,NA,NA,NA,NA,0,glass,NA,0,NA,NA
+20180828,0,0,0,0,227,225,212,0.008810573,DI,TRUE,J013_B1,NA,30,1,20X,NA,Camila,Camila,NA,NA,NA,3,FALSE,582,0,0,0,DI,585,plastic,0,585,811,811
+20190705,NA,NA,NA,NA,NA,NA,NA,NA,NA,FALSE,J013_B2,NA,30,2,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,NA,NA,NA
+20190308,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J013_B3,NA,7,2,20X,NA,NA,Ffion,very few correctly oriented D-stage; no larvae on second SWR,NA,NA,0,NA,0,NA,NA,NA,NA,0,glass,NA,0,NA,NA
+20180720,0,0,1,1,90,89,NA,0.011111111,DI,TRUE,J014_B1,NA,25,2,10X,NA,Katie,Katie,NA,NA,NA,8,FALSE,639,0,0,0,DI,647,plastic,0,647,737.5,736.5
+20190308,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J014_B3,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,NA,NA,NA,NA,0,glass,NA,0,NA,NA
+20180829,1,1,0,0,396,395,NA,0.002525253,DI,TRUE,J015_B1,NA,30,1,20X,NA,Camila,Camila,NA,NA,NA,7,FALSE,320,0,0,0,DI,327,plastic,0,327,723.5,723.5
+20190308,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J015_B3,NA,2,2,20X,NA,NA,Ffion,non-larvae/extremely abnormal: 1,NA,NA,0,NA,0,NA,NA,NA,NA,0,glass,NA,0,NA,NA
+20180830,5,5,0,0,482,491,NA,-0.018672199,DI,TRUE,J016_B1,NA,27,1,20X,NA,Camila,Camila,NA,NA,NA,5,FALSE,361,0,0,0,DI,366,plastic,0,366,857.5,857.5
+20190322,NA,NA,NA,NA,NA,NA,NA,NA,NA,FALSE,J016_B2,NA,30,1,20X,0.006976744,NA,Ffion,NA,FALSE,FALSE,3,NA,427,NA,NA,NA,NA,430,glass,NA,NA,NA,NA
+20190308,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J016_B3,NA,31,1,20X,NA,NA,Ffion,abnormal larvae photos: 18?,NA,NA,0,NA,0,NA,NA,NA,NA,0,glass,NA,0,NA,NA
+20180830,4,4,0,0,460,441,369,0.041304348,DI,TRUE,J017_B1,NA,30,1,20X,NA,Camila,Camila,NA,NA,NA,4,FALSE,155,0,0,0,DI,159,plastic,0,159,613.5,613.5
+20190322,NA,NA,NA,NA,NA,NA,NA,NA,NA,FALSE,J017_B2,NA,8,1,20X,0.684210526,NA,Ffion,NA,TRUE,TRUE,13,NA,6,NA,NA,NA,NA,19,glass,NA,NA,NA,NA
+20190308,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J017_B3,NA,7,2,20X,NA,NA,Ffion,non-larvae: 5-6; several round larvae; 5-6 at 10x obj,NA,NA,0,NA,0,NA,NA,NA,NA,0,glass,NA,0,NA,NA
+20180830,2,2,0,0,210,207,191,0.014285714,DI,TRUE,J018_B1,NA,30,1,20X,NA,Camila,Camila,NA,NA,NA,11,FALSE,263,0,0,0,DI,274,plastic,0,274,484.5,484.5
+20190705,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J018_B2,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190308,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J018_B3,NA,31,1,20X,NA,NA,Ffion,non-larvae: 21; copepod photo at 10x obj,NA,NA,0,NA,0,NA,NA,NA,NA,0,glass,NA,0,NA,NA
+20180831,3,3,0,0,476,487,526,-0.023109244,DI,TRUE,J019_B1,NA,30,1,20X,NA,Camila,Camila,NA,NA,NA,2,FALSE,233,0,0,0,DI,235,plastic,0,235,719.5,719.5
+20190705,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J019_B2,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190328,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J019_B3,NA,31,1,20X,0.348484849,NA,Ffion,NA,TRUE,TRUE,23,NA,43,NA,NA,NA,NA,66,glass,NA,66,NA,NA
+20180904,2,2,0,0,423,412,NA,0.026004728,DI,TRUE,J020_B1,NA,30,1,20X,NA,Camila,Camila,NA,NA,NA,0,FALSE,74,0,0,0,DI,74,plastic,0,74,493.5,493.5
+20190329,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J020_B3,NA,30,1,20X,0.853211009,NA,Ffion,NA,TRUE,FALSE,93,NA,16,NA,NA,NA,NA,109,glass,NA,109,NA,NA
+20180904,2,2,0,0,411,419,NA,-0.01946472,DI,TRUE,J021_B1,NA,30,1,20X,NA,Camila,Camila,NA,NA,NA,17,FALSE,249,0,0,0,DI,266,plastic,0,266,683,683
+20190705,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J021_B2,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190329,NA,NA,NA,NA,NA,NA,NA,NA,NA,FALSE,J021_B3,NA,30,1,20X,0.941176471,NA,Ffion,NA,TRUE,TRUE,48,NA,3,NA,NA,NA,NA,51,glass,NA,NA,NA,NA
+20180905,5,5,0,0,265,266,NA,-0.003773585,DI,TRUE,J022_B1,NA,30,1,20X,NA,Camila,Camila,NA,NA,NA,22,FALSE,123,0,0,0,DI,145,plastic,0,145,415.5,415.5
+20180905,1,1,0,0,252,255,NA,-0.011904762,DI,TRUE,J023_B1,Lots of large larvae like photo #30,30,1,20X,NA,Camila,Camila,NA,NA,NA,3,FALSE,438,0,0,0,DI,441,plastic,0,441,695.5,695.5
+20190322,NA,NA,NA,NA,NA,NA,NA,NA,NA,FALSE,J023_B2,NA,31,1,20X,0.009975062,NA,Ffion,non-larvae: 3 (10x obj),FALSE,TRUE*,8,NA,794,NA,NA,NA,NA,802,glass,NA,NA,NA,NA
+20180906,3,3,0,0,228,232,NA,-0.01754386,DI,TRUE,J024_B1,NA,31,1,20X,NA,Camila,Camila,NA,NA,NA,7,FALSE,114,0,0,0,DI,121,plastic,0,121,354,354
+20190322,NA,NA,NA,NA,NA,NA,NA,NA,NA,FALSE,J024_B2,NA,5,1,20X,1,NA,Ffion,NA,TRUE,TRUE,2,NA,0,NA,NA,NA,NA,2,glass,NA,NA,NA,NA
+20190401,NA,NA,NA,NA,NA,NA,NA,NA,NA,FALSE,J024_B3,NA,15,1,20X,1,NA,Ffion,non-larvae: 4,TRUE,TRUE,14,NA,0,NA,NA,NA,NA,14,glass,NA,NA,NA,NA
+20180907,4,4,0,0,162,163,NA,-0.00617284,DI,TRUE,J025_B1,"Accidentally forgot to count the larvae on the slide before putting it back into the falcon tube, so I just counted them on the filter, so there is no abnormal data",34,1,20X,NA,Camila,Camila,3 abnormal larvae photographed,NA,NA,3,FALSE,369,0,0,0,DI,372,plastic,0,372,538.5,538.5
+20190401,NA,NA,NA,NA,NA,NA,NA,NA,NA,FALSE,J025_B3,NA,30,1,20X,0.850574713,NA,Ffion,NA,TRUE,FALSE,74,NA,13,NA,NA,NA,NA,87,glass,NA,NA,NA,NA
+20180910,8,8,0,0,88,84,81,0.045454545,DI,TRUE,J026_B1,NA,32,1,20X,NA,Camila,Camila,2 abnormal larvae photographed,NA,NA,16,FALSE,1255,0,0,0,DI,1271,plastic,0,1271,1365,1365
+20190705,NA,NA,NA,NA,NA,NA,NA,NA,NA,FALSE,J026_B2,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,NA,NA,NA
+20180910,9,10,0,0,240,249,227,-0.0375,DI,TRUE,J027_B1,NA,31,1,20X,NA,Camila,Camila,1-2 abnormal larvae photographed,NA,NA,12,FALSE,135,0,0,0,DI,147,plastic,0,147,401,401
+20190705,NA,NA,NA,NA,NA,NA,NA,NA,NA,FALSE,J027_B2,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,NA,NA,NA
+20180910,7,9,0,0,231,237,NA,-0.025974026,DI,TRUE,J028_B1,NA,31,1,20X,NA,Camila,Camila,1 abnormal larva photographed,NA,NA,3,FALSE,195,0,0,0,DI,198,plastic,0,198,440,440
+20180910,5,5,0,0,183,192,NA,-0.049180328,DI,TRUE,J029_B1,NA,30,1,20X,NA,Camila,Camila,NA,NA,NA,1,FALSE,262,0,0,0,DI,263,plastic,0,263,455.5,455.5
+20190705,NA,NA,NA,NA,NA,NA,NA,NA,NA,FALSE,J029_B2,NA,31,1,20X,NA,NA,Ffion,last photo copepod,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,NA,NA,NA
+20180911,3,3,0,0,249,249,NA,0,DI,TRUE,J030_B1,NA,30,1,20X,NA,Camila,Camila,NA,NA,NA,3,FALSE,169,0,0,0,DI,172,plastic,0,172,424,424
+20190715,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,J031_B2,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,NA,NA,NA
+20190401,NA,NA,NA,NA,NA,NA,NA,NA,NA,FALSE,J031_B3,NA,30,1,20X,0.218461539,NA,Ffion,NA,TRUE,FALSE,71,NA,254,NA,NA,NA,NA,325,glass,NA,NA,NA,NA
+20180911,3,4,0,0,72,71,66,0.013888889,DI,TRUE,J032_B1,NA,30,1,20X,NA,Camila,Camila,NA,NA,NA,1,FALSE,370,0,0,0,DI,371,plastic,0,371,446,446
+20190715,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,J032_B2,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,NA,NA,NA
+20180912,4,4,0,0,345,330,NA,0.043478261,DI,TRUE,J033_B1,NA,31,1,20X,NA,Camila,Camila,NA,NA,NA,7,FALSE,81,0,0,0,DI,88,plastic,0,88,429.5,429.5
+20190401,NA,NA,NA,NA,NA,NA,NA,NA,NA,FALSE,J033_B3,NA,17,2,20X,0.733333333,NA,Ffion,"tiny larvae? 6, 8",TRUE,FALSE,11,NA,4,NA,NA,NA,NA,15,glass,NA,NA,NA,NA
+20180913,4,4,0,0,472,454,NA,0.038135593,DI,TRUE,J034_B1,NA,32,2,20X,NA,Camila,Camila,NA,NA,NA,1,FALSE,66,0,0,0,DI,67,plastic,0,67,534,534
+20190816,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,J034_B2,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,NA,NA,NA
+20180913,2,2,1,1,362,373,NA,-0.03038674,DI,TRUE,J035_B1,NA,30,1,20X,NA,Camila,Camila,NA,NA,NA,0,FALSE,251,0,0,0,DI,251,plastic,0,251,621.5,620.5
+20180913,7,7,1,1,285,278,NA,0.024561404,DI,TRUE,J036_B1,NA,30,1,20X,NA,Camila,Camila,NA,NA,NA,5,FALSE,185,0,0,0,DI,190,plastic,0,190,479.5,478.5
+20180914,3,3,0,0,392,400,438,-0.020408163,DI,TRUE,J037_B1,"Had to count the filter 4 times, the 4th count was 372",30,1,20X,NA,Camila,Camila,NA,NA,NA,4,FALSE,272,0,0,0,DI,276,plastic,0,276,675,675
+20190401,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J037_B3,NA,16,1,20X,0.866666667,NA,Ffion,NA,TRUE,FALSE,13,NA,2,NA,NA,NA,NA,15,glass,NA,15,NA,NA
+20180914,18,19,0,0,376,381,NA,-0.013297872,DI,TRUE,J038_B1,NA,30,1,20X,NA,Camila,Camila,4 abnormal larvae photographed,NA,NA,22,FALSE,272,0,0,0,DI,294,plastic,0,294,691,691
+20180914,1,1,0,0,273,267,NA,0.021978022,DI,TRUE,J039_B1,Replaced the 100 micron filter ,30,1,20X,NA,Camila,Camila,NA,NA,NA,2,FALSE,182,0,0,0,DI,184,plastic,0,184,455,455
+20180914,0,0,0,0,260,260,NA,0,DI,TRUE,J040_B1,NA,30,1,20X,NA,Camila,Camila,1 abnormal larva photographed,NA,NA,3,FALSE,120,0,0,0,DI,123,plastic,0,123,383,383
+20190816,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,J040_B2,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,NA,NA,NA
+20180917,5,5,0,0,332,330,NA,0.006024096,DI,TRUE,J041_B1,upper right had the most larvae,32,1,20X,NA,Camila,Camila,2 abnormal larvae photographed,NA,NA,8,FALSE,77,0,0,1,DI,86,plastic,0,86,422,422
+20180917,11,12,0,0,861,846,NA,0.017421603,DI,TRUE,J042_B1,"had to count four times,  lower half of the filter had the most larvae",30,1,20X,NA,Camila,Camila,NA,NA,NA,27,FALSE,218,0,0,0,DI,245,plastic,0,245,1110,1110
+20190816,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J042_B2,NA,18,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20180917,6,6,0,0,485,482,NA,0.006185567,DI,TRUE,J043_B1,upper half had the most larvae,30,1,20X,NA,Camila,Camila,NA,NA,NA,6,FALSE,334,0,0,0,DI,340,plastic,0,340,829.5,829.5
+20180917,3,3,0,0,542,534,NA,0.014760148,DI,TRUE,J044_B1,left side had the most larvae,30,1,20X,NA,Camila,Camila,NA,NA,NA,1,FALSE,108,0,0,0,DI,109,plastic,0,109,650,650
+20180918,6,6,0,0,98,97,NA,0.010204082,DI,TRUE,J045_B1,upper half had the most larvae,31,1,20X,NA,Camila,Camila,1 abnormal larva photographed,NA,NA,2,FALSE,191,0,0,0,DI,193,plastic,0,193,296.5,296.5
+20190816,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J045_B2,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20180918,4,4,0,0,148,141,NA,0.047297297,DI,TRUE,J046_B1,Lower half had the most larvae,31,1,20X,NA,Camila,Camila,3? abnormal larvae photographed,NA,NA,9,FALSE,44,0,0,0,DI,53,plastic,0,53,201.5,201.5
+20190816,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J047_B2,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190816,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J048_B2,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20180918,6,6,0,0,328,331,382,-0.009146341,DI,TRUE,J049_B1,lower left had the most larvae,30,1,20X,NA,Camila,Camila,NA,NA,NA,6,FALSE,192,0,0,0,DI,198,plastic,0,198,533.5,533.5
+20180919,8,8,1,1,309,323,292,-0.045307443,DI,TRUE,J050_B1,right side had the most larvae,30,1,20X,NA,Camila,Camila,NA,NA,NA,4,FALSE,376,0,0,0,DI,380,plastic,0,380,705,704
+20180919,3,3,0,0,291,304,NA,-0.04467354,DI,TRUE,J051_B1,"upper left had the most larvae, they were more faint in color than other filters have been, maybe they didn't get enought neutral red dye?",30,1,20X,NA,Camila,Camila,NA,NA,NA,0,FALSE,404,0,0,0,DI,404,plastic,0,404,704.5,704.5
+20190322,NA,NA,NA,NA,NA,NA,NA,NA,NA,FALSE,J051_B2,NA,30,1,20X,0.027027027,NA,Ffion,NA,FALSE,FALSE,4,NA,144,NA,NA,NA,NA,148,glass,NA,NA,NA,NA
+20180919,4,4,0,0,448,470,NA,-0.049107143,DI,TRUE,J052_B1,right side had the most larvae,33,1,20X,NA,Camila,Camila,"3 ""facing away"" larvae photographed; many ""facing away"" larvae in subsample",NA,NA,4,FALSE,102,0,0,0,DI,106,plastic,0,106,569,569
+20180919,4,4,0,0,272,274,NA,-0.007352941,DI,TRUE,J053_B1,upper left had the most larvae,32,1,20X,NA,Camila,Camila,2 abnormal larvae photographed,NA,NA,2,FALSE,449,0,0,1,DI,452,plastic,0,452,729,729
+20190325,NA,NA,NA,NA,NA,NA,NA,NA,NA,FALSE,J053_B2,NA,11,1,20X,0.818181818,NA,Ffion,NA,TRUE,TRUE,9,NA,2,NA,NA,NA,NA,11,glass,NA,NA,NA,NA
+20180919,3,3,0,0,191,194,206,-0.015706806,DI,TRUE,J054_B1,upper right had the most larvae,30,1,20X,NA,Camila,Camila,"many ""facing away"" larvae in subsample",NA,NA,5,FALSE,493,0,0,0,DI,498,plastic,0,498,693.5,693.5
+20180919,1,1,0,0,396,380,NA,0.04040404,DI,TRUE,J055_B1,upper left had the most larvae,30,1,20X,NA,Camila,Camila,NA,NA,NA,3,FALSE,253,0,0,0,DI,256,plastic,0,256,645,645
+20190826,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,J055_B2,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,NA,NA,NA
+20180920,2,2,0,0,384,394,NA,-0.026041667,DI,TRUE,J056_B1,Lower half had the most larvae,30,1,20X,NA,Camila,Camila,NA,NA,NA,7,FALSE,874,0,0,0,DI,881,plastic,0,881,1272,1272
+20190826,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,J056_B2,NA,23,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,NA,NA,NA
+20180924,3,3,0,0,272,268,NA,0.014705882,DI,TRUE,J057_B1,"lower right had the most larvae, storage falcon tube used to test tubidity meter",30,1,20X,NA,Camila,Camila,NA,NA,NA,10,FALSE,96,0,0,0,DI,106,plastic,0,106,379,379
+20180924,0,0,0,0,141,139,152,0.014184397,DI,TRUE,J058_B1,upper right had the most larvae,30,1,20X,NA,Camila,Camila,NA,NA,NA,5,FALSE,373,0,0,0,DI,378,plastic,0,378,518,518
+20180924,1,1,0,0,267,260,NA,0.026217228,DI,TRUE,J059_B1,lower left had the most larvae,30,2,20X,NA,Camila,Camila,NA,NA,NA,3,FALSE,79,0,0,0,DI,82,plastic,0,82,346.5,346.5
+20190826,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J059_B2,NA,2,2,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20180924,5,6,0,0,348,355,327,-0.020114943,DI,TRUE,J060_B1,right side had the most larvae,30,1,20X,NA,Camila,Camila,NA,NA,NA,10,FALSE,96,0,0,0,DI,106,plastic,0,106,463,463
+20190826,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J060_B2,NA,30,1,20X,NA,NA,Ffion,sample used for pH tracking,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20180924,5,5,0,0,67,69,NA,-0.029850746,DI,TRUE,J061_B1,lower right had the most larvae,30,1,20X,NA,Camila,Camila,NA,NA,NA,1,FALSE,648,0,0,0,DI,649,plastic,0,649,722,722
+20180925,3,4,0,0,242,235,NA,0.02892562,DI,TRUE,J062_B1,upper right had the most larvae,30,1,20X,NA,Camila,Camila,NA,NA,NA,13,FALSE,242,0,0,0,DI,255,plastic,0,255,497,497
+20180925,1,1,0,0,240,239,NA,0.004166667,DI,TRUE,J063_B1,lower left had the most larvae,30,1,20X,NA,Camila,Camila,NA,NA,NA,4,FALSE,455,0,0,0,DI,459,plastic,0,459,699.5,699.5
+20180925,0,0,0,0,327,332,NA,-0.01529052,DI,TRUE,J064_B1,upper left had the most larvae,30,1,20X,NA,Camila,Camila,NA,NA,NA,2,FALSE,183,0,0,0,DI,185,plastic,0,185,514.5,514.5
+20180925,0,0,0,0,259,251,NA,0.030888031,DI,TRUE,J065_B1,lower right had the most larvae,30,1,20X,NA,Camila,Camila,NA,NA,NA,10,FALSE,158,0,0,0,DI,168,plastic,0,168,423,423
+20190826,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J065_B2,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20180926,1,1,0,0,323,314,301,0.027863777,DI,TRUE,J066_B1,lower right had the most larvae,30,1,20X,NA,Camila,Camila,NA,NA,NA,11,FALSE,170,0,0,0,DI,181,plastic,0,181,500.5,500.5
+20180926,3,3,0,0,276,285,NA,-0.032608696,DI,TRUE,J067_B1,upper left had the most larvae,30,1,20X,NA,Camila,Camila,NA,NA,NA,3,FALSE,553,0,0,0,DI,556,plastic,0,556,839.5,839.5
+20190826,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J067_B2,NA,21,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20180926,3,3,0,0,570,573,542,-0.005263158,DI,TRUE,J068_B1,upper left had the most larvae ,30,1,20X,NA,Camila,Camila,NA,NA,NA,9,FALSE,110,0,0,0,DI,119,plastic,0,119,693.5,693.5
+20190826,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J068_B2,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20180926,1,1,0,0,82,79,92,0.036585366,DI,TRUE,J069_B1,left side had the most larvae,30,1,20X,NA,Camila,Camila,NA,NA,NA,3,FALSE,670,0,0,0,DI,673,plastic,0,673,754.5,754.5
+20190826,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J069_B2,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20180927,3,4,0,0,274,278,NA,-0.01459854,DI,TRUE,J070_B1,upper right had the most larvae,38,1,20X,NA,Camila,Camila,NA,NA,NA,8,FALSE,141,63,0,0,DI,212,plastic,0,149,491.5,491.5
+20180927,0,0,0,0,143,143,NA,0,DI,TRUE,J071_B1,upper right had the most larvae,32,2,20X,NA,Camila,Camila,NA,NA,NA,2,FALSE,37,3,0,0,DI,42,plastic,0,39,185,185
+20180927,0,0,0,0,114,115,NA,-0.00877193,DI,TRUE,J072_B1,Lower half had the most larvae,31,1,20X,NA,Camila,Camila,NA,NA,NA,1,FALSE,48,27,0,0,DI,76,plastic,0,49,190.5,190.5
+20180927,5,5,0,0,920,961,NA,-0.044565217,DI,TRUE,J073_B1,right side had the most larvae,35,1,20X,NA,Camila,Camila,NA,NA,NA,4,FALSE,420,295,0,0,DI,728,plastic,9,424,1673.5,1673.5
+20180928,5,6,0,0,505,516,460,-0.021782178,DI,TRUE,J074_B1,upper left had the most larvae,35,1,20X,NA,Camila,Camila,NA,NA,NA,5,FALSE,1865,51,0,0,DI,1928,plastic,7,1870,2444,2444
+20180928,2,2,0,0,226,222,NA,0.017699115,DI,TRUE,J076_B1,upper middle had the most larvae,32,1,20X,NA,Camila,Camila,NA,NA,NA,0,FALSE,248,56,2,0,DI,307,plastic,1,248,533,533
+20180928,1,1,1,1,334,337,NA,-0.008982036,DI,TRUE,J077_B1,Lower half had the most larvae,31,1,20X,NA,Camila,Camila,NA,NA,NA,1,FALSE,118,4,0,0,DI,123,plastic,0,119,460.5,459.5
+20180928,1,1,0,0,245,234,NA,0.044897959,DI,TRUE,J078_B1,NA,46,1,20X,NA,Camila,Camila,NA,NA,NA,2,FALSE,156,149,2,0,DI,309,plastic,0,158,549.5,549.5
+20181001,3,3,0,0,507,488,464,0.037475345,DI,TRUE,J079_B1,lower right had the most larvae,44,1,20X,NA,Camila,Camila,NA,NA,NA,11,FALSE,205,54,4,0,DI,279,plastic,5,216,779.5,779.5
+20181001,3,3,0,0,297,296,NA,0.003367003,DI,TRUE,J080_B1,lower right had the most larvae,43,1,20X,NA,Camila,Camila,NA,NA,NA,13,FALSE,633,25,2,0,DI,680,plastic,7,646,979.5,979.5
+20181001,3,3,0,0,267,262,NA,0.018726592,DI,TRUE,J081_B1,"lower left had the most larvae, storage falcon tube used to test tubidity meter",39,1,20X,NA,Camila,Camila,NA,NA,NA,6,FALSE,213,177,6,0,DI,403,plastic,1,219,670.5,670.5
+20190826,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J081_B2,NA,31,1,20X,NA,NA,Ffion,lots of junk; #17 possible plankton,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20181002,1,1,0,0,625,626,NA,-0.0016,DI,TRUE,J082_B1,right side had the most larvae,32,1,20X,NA,Camila,Camila,NA,NA,NA,2,FALSE,171,4,1,0,DI,178,plastic,0,173,804.5,804.5
+20181002,6,8,0,0,439,435,464,0.009111617,DI,TRUE,J083_B1,upper right had the most larvae,37,1,20X,NA,Camila,Camila,NA,NA,NA,7,FALSE,291,126,15,0,DI,444,plastic,5,298,888,888
+20181004,0,0,0,0,166,169,203,-0.018072289,DI,TRUE,J084_B1,upper left had the most larvae,37,1,20X,NA,Camila,Camila,NA,NA,NA,7,FALSE,664,58,2,0,DI,734,plastic,3,671,901.5,901.5
+20190826,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J084_B2,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20181004,2,2,0,0,136,137,128,-0.007352941,DI,TRUE,J085_B1,NA,30,1,20X,NA,Camila,Camila,NA,NA,NA,3,FALSE,124,41,1,0,DI,171,plastic,2,127,309.5,309.5
+20181004,1,1,0,0,64,65,NA,-0.015625,DI,TRUE,J086_B1,NA,30,1,20X,NA,Camila,Camila,NA,NA,NA,2,FALSE,304,9,0,0,DI,316,plastic,1,306,381.5,381.5
+20181004,0,0,0,0,213,204,225,0.042253521,DI,TRUE,J087_B1,upper right,40,1,20X,NA,Camila,Camila,NA,NA,NA,0,FALSE,100,79,1,0,DI,182,plastic,2,100,390.5,390.5
+20181004,0,0,0,0,143,142,NA,0.006993007,DI,TRUE,J088_B1,upper right,30,1,20X,NA,Camila,Camila,NA,NA,NA,3,FALSE,169,4,0,0,DI,176,plastic,0,172,318.5,318.5
+20181005,0,0,0,0,54,53,NA,0.018518519,DI,TRUE,J089_B1,lower right,30,1,20X,NA,Camila,Camila,NA,NA,NA,2,FALSE,378,3,0,0,DI,383,plastic,0,380,436.5,436.5
+20181005,0,0,0,0,121,117,NA,0.033057851,DI,TRUE,J090_B1,upper right,30,1,20X,NA,Camila,Camila,NA,NA,NA,4,FALSE,219,72,3,0,DI,299,plastic,1,223,418,418
+20181005,0,0,0,0,101,102,NA,-0.00990099,DI,TRUE,J091_B1,lower right,33,1,20X,NA,Camila,Camila,NA,NA,NA,3,FALSE,348,17,0,0,DI,369,plastic,1,351,470.5,470.5
+20181005,0,0,1,1,282,288,NA,-0.021276596,DI,TRUE,J092_B1,upper right,34,1,20X,NA,Camila,Camila,NA,NA,NA,4,FALSE,572,7,0,0,DI,583,plastic,0,576,869,868
+20190826,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J092_B2,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20181011,0,0,2,2,151,155,NA,-0.026490066,DI,TRUE,J093_B1,upper right,30,1,20X,NA,Camila,Camila,NA,NA,NA,3,FALSE,348,17,0,0,DI,369,plastic,1,351,524,522
+20190826,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J093_B2,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20181012,1,1,0,0,207,198,NA,0.043478261,DI,TRUE,J094_B1,upper left,30,1,20X,NA,Camila,Camila,NA,NA,NA,7,FALSE,489,14,1,0,DI,511,plastic,0,496,714.5,714.5
+20181012,1,1,0,0,237,230,NA,0.029535865,DI,TRUE,J095_B1,lower left,30,1,20X,NA,Camila,Camila,NA,NA,NA,3,FALSE,603,8,0,0,DI,614,plastic,0,606,848.5,848.5
+20190826,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J095_B2,NA,4,3,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20181012,3,3,0,0,364,355,NA,0.024725275,DI,TRUE,J096_B1,upper right,30,1,20X,NA,Camila,Camila,NA,NA,NA,10,FALSE,145,62,5,0,DI,222,plastic,0,155,584.5,584.5
+20181012,3,3,0,0,262,256,239,0.022900763,DI,TRUE,J097_B1,lower left,30,1,20X,NA,Camila,Camila,NA,NA,NA,5,FALSE,181,29,1,0,DI,216,plastic,0,186,478,478
+20190826,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J097_B2,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20181012,0,0,0,0,505,503,551,0.003960396,DI,TRUE,J098_B1,upper right,30,1,20X,NA,Camila,Camila,NA,NA,NA,15,FALSE,330,112,2,0,DI,459,plastic,0,345,963,963
+20181015,1,1,0,0,169,168,182,0.00591716,DI,TRUE,J099_B1,upper right,30,1,20X,NA,Camila,Camila,NA,NA,NA,3,FALSE,747,3,0,0,DI,754,plastic,1,750,923.5,923.5
+20190826,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J099_B2,NA,31,1,20X,NA,NA,Ffion,plankton moult (#21),NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20181015,3,3,0,0,448,440,NA,0.017857143,DI,TRUE,J100_B1,upper left,30,1,20X,NA,Camila,Camila,NA,NA,NA,8,FALSE,201,58,3,4,DI,274,plastic,0,213,721,721
+20181016,3,3,0,0,156,153,NA,0.019230769,DI,TRUE,J101_B1,lower left,30,1,20X,NA,Camila,Camila,NA,NA,NA,1,FALSE,32,5,0,1,DI,39,plastic,0,34,196.5,196.5
+20190826,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J101_B2,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20181016,3,3,0,0,115,113,NA,0.017391304,DI,TRUE,J102_B1,upper left,30,1,20X,NA,Camila,Camila,NA,NA,NA,3,FALSE,49,24,0,0,DI,76,plastic,0,52,193,193
+20190401,NA,NA,NA,NA,NA,NA,NA,NA,NA,FALSE,J103_B3,NA,30,1,20X,0.556962025,NA,Ffion,NA,TRUE,FALSE,44,NA,35,NA,NA,NA,NA,79,glass,NA,NA,NA,NA
+20181016,2,2,0,0,97,97,NA,0,DI,TRUE,J104_B1,lower left,30,1,20X,NA,Camila,Camila,NA,NA,NA,4,FALSE,259,4,0,0,DI,267,plastic,0,263,366,366
+20190325,NA,NA,NA,NA,NA,NA,NA,NA,NA,FALSE,J104_B2,NA,30,1,20X,0.006666667,NA,Ffion,NA,FALSE,FALSE,1,NA,149,NA,NA,NA,NA,150,glass,NA,NA,NA,NA
+20190401,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J104_B3,NA,30,1,20X,0.292857143,NA,Ffion,NA,TRUE,FALSE,41,NA,99,NA,NA,NA,NA,140,glass,NA,140,NA,NA
+20181016,0,0,0,0,363,358,342,0.013774105,DI,TRUE,J105_B1,upper right,30,1,20X,NA,Camila,Camila,NA,NA,NA,7,FALSE,250,92,5,1,DI,356,plastic,1,258,716.5,716.5
+20181102,5,5,0,0,175,178,NA,-0.017142857,DI,TRUE,J106_B1,larvae poured onto 10 micron filter by accident ,30,1,20X,NA,Camila,Camila,NA,NA,NA,4,FALSE,149,75,1,0,DI,229,plastic,0,153,410.5,410.5
+20190827,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J106_B2,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20181102,0,0,1,1,257,268,286,-0.042801556,DI,TRUE,J107_B1,NA,30,1,20X,NA,Camila,Camila,NA,NA,NA,2,FALSE,134,9,1,0,DI,146,plastic,0,136,409.5,408.5
+20181105,0,0,0,0,227,220,NA,0.030837004,DI,TRUE,J108_B1,NA,30,1,20X,NA,Camila,Camila,NA,NA,NA,28,FALSE,225,49,2,0,DI,304,plastic,0,253,527.5,527.5
+20190325,NA,NA,NA,NA,NA,NA,NA,NA,NA,FALSE,J108_B2,NA,30,1,20X,0.090909091,NA,Ffion,NA,FALSE,FALSE,7,NA,70,NA,NA,NA,NA,77,glass,NA,NA,NA,NA
+20181105,0,0,0,0,227,225,NA,0.008810573,DI,TRUE,J109_B1,NA,30,1,20X,NA,Camila,Camila,NA,NA,NA,2,FALSE,109,3,0,0,DI,114,plastic,0,111,340,340
+20190401,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J109_B3,NA,30,1,20X,1,NA,Ffion,16?,TRUE,TRUE,51,NA,0,NA,NA,NA,NA,51,glass,NA,51,NA,NA
+20181106,3,3,0,0,208,209,219,-0.004807692,DI,TRUE,J110_B1,NA,30,1,20X,NA,Camila,Camila,NA,NA,NA,8,FALSE,47,25,1,0,DI,81,plastic,0,55,292.5,292.5
+20181106,1,1,0,0,364,359,NA,0.013736264,DI,TRUE,J111_B1,larvae were very light on the filter,30,1,20X,NA,Camila,Camila,NA,NA,NA,2,FALSE,356,5,0,0,DI,363,plastic,0,358,725.5,725.5
+20181107,0,0,0,0,317,322,NA,-0.015772871,DI,TRUE,J112_B1,NA,30,1,20X,NA,Camila,Camila,NA,NA,NA,32,FALSE,251,114,3,1,DI,401,plastic,0,284,720.5,720.5
+20190827,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J112_B2,NA,31,1,20X,NA,NA,Ffion,plankton moult (#7),NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20181107,3,3,0,0,453,454,510,-0.002207506,DI,TRUE,J113_B1,NA,30,1,20X,NA,Camila,Camila,NA,NA,NA,14,FALSE,429,20,0,0,DI,464,plastic,1,443,920.5,920.5
+20181113,0,0,1,1,470,470,NA,0,DI,TRUE,J114_B1,tons of larvae on the sides of the filter,30,1,20X,NA,Camila,Camila,NA,NA,NA,49,FALSE,715,181,4,0,DI,949,plastic,0,764,1420,1419
+20190327,NA,NA,NA,NA,NA,NA,NA,NA,NA,FALSE,J114_B2,NA,30,1,20X,0.28,NA,Ffion,NA,TRUE,FALSE,21,NA,54,NA,NA,NA,NA,75,glass,NA,NA,NA,NA
+20181113,0,0,0,0,433,428,NA,0.011547344,DI,TRUE,J115_B1,NA,30,1,20X,NA,Camila,Camila,NA,NA,NA,19,FALSE,1049,28,0,0,DI,1096,plastic,0,1068,1526.5,1526.5
+20190827,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J115_B2,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20181113,1,1,0,0,878,917,837,-0.044419134,DI,FALSE,J116_B1,NA,30,1,20X,NA,Camila,Camila,NA,NA,NA,13,FALSE,118,131,6,0,DI,268,plastic,0,131,1166.5,1166.5
+20181114,0,0,0,0,344,341,NA,0.00872093,DI,FALSE,J117_B1,"recounted filter when dry: 333, storage falcon tube used to look at larvae again so more DI and formalin was added",30,1,20X,NA,Camila,Camila,NA,NA,NA,4,FALSE,543,12,0,0,DI,559,plastic,0,547,901.5,901.5
+20190827,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J117_B2,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190402,NA,NA,NA,NA,NA,NA,NA,NA,NA,FALSE,J117_B3,NA,30,1,20X,0.394557823,NA,Ffion,NA,TRUE,FALSE,58,NA,89,NA,NA,NA,NA,147,glass,NA,NA,NA,NA
+20181114,1,1,0,0,542,542,NA,0,DI,FALSE,J118_B1,"recounted filter when dry: 416, 422",30,1,20X,NA,Camila,Camila,NA,NA,NA,12,FALSE,192,67,1,0,DI,272,plastic,0,204,815,815
+20190827,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J118_B2,NA,14,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190402,NA,NA,NA,NA,NA,NA,NA,NA,NA,FALSE,J118_B3,NA,30,1,20X,0.173584906,NA,Ffion,NA,TRUE,FALSE,46,NA,219,NA,NA,NA,NA,265,glass,NA,NA,NA,NA
+20181114,1,1,0,0,281,293,NA,-0.042704626,DI,FALSE,J119_B1,recounted filter when dry: 282,30,1,20X,NA,Camila,Camila,NA,NA,NA,2,FALSE,265,5,0,0,DI,272,plastic,0,267,560,560
+20190827,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J119_B2,NA,15,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190402,NA,NA,NA,NA,NA,NA,NA,NA,NA,FALSE,J119_B3,NA,30,1,20X,0.56626506,NA,Ffion,NA,TRUE,FALSE,47,NA,36,NA,NA,NA,NA,83,glass,NA,NA,NA,NA
+20181115,1,1,0,0,444,435,NA,0.02027027,DI,FALSE,J120_B1,NA,30,1,20X,NA,Camila,Camila,NA,NA,NA,6,FALSE,68,29,0,0,DI,104,plastic,1,74,544.5,544.5
+20190327,NA,NA,NA,NA,NA,NA,NA,NA,NA,FALSE,J120_B2,NA,7,1,20X,0.769230769,NA,Ffion,NA,TRUE,FALSE,10,NA,3,NA,NA,NA,NA,13,glass,NA,NA,NA,NA
+20181116,0,0,0,0,177,183,NA,-0.033898305,DI,FALSE,J121_B1,lots of debris on filter,31,1,20X,NA,Camila,Camila,abnormal photos: 13,NA,NA,0,TRUE,0,0,0,0,DI,600,plastic,0,NA,780,780
+20190402,NA,NA,NA,NA,NA,NA,NA,NA,NA,FALSE,J121_B3,NA,31,1,20X,0.066176471,NA,Ffion,28 egg?,TRUE,FALSE,9,NA,127,NA,NA,NA,NA,136,glass,NA,NA,NA,NA
+20181116,3,3,1,1,733,748,NA,-0.020463847,DI,FALSE,J122_B1,NA,39,1,20X,NA,Camila,Camila,"abnormal photos: 7, 9, 10, 16, 18, 19, 28, 31, 34",NA,NA,0,TRUE,0,0,0,0,DI,176,plastic,0,0,920.5,919.5
+20181116,1,1,0,0,245,254,NA,-0.036734694,SFSW,FALSE,J123_B1,recounted filter when dry: 265,30,1,20X,NA,Camila,Camila,NA,NA,NA,0,TRUE,0,0,0,0,SFSW,578,plastic,0,0,828.5,828.5
+20190827,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J123_B2,NA,17,1,20X,NA,NA,Ffion,plankton moults (#10-11),NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20181116,0,0,0,0,577,596,NA,-0.032928943,SFSW,FALSE,J124_B1,NA,31,1,20X,NA,Camila,Camila,abnormal photo: 5,NA,NA,0,TRUE,0,0,0,0,SFSW,129,plastic,0,0,715.5,715.5
+20181116,0,0,0,0,168,166,179,0.011904762,SFSW,FALSE,J125_B1,NA,30,1,20X,NA,Camila,Camila,NA,NA,NA,0,TRUE,0,0,0,0,SFSW,336,plastic,0,0,503,503
+20190828,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J125_B2,NA,15,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20181119,2,2,1,1,331,321,NA,0.03021148,SFSW,FALSE,J126_B1,NA,38,1,20X,NA,Camila,Camila,"abnormal photos: 1, 2, 8, 13, 24, 27 (open?), 31, 34 (velum)",NA,NA,0,TRUE,0,0,0,0,SFSW,154,plastic,0,0,483,482
+20190828,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J126_B2,NA,15,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20181119,4,4,0,0,399,405,NA,-0.015037594,SFSW,FALSE,J127_B1,NA,35,1,20X,NA,Camila,Camila,"abnormal photos: 4, 13, 17, 22, 29",NA,NA,0,TRUE,0,0,0,0,SFSW,177,plastic,0,0,583,583
+20181119,13,12,1,1,453,445,NA,0.017660044,SFSW,FALSE,J128_B1,NA,30,1,20X,NA,Camila,Camila,NA,NA,NA,0,TRUE,0,0,0,0,SFSW,243,plastic,0,0,705.5,704.5
+20190828,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J128_B2,NA,15,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20181119,0,0,0,0,50,50,NA,0,SFSW,FALSE,J129_B1,NA,30,1,20X,NA,Camila,Camila,NA,NA,NA,0,TRUE,0,0,0,0,SFSW,696,plastic,0,0,746,746
+20181119,0,0,0,0,681,694,NA,-0.019089574,SFSW,FALSE,J130_B1,"extra counts at different magnifications: at 2.0x=705, 1.0x=590, 1.0x= 554",30,1,20X,NA,Camila,Camila,abnormal photo: 16,NA,NA,0,TRUE,0,0,0,0,SFSW,1003,plastic,0,0,1690.5,1690.5
+20181126,1,1,1,1,453,452,482,0.002207506,SFSW,FALSE,J131_B1,NA,30,1,20X,NA,Camila,Camila,NA,NA,NA,0,TRUE,0,0,0,0,SFSW,212,plastic,0,0,666.5,665.5
+20190828,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J131_B2,NA,6,3,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20181126,3,3,0,0,487,474,462,0.026694045,DI,FALSE,J132_B1,NA,35,1,20X,NA,Camila,Camila,"abnormal photos: 1, 8, 11, 19, 26",NA,NA,0,TRUE,0,0,0,0,SFSW,226,plastic,0,0,709.5,709.5
+20190828,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J132_B2,NA,15,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20181126,2,2,0,0,200,197,NA,0.015,DI,FALSE,J133_B1,NA,30,1,20X,NA,Camila,Camila,NA,NA,NA,0,TRUE,0,0,0,0,SFSW,267,plastic,0,0,467.5,467.5
+20181127,2,2,0,0,253,246,NA,0.027667984,DI,FALSE,J134_B1,NA,33,1,20X,NA,Camila,Camila,"abnormal photos: 3, 17, 20",NA,NA,0,TRUE,0,0,0,0,SFSW,83,plastic,0,0,334.5,334.5
+20181127,1,1,0,0,256,255,NA,0.00390625,DI,FALSE,J135_B1,NA,31,1,20X,NA,Camila,Camila,abnormal photos: 9,NA,NA,0,TRUE,0,0,0,0,SFSW,106,plastic,0,0,362.5,362.5
+20181127,0,0,0,0,323,318,NA,0.015479876,DI,FALSE,J136_B1,"Had to use 3 swr slides because the majority of the larvae on the first slide were the wrong orientation and there were not enough for all the photos, on the first slide there were 71 larvae, 20 on the second and 11 on the third",38,3,20X,NA,Camila,Camila,"abnormal photos: 6, 7, 11, 19, 21, 26, 28, 34",NA,NA,0,TRUE,0,0,0,0,SFSW,102,plastic,0,0,422.5,422.5
+20181127,1,1,0,0,179,175,NA,0.022346369,DI,FALSE,J137_B1,NA,31,1,20X,NA,Camila,Camila,abnormal photos: 8,NA,NA,0,TRUE,0,0,0,0,SFSW,211,plastic,0,0,389,389
+20181128,9,11,0,0,355,360,376,-0.014084507,DI,FALSE,J138_B1,NA,39,1,20X,NA,Camila,Camila,"abnormal photos: 4, 13, 18, 19, 31, 36; photos 1-3: strange particles on slide",NA,NA,0,TRUE,0,0,0,0,SFSW,250,plastic,0,0,617.5,617.5
+20181128,2,2,1,1,361,368,382,-0.019390582,DI,FALSE,J139_B1,NA,30,1,20X,NA,Camila,Camila,NA,NA,NA,0,TRUE,0,0,0,0,SFSW,379,plastic,0,0,746.5,745.5
+20190828,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J139_B2,NA,15,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20181128,0,0,1,1,357,360,380,-0.008403361,DI,FALSE,J140_B1,NA,40,1,20X,NA,Camila,Camila,"abnormal photos: 7, 11, 12, 18, 23, 25, 31, 36, 37, 38",NA,NA,0,TRUE,0,0,0,0,SFSW,207,plastic,0,0,566.5,565.5
+20181128,1,1,0,0,158,164,NA,-0.037974684,DI,FALSE,J141_B1,relooked at the larvae again and so more SFSW and formalin was added,30,1,20X,NA,Camila,Camila,NA,NA,NA,0,TRUE,0,0,0,0,SFSW,616,plastic,0,0,778,778
+20190828,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J141_B2,NA,15,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20181128,4,4,0,0,431,415,NA,0.03712297,DI,FALSE,J142_B1,NA,36,1,20X,NA,Camila,Camila,"abnormal photos: 6, 9, 21, 26, 29, 33",NA,NA,0,TRUE,0,0,0,0,SFSW,165,plastic,0,0,592,592
+20190828,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J142_B2,NA,15,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20181130,1,1,0,0,110,114,NA,-0.036363636,100% ETOH,FALSE,J143_B1,I believe that some of the larvae stuck to the filter stacks when filtering because the pressure of the ethanol was not as strong as when I rinse with water,30,1,20X,NA,Camila,Camila,NA,NA,NA,0,TRUE,0,0,0,0,100% ETOH,824,plastic,0,0,937,937
+20190327,NA,NA,NA,NA,NA,NA,NA,NA,NA,FALSE,J143_B2,NA,30,1,20X,0.26344086,NA,Ffion,NA,TRUE,FALSE,49,NA,137,NA,NA,NA,NA,186,glass,NA,NA,NA,NA
+20181203,1,1,0,0,125,123,NA,0.016,100% ETOH,FALSE,J144_B1,NA,30,1,20X,NA,Camila,Camila,NA,NA,NA,0,TRUE,0,0,0,0,100% ETOH,599,plastic,0,0,724,724
+20190402,NA,NA,NA,NA,NA,NA,NA,NA,NA,FALSE,J144_B3,NA,30,1,20X,0.794117647,NA,Ffion,NA,TRUE,FALSE,27,NA,7,NA,NA,NA,NA,34,glass,NA,NA,NA,NA
+20181206,0,0,0,0,0,0,NA,0,95% ETOH,FALSE,J145_B1,"For the filter we tested the suction filtration device, but the suction didn't form because the rubber stopper was cracked so Isaac took it off and the entire sample fell out onto the counter/floor",43,1,20X,NA,Camila/Isaac,Camila,NA,NA,NA,0,TRUE,0,0,0,0,95%ETOH,98,plastic,0,0,98,0
+20190110,NA,NA,0,0,NA,NA,NA,0,NA,FALSE,J146_B1,NA,31,1,20X,NA,NA,Ffion,abnormal photos: 5,NA,NA,0,NA,0,0,0,0,NA,254,plastic,0,0,NA,254
+20190111,NA,NA,0,0,NA,NA,NA,0,NA,FALSE,J147_B1,NA,26,1,20X,NA,NA,Ffion,"abnormal photos: 31, 43",NA,NA,0,NA,0,0,0,0,NA,103,plastic,0,0,NA,103
+20190114,NA,NA,0,0,NA,NA,NA,0,NA,FALSE,J148_B1,NA,25,1,20X,NA,NA,Ffion,abnormal photos: 21,NA,NA,0,NA,0,0,0,0,NA,187,plastic,0,0,NA,187
+20190114,NA,NA,0,0,NA,NA,NA,0,NA,FALSE,J149_B1,NA,33,1,20X,NA,NA,Ffion,"abnormal photos: 5, 7, 26, 33",NA,NA,0,NA,0,0,0,0,NA,457,plastic,0,0,NA,457
+20190828,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J150_B2,NA,15,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190115,NA,NA,0,0,NA,NA,NA,0,NA,FALSE,J152_B1,NA,33,1,20X,NA,NA,Ffion,abnormal photos: 2?,NA,NA,0,NA,0,0,0,0,NA,164,plastic,0,0,NA,164
+20190829,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J152_B2,NA,15,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190115,NA,NA,0,0,NA,NA,NA,0,NA,FALSE,J153_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,327,plastic,0,0,NA,327
+20190116,NA,NA,0,0,NA,NA,NA,0,NA,FALSE,J154_B1,NA,32,1,20X,NA,NA,Ffion,"abnormal photos: 18, 33",NA,NA,0,NA,0,0,0,0,NA,423,plastic,0,0,NA,423
+20190116,NA,NA,0,0,NA,NA,NA,0,NA,FALSE,J155_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,129,plastic,0,0,NA,129
+20190829,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J155_B2,NA,15,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190117,NA,NA,0,0,NA,NA,NA,0,NA,FALSE,J156_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,187,plastic,0,0,NA,187
+20190829,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J156_B2,NA,15,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190117,NA,NA,0,0,NA,NA,NA,0,NA,FALSE,J157_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,475,plastic,0,0,NA,475
+20190117,NA,NA,0,0,NA,NA,NA,0,NA,FALSE,J158_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,149,plastic,0,0,NA,149
+20190117,NA,NA,0,0,NA,NA,NA,0,NA,FALSE,J159_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,314,plastic,0,0,NA,314
+20190118,NA,NA,0,0,NA,NA,NA,0,NA,FALSE,J160_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,131,plastic,0,0,NA,131
+20190118,NA,NA,0,0,NA,NA,NA,0,NA,FALSE,J161_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,361,plastic,0,0,NA,361
+20190118,NA,NA,0,0,NA,NA,NA,0,NA,FALSE,J162_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,273,plastic,0,0,NA,273
+20190118,NA,NA,0,0,NA,NA,NA,0,NA,FALSE,J163_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,92,plastic,0,0,NA,92
+20190829,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J163_B2,NA,15,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190122,NA,NA,0,0,NA,NA,NA,0,NA,FALSE,J164_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,179,plastic,0,0,NA,179
+20190122,NA,NA,0,0,NA,NA,NA,0,NA,FALSE,J165_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,307,plastic,0,0,NA,307
+20190123,NA,NA,0,0,NA,NA,NA,0,NA,FALSE,J166_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,166,plastic,0,0,NA,166
+20190829,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J166_B2,NA,15,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190123,NA,NA,0,0,NA,NA,NA,0,NA,FALSE,J167_B1,flag as outlier,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,1792,plastic,0,0,NA,1792
+20190123,NA,NA,0,0,NA,NA,NA,0,NA,FALSE,J168_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,292,plastic,0,0,NA,292
+20190829,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J168_B2,NA,15,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190124,NA,NA,0,0,NA,NA,NA,0,NA,FALSE,J169_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,595,plastic,0,0,NA,595
+20190124,NA,NA,0,0,NA,NA,NA,0,NA,FALSE,J170_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,224,plastic,0,0,NA,224
+20190124,NA,NA,0,0,NA,NA,NA,0,NA,FALSE,J171_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,275,plastic,0,0,NA,275
+20190124,NA,NA,0,0,NA,NA,NA,0,NA,FALSE,J172_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,391,plastic,0,0,NA,391
+20190125,NA,NA,0,0,NA,NA,NA,0,NA,FALSE,J173_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,465,plastic,0,0,NA,465
+20190125,NA,NA,0,0,NA,NA,NA,0,NA,FALSE,J174_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,plastic,0,0,NA,0
+20190128,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J175_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,plastic,0,0,NA,NA
+20190829,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J175_B2,NA,11,3,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190128,NA,NA,NA,NA,NA,NA,NA,NA,NA,FALSE,J176_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,plastic,0,NA,NA,NA
+20190829,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J176_B2,NA,15,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190128,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J177_B1,NA,30,1,20X,NA,NA,Ffion,many deformed larvae,NA,NA,0,NA,0,0,0,0,NA,0,plastic,0,0,NA,NA
+20190829,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J177_B2,NA,15,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190128,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J178_B1,NA,30,2,20X,NA,NA,Ffion,"13 photos first slide, ~20 larvae total on first slide",NA,NA,0,NA,0,0,0,0,NA,0,plastic,0,0,NA,NA
+20190128,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J179_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,plastic,0,0,NA,NA
+20190829,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J179_B2,NA,2,2,20X,NA,NA,Ffion,not sure if #1 is larva,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190128,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J180_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,plastic,0,0,NA,NA
+20190129,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J181_B1,NA,10,1,20X,NA,NA,Ffion,only 10 photos appear in folder,NA,NA,0,NA,0,0,0,0,NA,0,plastic,0,0,NA,NA
+20190129,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J182_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,plastic,0,0,NA,NA
+20190327,NA,NA,NA,NA,NA,NA,NA,NA,NA,FALSE,J182_B2,NA,7,1,20X,0.875,NA,Ffion,NA,TRUE,FALSE,7,NA,1,NA,NA,NA,NA,8,glass,NA,NA,NA,NA
+20190327,NA,NA,NA,NA,NA,NA,NA,NA,NA,FALSE,J183_B2,NA,30,1,20X,0.061349693,NA,Ffion,NA,TRUE,FALSE,10,NA,153,NA,NA,NA,NA,163,glass,NA,NA,NA,NA
+20190829,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J184_B2,NA,15,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190130,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J185_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190130,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J186_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190829,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J186_B2,NA,15,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190130,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J187_B1,NA,30,2,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190131,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J188_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190829,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J189_B2,NA,15,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190131,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J190_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190131,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J191_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190829,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J191_B2,NA,15,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190131,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J192_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190327,NA,NA,NA,NA,NA,NA,NA,NA,NA,FALSE,J192_B2,NA,30,1,20X,0.007259528,NA,Ffion,NA,FALSE,FALSE,4,NA,547,NA,NA,NA,NA,551,glass,NA,NA,NA,NA
+20190131,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J193_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190829,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J193_B2,NA,15,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190829,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J194_B2,NA,15,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190131,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J195_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190131,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J197_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190829,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J197_B2,NA,15,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190201,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J198_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190201,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J199_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190829,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J199_B2,NA,15,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190201,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J200_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190201,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J201_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190829,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J201_B2,NA,15,1,20X,NA,NA,Ffion,sample used for pH tracking,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190201,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J202_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190201,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J203_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190201,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J204_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190829,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J204_B2,NA,15,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190204,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J205_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190204,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J207_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190829,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J207_B2,NA,15,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190205,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J208_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190829,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J208_B2,NA,15,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190205,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J209_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190327,NA,NA,NA,NA,NA,NA,NA,NA,NA,FALSE,J209_B2,NA,30,1,20X,0.103202847,NA,Ffion,NA,TRUE,FALSE,29,NA,252,NA,NA,NA,NA,281,glass,NA,NA,NA,NA
+20190205,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J210_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190829,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J210_B2,NA,15,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190205,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J211_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190205,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J212_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190829,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J212_B2,NA,15,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190207,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J213_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190207,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J214_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190829,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J214_B2,NA,15,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190207,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J215_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190829,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J215_B2,NA,4,1,20X,NA,NA,Ffion,all abnormal,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190207,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J216_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190207,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J217_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190208,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J218_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190208,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J219_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190211,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J220_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190211,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J221_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190829,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J221_B2,NA,15,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190211,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J222_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190206,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J223_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190829,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J223_B2,NA,15,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190211,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J224_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190211,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J225_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190211,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J226_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190829,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J226_B2,NA,15,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190211,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J227_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190212,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J228_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190829,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J228_B2,NA,15,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190212,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J229_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190212,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J230_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190212,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J231_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190212,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J232_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190214,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J233_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190214,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J234_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190829,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J234_B2,NA,15,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190214,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J235_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190214,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J236_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190829,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J236_B2,NA,15,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190214,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J237_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190829,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J237_B2,NA,15,2,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190214,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J238_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190214,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J239_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190829,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J239_B2,NA,15,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190215,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J240_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190215,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J241_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190215,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J243_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190215,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J244_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190215,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J245_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190215,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J246_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190215,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J247_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190215,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J248_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190829,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J248_B2,NA,15,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190215,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J249_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190215,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J250_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190829,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J250_B2,NA,15,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190220,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J251_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190220,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J252_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190829,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J252_B2,NA,15,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190220,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J253_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190220,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J254_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190220,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J255_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190829,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J255_B2,NA,15,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190220,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J256_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190220,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J257_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190829,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J257_B2,NA,15,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190220,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J258_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190221,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J259_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190829,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J259_B2,NA,15,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190221,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J260_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190221,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J261_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190221,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J262_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190221,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J263_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190830,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J263_B2,NA,15,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190221,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J264_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190221,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J265_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190403,NA,NA,NA,NA,NA,NA,NA,NA,NA,FALSE,J265_B3,NA,31,1,20X,0.252336449,NA,Ffion,NA,TRUE,FALSE,27,NA,80,NA,NA,NA,NA,107,glass,NA,NA,NA,NA
+20190221,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J266_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190404,NA,NA,NA,NA,NA,NA,NA,NA,NA,FALSE,J266_B3,NA,30,1,20X,0.656716418,NA,Ffion,NA,TRUE,FALSE,88,NA,46,NA,NA,NA,NA,134,glass,NA,NA,NA,NA
+20190221,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J267_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190328,NA,NA,NA,NA,NA,NA,NA,NA,NA,FALSE,J267_B2,NA,30,1,20X,0.017110266,NA,Ffion,NA,TRUE,FALSE,9,NA,517,NA,NA,NA,NA,526,glass,NA,NA,NA,NA
+20190221,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J268_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190830,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J268_B2,NA,11,2,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190222,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J269_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190222,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J270_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190830,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J270_B2,NA,15,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190404,NA,NA,NA,NA,NA,NA,NA,NA,NA,FALSE,J270_B3,NA,30,1,20X,0.204081633,NA,Ffion,NA,TRUE,FALSE,30,NA,117,NA,NA,NA,NA,147,glass,NA,NA,NA,NA
+20190225,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J271_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190404,NA,NA,NA,NA,NA,NA,NA,NA,NA,FALSE,J271_B3,NA,30,1,20X,0.701754386,NA,Ffion,NA,TRUE,FALSE,80,NA,34,NA,NA,NA,NA,114,glass,NA,NA,NA,NA
+20190225,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J272_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190830,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J272_B2,NA,15,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190225,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J273_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190830,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J273_B2,NA,16,1,20X,NA,NA,Ffion,what's the deal w/ larvae e.g. #16?,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190226,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J274_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190226,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J275_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190226,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J276_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190226,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J277_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190226,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J278_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190830,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J278_B2,NA,16,1,20X,NA,NA,Ffion,plankton moult (#6),NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190226,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J279_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190226,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J280_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190830,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J280_B2,NA,15,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190227,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J281_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190227,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J282_B1,NA,29,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190830,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J282_B2,NA,15,1,20X,NA,NA,Ffion,sample used for pH tracking,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190227,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J283_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190830,NA,NA,NA,NA,NA,NA,NA,0,NA,NA,J283_B2,NA,15,1,20X,NA,NA,Ffion,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,glass,NA,0,NA,NA
+20190227,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J284_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190227,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J285_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190227,NA,NA,NA,NA,NA,NA,NA,0,NA,FALSE,J286_B1,NA,30,1,20X,NA,NA,Ffion,NA,NA,NA,0,NA,0,0,0,0,NA,0,glass,0,0,NA,NA
+20190328,NA,NA,NA,NA,NA,NA,NA,NA,NA,FALSE,J286_B2,NA,30,1,20X,0.0625,NA,Ffion,NA,TRUE,FALSE,7,NA,105,NA,NA,NA,NA,112,glass,NA,NA,NA,NA
+20180719,NA,NA,NA,NA,NA,NA,NA,0,DI,TRUE,J288_B1,NA,20,NA,10X,NA,NA,Brett?,NA,NA,NA,NA,FALSE,NA,0,0,NA,DI,NA,plastic,0,0,NA,0
+20190328,NA,NA,NA,NA,NA,NA,NA,NA,NA,FALSE,J288_B2,NA,36,1,20X,0.743801653,NA,Ffion,NA,TRUE,TRUE,90,NA,31,NA,NA,NA,NA,121,glass,NA,NA,NA,NA
+NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA

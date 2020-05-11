@@ -1,0 +1,1888 @@
+---
+title: "Larvae Biomineralization"
+output: html_document
+---
+
+
+# Load libraries
+```{r, include=FALSE}
+library(knitr)
+library(tidyverse)
+library(plyr)
+library(sciplot)
+library(reshape2)
+library(lme4)
+library(lmerTest)
+library(blme)
+library(grid)
+library(data.table)
+library(gridExtra)
+library(lattice)
+#library(optimx)
+library(car)
+library(Hmisc)
+library(corrplot)
+library(emmeans)
+library(chron)
+```
+
+```{r, echo=FALSE}
+knitr::opts_chunk$set(error = TRUE)
+```
+
+# Load data
+Name the data you export from FileMaker Pro by their exact table names and save them as CSVs, e.g. Larvae_Morphology.csv
+```{r}
+#setwd("~/Repos/LarvaeTransGen2018")
+setwd("~/R/GitHub/LarvaeTransGen2018/data") #Elise's working directory
+#upload all of the data tables for the larvae experiment
+Larvae_Morphology <- read.csv("../data/Larvae_Morphology.csv") #contains data from CellProfiler from the larvae outlines
+Barcode_Jar <- read.csv("../data/Barcode_Jar.csv") #contains data on CrossID, seatable, and whether or not larvae were present
+Block_ID <- read.csv("../data/Block_ID.csv") #contains data on the block
+Cross<- read.csv("../data/Cross.csv") #contains data on the female and male IDs for the cross and whether the cross was for QG or Meth
+Fert_QG<- read.csv("../data/Fert_QG.csv") #contains data on fertilization counts, the JarIDs for the crosses
+Header_WC<- read.csv("../data/Header_WC.csv") #contains data on the header tanks used to fill the jars
+Larvae_Calcification <- read.csv("../data/Larvae_Calcification.csv") #contains data on filter weights and counts
+Larvae_Counts <- read.csv("../data/Larvae_Counts.csv") #contains data on sedgewick rafter larvae counts
+Larvae_WC <- read.csv("../data/Larvae_WC.csv") #contains data on larvae jar water chemistry
+Parent_ID <- read.csv("../data/Parent_ID.csv") #contains data on the adults at the time of shucking. Includes Parent ID assignments
+Larvae_Cilia<- read.csv("../data/Larvae_Cilia.csv") #contains data on cilia extrusion of the larvae photographed for morphology
+Egg_Morphology<- read.csv("../data/Egg_Morphology.csv") #contains data on egg sizes from CellProfiler
+Adult_Sample<- read.csv("../data/Adult_Sample.csv") #contains data on adult oysters at the time of collection
+WC_Standard<- read.csv("../data/WC_Standard.csv") #contains data on the standards used for water chemistry
+Tank_WC<- read.csv("../data/Tank_WC.csv") #contains data on the adult tank water chemistry
+```
+
+Make required fields factors: 
+```{r}
+Adult_Sample$AccTankID<- as.factor(Adult_Sample$AccTankID)
+Adult_Sample$TrtTankID<- as.factor(Adult_Sample$TrtTankID)
+Barcode_Jar$JarSeatable<- as.factor(Barcode_Jar$JarSeatable)
+Tank_WC$ParentTrt<- as.factor(Tank_WC$ParentTrt)
+Tank_WC$Tank<- as.factor(Tank_WC$Tank)
+Tank_WC$Folder<- as.factor(Tank_WC$Folder)
+WC_Standard$CRM<- as.factor(WC_Standard$CRM)
+Larvae_WC$DateFilter<- as.factor(Larvae_WC$DateFilter)
+
+```
+
+Calculate average larval jar water chemistry based on the subset of bottles that were run on the VINDTA. May need to look to see if we want to use the mean or the median
+```{r}
+#start by joining Barcode_Jar and Larvae_WC datasets 
+JarChem<- merge(x=Barcode_Jar, y= Larvae_WC, by="JarID", all.x=TRUE)
+#combine Date filter and JarTrt columns to get a unique combo value for each
+JarChem<-unite(JarChem,BlockTrt, c("DateFilter","JarTrt"), sep='', remove=F)
+#get only jars with larvae
+JarChem<- subset(JarChem, Larvae =="TRUE")
+JarChem<- subset(JarChem, DateFilter !="20180810")
+boxplot(JarpHSW~BlockTrt, data=JarChem, ylim=c(6,8))
+
+#get means for the parameters
+JarMeans<- ddply(JarChem, .(BlockTrt), numcolwise(mean, na.rm=T))
+
+#remove the unnecessary columns from JarMeans
+JarMeans<- subset(JarMeans, select= c(BlockTrt,JarAlkCalc, JarpCO2, JarHCO3, JarCO3, JarCO2, JarOmegaCalcite, JarOmegaArg))   
+#add Est for "estimated" to the column names
+colnames(JarMeans)<- paste("Est", colnames(JarMeans), sep="")
+
+#add columns to JarChem for mean carb values
+JarChem<- merge(x=JarChem, y=JarMeans, by.x="BlockTrt", by.y="EstBlockTrt", all.x=TRUE)
+
+#use ifelse statement to fill in the na values in the original carb fields
+JarChem$JarpCO2<- ifelse((is.na(JarChem$JarpCO2)), paste(JarChem$EstJarpCO2), JarChem$JarpCO2)
+JarChem$JarAlkCalc<- ifelse((is.na(JarChem$JarAlkCalc)), paste(JarChem$EstJarAlkCalc), JarChem$JarAlkCalc)
+JarChem$JarHCO3<- ifelse((is.na(JarChem$JarHCO3)), paste(JarChem$EstJarHCO3), JarChem$JarHCO3)
+JarChem$JarCO3<- ifelse((is.na(JarChem$JarCO3)), paste(JarChem$EstJarCO3), JarChem$JarCO3)
+JarChem$JarCO2<- ifelse((is.na(JarChem$JarCO2)), paste(JarChem$EstJarCO2), JarChem$JarCO2)
+JarChem$JarOmegaCalcite<- ifelse((is.na(JarChem$JarOmegaCalcite)), paste(JarChem$EstJarOmegaCalcite), JarChem$JarOmegaCalcite)
+JarChem$JarOmegaArg<- ifelse((is.na(JarChem$JarOmegaArg)), paste(JarChem$EstJarOmegaArg), JarChem$JarOmegaArg)
+
+#get the carb parameters to numeric
+JarChem$JarpCO2<- as.numeric(JarChem$JarpCO2)
+JarChem$JarAlkCalc<- as.numeric(JarChem$JarAlkCalc)
+JarChem$JarHCO3<- as.numeric(JarChem$JarHCO3)
+JarChem$JarCO3<- as.numeric(JarChem$JarCO3)
+JarChem$JarCO2<- as.numeric(JarChem$JarCO2)
+JarChem$JarOmegaCalcite<- as.numeric(JarChem$JarOmegaCalcite)
+JarChem$JarOmegaArg<- as.numeric(JarChem$JarOmegaArg)
+#good to go!
+```
+
+
+Look at the water chemistry data for adult tanks
+```{r}
+#subset the tank data to only get blocks 1 and 2 
+Tank_WCB1B2<- subset(Tank_WC, Block != "B3")
+#test to see if tanks are significantly different. 
+#start by plotting the pCO2 for each tank
+boxplot(WCa_pHDIC~Tank, data=Tank_WCB1B2, na.omit=TRUE)
+Tank_WCB1B2sub<- subset(Tank_WCB1B2, WCa_pHDIC !="NA")
+
+#check for significant differences in water chemistry for blocks 1 & 2
+#pCO2 differences
+Ca1<- lm(WCa_pHDIC~ParentTrt*Block*Tank, data=Tank_WCB1B2sub)
+
+#check assumptions
+par(mfcol=c(2,2))
+plot(Ca1) #there is more variance at the high pCO2 treatment. 
+par(mfcol=c(1,1))
+acf(Ca1)
+
+Ca2<- lm(WCa_pHDIC~ParentTrt*Block+Tank, data=Tank_WCB1B2sub)
+anova(Ca1, Ca2)#choose Ca2
+Ca3<- lm(WCa_pHDIC~ParentTrt+Block*Tank, data=Tank_WCB1B2sub)
+anova(Ca2, Ca3) #unclear which is better
+Ca4<- lm(WCa_pHDIC~ParentTrt*Tank+Block, data=Tank_WCB1B2sub)
+anova(Ca2, Ca4) #unclear which is better
+anova(Ca3, Ca4) #unclear which is better
+Ca5<- lm(WCa_pHDIC~ParentTrt+Block+Tank, data=Tank_WCB1B2sub)
+anova(Ca2, Ca5) #choose Ca5
+anova(Ca3, Ca5) #choose Ca5
+anova(Ca4, Ca5) #choose Ca5
+Ca6<- lm(WCa_pHDIC~ParentTrt*Block, data=Tank_WCB1B2sub)
+anova(Ca5, Ca6) #choose Ca6
+Ca7<- lm(WCa_pHDIC~ParentTrt+Block, data=Tank_WCB1B2sub)
+anova(Ca6, Ca7) #Choose Ca7
+Ca8<- lm(WCa_pHDIC~Block*Tank, data=Tank_WCB1B2sub)
+anova(Ca7, Ca8) #choose Ca7
+Ca9<- lm(WCa_pHDIC~Block+Tank, data=Tank_WCB1B2sub)
+anova(Ca7, Ca9) #unclear which to choose
+Ca10<- lm(WCa_pHDIC~ParentTrt*Tank, data=Tank_WCB1B2sub)
+anova(Ca7, Ca10) #choose Ca7
+anova(Ca9, Ca10)#choose Ca9
+Ca11<- lm(WCa_pHDIC~ParentTrt+Tank, data=Tank_WCB1B2sub)
+anova(Ca7, Ca11) #unclear which to choose
+anova(Ca9, Ca11) #unclear which to choose
+Ca12<- lm(WCa_pHDIC~ParentTrt, data=Tank_WCB1B2sub)
+anova(Ca7, Ca12) #choose Ca12
+anova(Ca9, Ca12) #choose Ca12
+anova(Ca11, Ca12)#choose Ca12
+Ca13<- lm(WCa_pHDIC~Block, data=Tank_WCB1B2sub)
+anova(Ca12, Ca13) 
+Ca14<- lm(WCa_pHDIC~Tank, data=Tank_WCB1B2sub)
+anova(Ca12, Ca14) 
+anova(Ca13, Ca14)# select Ca14
+
+#check AIC to see what the final model should be
+AIC(Ca12) #lowest AIC
+AIC(Ca13)
+AIC(Ca14)
+
+par(mfcol=c(2,2))
+plot(Ca12) #does this look okay to you, Katie? 
+par(mfcol=c(1,1))
+acf(Ca12)
+summary(Ca12)
+#There is a significant effect of ParentTrt, but not tank or block according to best model (lowest AIC). So I would feel confident just using this as a factor. 
+
+#create dataframe that has the mean values for each tank
+TankMeans<- ddply(Tank_WCB1B2, .(Tank, Block, ParentTrt), numcolwise(mean, na.rm=T))
+```
+
+Join the data into dataframes for analysis.
+```{r}
+#First dataframe will be for examining egg morphology for all eggs traced; multiple values for each adult
+ParentInfo<- merge(x=Adult_Sample, y=Parent_ID, by="AdultID", all.x=TRUE)
+Eggs<- merge(x=Egg_Morphology, y=ParentInfo, by.x="FemaleID", by.y="ParentBlockID", all.x=TRUE)
+#add the tank data
+Eggs<- merge(x=Eggs, y=TankMeans, by.x="TrtTankID", by.y= "Tank", all.x=TRUE)
+#subset the data to exclude Block 3
+EggsB1B2<- subset(Eggs, Block !="B3") # in the end we may decide to also exclude Block 2. 
+EggsYoutliers<- subset(Eggs, Block!="B3") #dataset with the outliers remaining
+```
+
+Visualize the data for eggs to start. Again, using only blocks 1 & 2 
+```{r}
+#There were some concerns at first that the eggs that were measured were too large. Elise looked into this in April 2020. The literature lists mature eggs for C. virginica as ~60 um in diameter. Check this against our mean eggs
+
+meanegg<- aggregate(EggDiamum~Block, data= EggsB1B2, FUN=mean)
+meanegg # these means are in agreement with the average size of a mature egg. 
+
+#now look at the data to find outliers. 
+#look at the egg measurements for each female
+boxplot(EggDiamum~FemaleID, data=EggsB1B2) #CF06_B2 seems to have eggs that are smaller than everyone else
+boxplot(EggDiamum~Block*ParentTrt, data=EggsB1B2)
+
+#check for outliers using code from https://www.r-bloggers.com/identify-describe-plot-and-remove-the-outliers-from-the-dataset/. The function uses Tukey's method to ID ouliers ranged above and below the 1.5*IQR. 
+outlierKD <- function(dt, var) {
+     var_name <- eval(substitute(var),eval(dt))
+     na1 <- sum(is.na(var_name))
+     m1 <- mean(var_name, na.rm = T)
+     par(mfrow=c(2, 2), oma=c(0,0,3,0))
+     boxplot(var_name, main="With outliers")
+     hist(var_name, main="With outliers", xlab=NA, ylab=NA)
+     outlier <- boxplot.stats(var_name)$out
+     mo <- mean(outlier)
+     var_name <- ifelse(var_name %in% outlier, NA, var_name)
+     boxplot(var_name, main="Without outliers")
+     hist(var_name, main="Without outliers", xlab=NA, ylab=NA)
+     title("Outlier Check", outer=TRUE)
+     na2 <- sum(is.na(var_name))
+     cat("Outliers identified:", na2 - na1, "n")
+     cat("Propotion (%) of outliers:", round((na2 - na1) / sum(!is.na(var_name))*100, 1), "n")
+     cat("Mean of the outliers:", round(mo, 2), "n")
+     m2 <- mean(var_name, na.rm = T)
+     cat("Mean without removing outliers:", round(m1, 2), "n")
+     cat("Mean if we remove outliers:", round(m2, 2), "n")
+     response <- readline(prompt="Do you want to remove outliers and to replace with NA? [yes/no]: ")
+     if(response == "y" | response == "yes"){
+          dt[as.character(substitute(var))] <- invisible(var_name)
+          assign(as.character(as.list(match.call())$dt), dt, envir = .GlobalEnv)
+          cat("Outliers successfully removed", "n")
+          return(invisible(dt))
+     } else{
+          dt[as.character(substitute(var))] <- invisible(var_name)
+          assign(as.character(as.list(match.call())$dt), dt, envir = .GlobalEnv)
+          cat("Outliers successfully removed", "n")
+          return(invisible(dt))
+     }
+}
+
+outlierKD(EggsB1B2, EggDiamum)
+#I opted to remove outliers for now. 
+#Outliers identified: 90 nPropotion (%) of outliers: 10.8 nMean of the outliers: 57.85 nMean without removing outliers: 62.88 nMean if we remove outliers: 63.43 n
+
+#count how many eggs are left per female after removing the outliers. 
+outrem<- aggregate(EggDiamum~FemaleID, data=EggsB1B2, FUN=length)
+#there are three females that have 10 or fewer eggs : CF06_B2, CF08_B2, and EF07_B1
+
+#remove females with fewer than 10 eggs
+EggsB1B2sub<- subset(EggsB1B2, FemaleID != "CF06_B2" & FemaleID != "CF08_B2")
+
+#moving forward for Egg data, I will be using EggsB1B2sub
+
+#Plot again
+par(mfcol=c(1,1))
+boxplot(EggDiamum~FemaleID, data=EggsB1B2sub) 
+boxplot(EggDiamum~Block*ParentTrt, data=EggsB1B2sub)
+
+#note that the eggs were filtered through a 70 um filter, but it appears many of them that were that large or larger made it through. Katie, should we remove these as well? I don't really think we should. 
+```
+
+
+```{r}
+#plot histograms of the egg data with outliers removed
+ggplot(EggsB1B2sub, aes(x=EggDiamum, color=ParentTrt))+
+  geom_histogram(alpha=0.5, position="identity") +
+  facet_grid(~Block) 
+eggmeans<- aggregate(EggDiamum~ParentTrt, data=EggsB1B2sub, FUN=mean) #400 = 63.76692; 2800= 63.12195
+eggmedians<- aggregate(EggDiamum~ParentTrt, data=EggsB1B2sub, FUN=median)#400 = 63.10395; 2800= 62.68700
+#I will use the mean egg size. 
+
+```
+
+Make datasets without the egg size outliers
+```{r}
+#start by removing the outliers from Egg_Morphology
+Egg_MorphNout<- Egg_Morphology
+outlierKD(Egg_MorphNout, EggDiamum)
+par(mfcol=c(1,1))
+meanegg<- ddply(Egg_MorphNout, .(FemaleID), numcolwise(mean, na.rm=T)) #get mean egg size
+FemAdults<- merge(x=ParentInfo, y= meanegg, by.x="ParentBlockID", by.y= "FemaleID", all.y=TRUE)
+#Next dataframe will be for one line per traced larva, includes all the data for that jar, including average egg size for that jar
+#EggsB1B2sub dataframe has all of the info that we need for the 
+Larvae<-merge(x=Larvae_Morphology, y=JarChem, by="JarID", all.x=TRUE)
+#use gather function in tidyr to make the Fert_QG Jar ID columns in long form vs. wide form
+Fert_QG_long <- Fert_QG %>% tidyr::gather(Key, JarID, JarID1:JarID6)
+#use the gathered data frame to merge with Larvae
+Larvae<-merge(x=Larvae, y=Fert_QG_long, by.x= c("JarID", "CrossID"), by.y=c("JarID", "CrossID"), all.x=TRUE) #did the join by two columns so CrossID column wasn't duplicated
+Larvae<- merge(x=Larvae, y=Cross, by="CrossID", all.x=TRUE)
+Larvae<- merge(x=Larvae, y=FemAdults, by.x= "FemaleID", by.y="ParentBlockID", all.x=TRUE)
+Larvae<- merge(x=Larvae, y= Larvae_Counts, by="JarID", all.x=TRUE)
+Larvae<- merge(x=Larvae, y=TankMeans, by.x= "TrtTankID", by.y="Tank", all.x=TRUE)
+#Remove jars without larvae
+Larvae<- subset(Larvae, Larvae=="TRUE")
+#get the growth per day for the larvae. Katie, do we have a column with the larvae age? 
+Larvae$GrowthPerDay<- (Larvae$LarvaeDiamum-Larvae$EggDiamum)/3
+#Final dataframe will be one line per Jar, includes all data for the jar, including the average larvae size per jar and cilia
+LarvByJar<-merge(x=Larvae_Calcification, y=Larvae_Cilia, by="JarID", all.x=TRUE, all.y=TRUE)
+LarvByJar<- merge(x=LarvByJar, y=JarChem, by="JarID", all.x=TRUE)
+LarvByJar<- merge(x=LarvByJar, y=Fert_QG_long, by.x=c("JarID", "CrossID"), by.y=c("JarID","CrossID"), all.x=TRUE)
+LarvByJar<- merge(x=LarvByJar, y=Cross, by="CrossID", all.x=TRUE)
+LarvByJar<- merge(x=LarvByJar, y=FemAdults, by.x="FemaleID", by.y="ParentBlockID", all.x=TRUE)
+LarvByJar<- merge(x=LarvByJar, y=Larvae_Counts, by="JarID", all.x=TRUE)
+LarvByJar<- merge(x=LarvByJar, y=TankMeans, by.x= "TrtTankID", by.y="Tank", all.x=TRUE)
+
+#get the means for larvae morphology and add to LarvByJar
+MeanLarvMorph<- ddply(Larvae_Morphology, .(JarID), numcolwise(mean, na.rm=T))
+SELarvMorph<- ddply(Larvae_Morphology, .(JarID), numcolwise(se, na.rm=T)) #get standard error of larvae size
+MeanLarvMorph<- full_join(MeanLarvMorph,SELarvMorph, by=c("JarID", "JarID"),suffix=c("","SE")) #join the mean and se larvae data
+LarvByJar<- merge(x=LarvByJar, y=MeanLarvMorph, by="JarID", all.x=TRUE)
+#Now let's add the survival data. See notes on "Larvae Survival" for more info on how we decided to count total larvae in the jar
+
+#Make columns for the two larvae counts for 1_5 and 2
+LarvByJar$v1_5SurvCount<- LarvByJar$SWRTotal+LarvByJar$F2LarvaeCount
+LarvByJar$v2SurvCount<- LarvByJar$F1LarvaeCount+LarvByJar$F2LarvaeCount
+#use ifelse statement to define the LarvaeSurvived column
+LarvByJar$LarvaeSurvived<- ifelse(LarvByJar$ProtocolVersion =="1", paste(LarvByJar$TotalLarvae), ifelse(LarvByJar$ProtocolVersion =="1_5", paste(LarvByJar$v1_5SurvCount), paste(LarvByJar$v2SurvCount)))
+LarvByJar$LarvaeSurvived<- as.numeric(LarvByJar$LarvaeSurvived)
+#elise checked the above code to make sure it resulted in the correct calculation and it does. 
+
+#now get the estimate of how many larvae were originally added to the jar. 
+LarvByJar$LarvaeStocked<- LarvByJar$LarvaePermL*LarvByJar$mLJarActual
+LarvByJar$PropSurvived<- LarvByJar$LarvaeSurvived/LarvByJar$LarvaeStocked
+
+#remove jars that did not have larvae: 
+LarvByJar<- subset(LarvByJar, Larvae=="TRUE")
+#now remove the data we do not want to analyze. 
+#For the Larvae datasets, that means removing Block 3, Block 2 control jars; Larvae from Females CF06_B2 and CF08_B2
+LarvaeDat<- subset(Larvae, Block == "B1")
+LarvaeB2e<- subset(Larvae, Block=="B2")
+LarvaeB2e<- subset(LarvaeB2e, JarTrt == "Exposed")
+LarvaeDat<- rbind(LarvaeDat, LarvaeB2e)
+LarvaeDat<- subset(LarvaeDat, FemaleID != "CF06_B2" & FemaleID != "CF08_B2")
+LarvaeDatB1<- subset(LarvaeDat, Block=="B1")
+
+LarvByJarDat<- subset(LarvByJar, Block == "B1")
+LarvByJarB2e<- subset(LarvByJar, Block=="B2")
+LarvByJarB2e<- subset(LarvByJarB2e, JarTrt == "Exposed")
+LarvByJarDat<- rbind(LarvByJarDat, LarvByJarB2e)
+LarvByJarDat<- subset(LarvByJarDat, FemaleID != "CF06_B2" & FemaleID != "CF08_B2")
+```
+
+Test for significant effect of parent treatment on egg size. Start with measured water chem
+```{r}
+#to test the simple models, I need to remove data that don't have an associated water chem from pH and DIC, hopefully these bottles can be found and added to the dataset, but for now I will need to omit those
+CalEggs<- subset(EggsB1B2sub, WCa_pHDIC != "NA")
+
+#start with models that have the response variable EggDiamum
+eggdiam1<- lmer(EggDiamum~WCa_pHDIC*AdultLength + (1|FemaleID) + (1|Block) +(1|AccTankID), data=CalEggs)
+
+#Check assumptions
+par(mfcol=c(1,1))
+qqnorm(resid(eggdiam1))
+qqline(resid(eggdiam1))
+plot(eggdiam1)
+acf(eggdiam1)
+
+summary(eggdiam1)
+#try simplifying the model; step function gives me errors, so I ended up doing this manually
+eggdiam2<- lmer(EggDiamum~WCa_pHDIC+ (1|FemaleID) + (1|Block) , data=CalEggs)
+anova(eggdiam1, eggdiam2)#Choose eggdiam2
+eggdiam3<- lm(EggDiamum~WCa_pHDIC, data=CalEggs)
+anova(eggdiam2, eggdiam3)#choose eggdiam2
+eggdiam4<- lmer(EggDiamum~WCa_pHDIC + (1|FemaleID), data=CalEggs)
+anova(eggdiam2, eggdiam4)#choose eggdiam4
+eggdiam5<- lmer(EggDiamum ~ 1 + (1|FemaleID), data=CalEggs)
+anova(eggdiam4, eggdiam5) #choose eggdiam5
+summary(eggdiam5)
+#look at assumptions of eggdiam 5
+par(mfcol=c(1,1))
+plot(eggdiam5)
+qqnorm(resid(eggdiam5))
+qqline(resid(eggdiam5))
+acf(eggdiam5)
+
+eggdiam6<- lm(EggDiamum~FemaleID, data=CalEggs)
+anova(eggdiam3, eggdiam6)
+summary(eggdiam6)
+
+#look at assumptions of eggdiam 6
+par(mfcol=c(2,2))
+plot(eggdiam6)
+par(mfcol=c(1,1))
+acf(eggdiam6)
+#FemaleID matters but not block, treatment or adult length. 
+
+plot(EggDiamum~FemaleID, data=CalEggs) #we need to account for FemaleID, but not egg size in Larvae models
+
+#now look at the response variable EggAreaum2
+eggarea1<- lmer(EggAreaum2~WCa_pHDIC*AdultLength + (1|FemaleID) + (1|Block) +(1|AccTankID), data=CalEggs)
+
+#Check assumptions
+qqnorm(resid(eggarea1))
+qqline(resid(eggarea1)) #definitely doesn't meet assumption of normality
+plot(eggarea1)
+acf(eggarea1)
+
+summary(eggarea1)
+
+#try simplifying the model; step function gives me errors, so I ended up doing this manually
+eggarea2<- lmer(EggAreaum2~WCa_pHDIC+ (1|FemaleID) + (1|Block) , data=CalEggs)
+anova(eggarea1, eggarea2)#Choose eggarea2
+eggarea3<- lm(EggAreaum2~WCa_pHDIC, data=CalEggs)
+anova(eggarea2, eggarea3)#choose eggarea2
+eggarea4<- lmer(EggAreaum2~WCa_pHDIC + (1|FemaleID), data=CalEggs)
+anova(eggarea2, eggarea4)#choose eggarea4
+eggarea5<- lmer(EggAreaum2 ~ 1 + (1|FemaleID), data=CalEggs)
+anova(eggarea4, eggarea5) #choose eggarea5
+summary(eggarea5)
+eggarea6<- lm(EggAreaum2~FemaleID, data=CalEggs)
+anova(eggarea3, eggarea6)
+summary(eggarea6)
+
+#look at assumptions of eggarea6
+par(mfcol=c(2,2))
+plot(eggarea6)
+par(mfcol=c(1,1))
+acf(eggarea6)
+#FemaleID matters but not block, treatment or adult length. Same as diameter, but model doesn't seem to meet the assumption of normality
+
+plot(EggAreaum2~FemaleID, data=CalEggs)
+
+#look at EggEccentricity
+eggeccen1<- lmer(EggEccentricity~WCa_pHDIC*AdultLength + (1|FemaleID) + (1|Block) +(1|AccTankID), data=CalEggs)
+
+#Check assumptions
+qqnorm(resid(eggeccen1))
+qqline(resid(eggeccen1)) #looks good!
+plot(eggeccen1) #this looks good too
+acf(eggeccen1)
+
+summary(eggeccen1)
+
+#try simplifying the model; step function gives me errors, so I ended up doing this manually
+eggeccen2<- lmer(EggEccentricity~WCa_pHDIC+ (1|FemaleID) + (1|Block) , data=CalEggs)
+anova(eggeccen1, eggeccen2)#Choose eggeccen2
+eggeccen3<- lm(EggEccentricity~WCa_pHDIC, data=CalEggs)
+anova(eggeccen2, eggeccen3)#choose eggeccen2
+eggeccen4<- lmer(EggEccentricity~WCa_pHDIC + (1|FemaleID), data=CalEggs)
+anova(eggeccen2, eggeccen4)#choose eggeccen4
+eggeccen5<- lmer(EggEccentricity ~ 1 + (1|FemaleID), data=CalEggs)
+anova(eggeccen4, eggeccen5) #choose eggeccen5
+summary(eggeccen5)
+eggeccen6<- lm(EggEccentricity~FemaleID, data=CalEggs)
+anova(eggeccen3, eggeccen6)
+summary(eggeccen6)
+
+#look at assumptions of eggeccen6
+par(mfcol=c(2,2))
+plot(eggeccen6)
+par(mfcol=c(1,1))
+acf(eggeccen6)
+#FemaleID matters but not block, treatment or adult length. Same as diameter
+
+plot(EggEccentricity~FemaleID, data=CalEggs)
+
+```
+
+
+Look at the water chemistry data for Jars
+```{r}
+#start with omega calcite
+plot(JarOmegaCalcite~JarTrt, data=LarvByJarDat)
+#remove the Jars that have their pH as 0/NA
+CalDat<- subset(LarvByJarDat, JarOmegaCalcite!= "NA")
+
+#I was having trouble with making this model: JarOmegaCalcite~JarTrt*ParentTrt*TimeFilter*BlockID, so I looked at TimeFilter because I think that is the problem. 
+Jar1<- lm(JarOmegaCalcite~TimeFilter, data=CalDat)
+par(mfcol=c(2,2))
+plot(Jar1)
+par(mfcol=c(1,1))
+#looks like we can't use timefilter because it is too specific to each jar. Get the error message "observations with leverage one"; try using seatable instead
+
+Jar2<- lmer(JarOmegaCalcite~JarTrt*JarSeatable + (1|Block), data=CalDat)
+
+#check assumptions 
+plot(Jar2)
+qqnorm(resid(Jar2))
+qqline(resid(Jar2))
+#looks good to me. 
+
+Jar2step<-step(Jar2)
+print(Jar2step)
+
+#final model chosen: JarpHCorrSW~JarTrt*JarSeatable + (1|Block)
+
+Jar3<- lmer(JarOmegaCalcite~JarTrt*JarSeatable + (1|Block), data=CalDat)
+#check assumptions
+qqnorm(resid(Jar3))
+qqline(resid(Jar3))
+plot(Jar3) #may want to look at this further
+
+summary(Jar3)
+#JarTrt and JarSeatable are both significant for JarpH and there is a significant interaction, block is also a significant but I don't know what to do about only having Exposed jars from Block2. We were expecting JarTrt, but not JarSeatable. 
+```
+
+
+Visualize the data for larvae morphology using the subset data
+```{r}
+ggplot(LarvaeDat, aes(x=LarvaeDiamum, color=JarTrt))+
+  geom_histogram(alpha=0.5, position="identity") +
+  facet_grid(ParentTrt~Block)
+#interesting bimodality in B2
+larvmeans<- aggregate(LarvaeDiamum~ParentTrt*JarTrt, data=LarvaeDat, FUN=mean)#CP/CL : 75.24389; EP/CL: 75.46671; CP/EL: 65.47536; EP/EL: 66.48770
+larvmedians<- aggregate(LarvaeDiamum~ParentTrt*JarTrt, data=LarvaeDat, FUN=median)#CP/CL : 75.29579; EP/CL: 75.52886; CP/EL: 65.27141; EP/EL: 66.86843
+#I think we can use the mean for these data 
+
+```
+
+Look at the larvae diameter data
+```{r}
+#create most complex model and then use the step function to see which model is best fit for the data; these are for ParentTrt and JarTrt as covariates. I decided to use pH since we have that for the all of the bottles (once we get the salinity to use) and the tanks. 
+larvlen<-lmer(LarvaeDiamum~WCa_pHDIC*JarOmegaCalcite+ (1|FemaleID)+(1|MaleID)+(1|CrossID)+(1|JarSeatable)+(1|JarID)+(1|TrtTankID)+(1|AccTankID)+(1|Block), data=LarvaeDat)
+
+steppedlarvlen<-step(larvlen)
+print(steppedlarvlen)
+
+#final model chosen by the lme4 step function: y~WCa_pHDIC*JarOmegaCalcite +(1|FemaleID)+(1|MaleID)+(1|JarID) + (1|JarSeatable)
+larvlenfin<- lmer(LarvaeDiamum~WCa_pHDIC*JarOmegaCalcite+ (1|FemaleID)+(1|MaleID)+(1|JarSeatable)+(1|JarID), data=LarvaeDat)
+
+#check the final model to see that it meets assumptions
+plot(larvlenfin) #seems to meet assumption of linearity and homoscedasticity
+qqnorm(resid(larvlenfin))
+qqline(resid(larvlenfin)) #has relatively long tails, doesn't seem to meet assumption of normality. Check with Katie 
+summary(larvlenfin)
+#signficant effect of Jar calcite sat, and sig. interaction between parent and Jar saturation states
+
+#look at autocorrelation. 
+acf(resid(larvlenfin)) #this looks good 
+
+#predit some of the data
+LarvaeDat$DiamPredict<-predict(larvlenfin)
+```
+
+Do the Larvae analysis without Block2 
+```{r}
+#Try without B2 data
+
+larvlenB1<-lmer(LarvaeDiamum~WCa_pHDIC*JarOmegaCalcite+ (1|FemaleID)+(1|MaleID)+(1|CrossID)+(1|JarSeatable)+(1|JarID)+(1|TrtTankID)+(1|AccTankID), data=LarvaeDatB1)
+
+steppedlarvlenB1<-step(larvlenB1)
+print(steppedlarvlenB1)
+
+larvlenB1fin<- lmer(LarvaeDiamum~WCa_pHDIC*JarOmegaCalcite+ (1|FemaleID)+(1|MaleID)+(1|JarID), data=LarvaeDatB1)
+#this is the same final model as with both blocks
+
+#check the final model to see that it meets assumptions
+plot(larvlenB1fin) #seems to meet assumption of linearity and homoscedasticity
+qqnorm(resid(larvlenB1fin))
+qqline(resid(larvlenB1fin)) #has relatively long tails, Katie, what do you think? 
+
+#look at autocorrelation. 
+acf(resid(larvlenB1fin)) #this looks good 
+summary(larvlenB1fin)
+#if we just look at block 1, both main effects are significant and their interaction. 
+```
+
+
+Visualize the larvae length data using continuous variables
+```{r}
+#plot the data using the means for each jar
+ggplot(LarvaeDat,
+       aes(fill = WCa_pHDIC, y = LarvaeDiamum, x = JarOmegaCalcite)) +
+  geom_point(aes(shape= Block, colour=WCa_pHDIC)) +
+  ggtitle("Larvae diameter by larvae jar saturation state")+ 
+  ylab("Larvae Diameter (um)")+
+  xlab("Larvae Jar Calcite Saturation State")+
+  theme_classic()
+
+#the reason there is spread is that for the jars that we actually measured carbonate dynamics I used those values, for all other jars, I used the average of those measurements
+
+#Try to visualize it in a more pleasant way
+#get means and SE of larvae diameters
+meanlarv<- ddply(LarvaeDat, .(JarTrt, ParentTrt), numcolwise(mean, na.rm=T))
+selarv<- ddply(LarvaeDat, .(JarTrt, ParentTrt), numcolwise(se, na.rm=T))
+
+#plot the mean Larvae Diameter +/- SE
+ggplot(data = meanlarv, aes(x = JarOmegaCalcite, y = LarvaeDiamum, group=ParentTrt, fill=ParentTrt)) +
+  geom_errorbar(aes(ymin= meanlarv$LarvaeDiamum-selarv$LarvaeDiamum, ymax=meanlarv$LarvaeDiamum+selarv$LarvaeDiamum),width=0.05, position=position_dodge(0))+
+   geom_errorbarh(aes(xmin= meanlarv$JarOmegaCalcite-selarv$JarOmegaCalcite, xmax=meanlarv$JarOmegaCalcite+selarv$JarOmegaCalcite),width=0.05, position=position_dodge(0))+
+  geom_point(aes(colour=ParentTrt))+
+  labs(x = "Larvae Jar Saturation State (Calcite)", y = "Larvae Diameter (um)") +
+  scale_color_manual(values = c("skyblue2", "red2")) +
+theme_classic()
+#should we add a model line to this? 
+
+#alternatively, I could visualize with bargraphs: 
+ggplot(data = meanlarv, aes(x = JarTrt, y = LarvaeDiamum, fill=ParentTrt)) +
+  geom_bar(stat="identity", aes(fill=ParentTrt), position="dodge")+
+  labs(x = "Larvae Treatment", y = "Larvae Diameter (um)") +
+  scale_fill_manual(name = "Parent Treatment", labels = c("Control", "OA Exposed"), values = c("skyblue2", "red2")) +
+  geom_errorbar(aes(ymin= meanlarv$LarvaeDiamum-selarv$LarvaeDiamum, ymax=meanlarv$LarvaeDiamum+selarv$LarvaeDiamum),width=0.2, position=position_dodge(.9))+
+  theme_classic()
+
+#plot with parent treatment on the x-axis
+
+ggplot(data = meanlarv, aes(x = ParentTrt , y = LarvaeDiamum, fill=JarTrt)) +
+  geom_bar(stat="identity", aes(fill=JarTrt), position="dodge")+
+  labs(x = "Parent Treatment", y = "Larvae Diameter (um)") +
+  scale_fill_manual(name = "Larvae Treatment", labels = c("Control", "OA Exposed"), values = c("skyblue2", "red2")) +
+  geom_errorbar(aes(ymin= meanlarv$LarvaeDiamum-selarv$LarvaeDiamum, ymax=meanlarv$LarvaeDiamum+selarv$LarvaeDiamum),width=0.2, position=position_dodge(.9))+
+  theme_classic()
+
+#now plot the difference between parental treatments for larvae diameter
+crossdiff <- data.frame(tapply(LarvaeDat$LarvaeDiamum, list(LarvaeDat$CrossID, LarvaeDat$JarTrt), mean)) %>%
+  rownames_to_column("CrossID") %>%
+  mutate(CrossTemp = CrossID) %>%
+  mutate(ParentTrt = ifelse(startsWith(CrossID, "E"), "Exposed", "Control")) %>%
+  separate(CrossTemp, c("FemaleID", "MaleID", "BlockID", "Fourth"), sep="_") %>% select(-Fourth) %>%
+  mutate(Diff = Exposed - Control)
+
+crossdiff$CrossID<- as.factor(crossdiff$CrossID)
+crossdiff$FemaleID<-as.factor(crossdiff$FemaleID)
+crossdiff$MaleID<-as.factor(crossdiff$MaleID)
+
+#look at cross differences by Male and Female ID
+ggplot(data = crossdiff, aes(x = MaleID, y = Diff)) + 
+  geom_point(aes(colour=FemaleID)) + 
+  labs(x = "Male ID", y = "Change in mean shell length (um) per family\nfrom control to OA conditions") + 
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(), panel.background = element_blank(), 
+        axis.line = element_line(colour = "black"), panel.border=element_rect(colour="black", fill=NA))+
+   theme(axis.text.x = element_text(angle = 90, vjust = 0.5))
+
+#get the means of the differences to visualize overall differences
+meandiff<- aggregate(Diff~ParentTrt, data=crossdiff, FUN=mean)
+sediff<-  aggregate(Diff~ParentTrt, data=crossdiff, FUN=se)
+
+ggplot(data = meandiff, aes(x = ParentTrt, y = Diff)) + 
+  geom_bar(stat="identity", aes(fill="gray45"), position="dodge") + 
+  labs(x = "Parental Treatment", y = "Change in mean shell length (um) per family\nfrom control to OA conditions") + 
+  scale_x_discrete(breaks = c("Control", "Exposed"), labels = c("Control", "OA Exposed")) + 
+  scale_fill_manual(values = "gray45") + 
+  geom_errorbar(aes(ymin= meandiff$Diff-sediff$Diff, ymax=meandiff$Diff+sediff$Diff),width=0.2, position=position_dodge(.9))+
+  theme(legend.position = "none", panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(), panel.background = element_blank(), 
+        axis.line = element_line(colour = "black"))
+
+diffttest<- t.test(Diff~ParentTrt, data=crossdiff, var.equal=T)
+diffttest #mean shell length difference is significantly higher for OA parent treatment
+
+```
+
+Analyze at growth per day
+```{r}
+larvgrow<-lmer(GrowthPerDay~WCa_pHDIC*JarOmegaCalcite+ (1|FemaleID)+(1|MaleID)+(1|CrossID)+(1|JarSeatable)+(1|JarID)+(1|TrtTankID)+(1|AccTankID)+(1|Block) , data=LarvaeDat)
+
+steppedlarvgrow<- step(larvgrow)
+print(steppedlarvgrow)
+
+#final model chosen by the lme4 step function: y~pHSWCorr*JarOmegaCalcite+(1|FemaleID)+(1|MaleID)+ (1|JarID)
+larvgrowfin<- lmer(GrowthPerDay~WCa_pHDIC*JarOmegaCalcite+(1|FemaleID)+(1|MaleID)+(1|JarID)+ (1|JarSeatable), data=LarvaeDat)
+
+
+#check the final model to see that it meets assumptions
+plot(larvgrowfin) #seems to meet assumption of linearity and homoscedasticity
+qqnorm(resid(larvgrowfin))
+qqline(resid(larvgrowfin)) #has relatively long tails, doesn't seem to meet assumption of normality. 
+summary(larvgrowfin)
+#looks like no collinearity between predictors
+
+#look at autocorrelation. 
+acf(resid(larvgrowfin)) #this looks fine to me. 
+#significant main effect of JarOmegaCalcite and significant interaction 
+
+#plot growth per day
+ggplot(LarvaeDat,
+       aes(fill = WCa_pHDIC, y = GrowthPerDay, x = JarOmegaCalcite)) +
+  geom_point(aes(shape= Block, colour=WCa_pHDIC)) +
+  ggtitle("Larvae growth by parent treatment")+ 
+  ylab("Growth (um/day)")+
+  theme_classic()
+
+#get means and SE of larvae growth
+meangrowth<- aggregate(GrowthPerDay~ParentTrt*JarTrt, data=LarvaeDat, FUN=mean)
+segrowth<- aggregate(GrowthPerDay~ParentTrt*JarTrt, data=LarvaeDat, FUN=se)
+
+#use a bargraph to plot the mean Larvae Diameter +/- SE
+ggplot(data = meangrowth, aes(x = ParentTrt, y = GrowthPerDay, fill=JarTrt)) +
+  geom_bar(stat="identity", aes(fill=JarTrt), position="dodge")+
+  labs(x = "Parent Treatment", y = "Larvae Growth (um/day)") +
+  scale_fill_manual(name = "Larvae Treatment", labels = c("Control", "OA Exposed"), values = c("skyblue2", "red2")) +
+  geom_errorbar(aes(ymin= meangrowth$GrowthPerDay-segrowth$GrowthPerDay, ymax=meangrowth$GrowthPerDay+segrowth$GrowthPerDay),width=0.2, position=position_dodge(.9))+
+  theme_classic()
+
+#now plot the difference between parental treatments for larvae growth
+
+growthdiff <- data.frame(tapply(LarvaeDat$GrowthPerDay, list(LarvaeDat$CrossID, LarvaeDat$JarTrt), mean)) %>%
+  rownames_to_column("CrossID") %>%
+  mutate(CrossTemp = CrossID) %>%
+  mutate(ParentTrt = ifelse(startsWith(CrossID, "E"), "Exposed", "Control")) %>%
+  separate(CrossTemp, c("FemaleID", "MaleID", "BlockID", "Fourth"), sep="_") %>% select(-Fourth) %>%
+  mutate(Diff = Exposed - Control)
+
+growthdiff$CrossID<- as.factor(growthdiff$CrossID)
+growthdiff$FemaleID<-as.factor(growthdiff$FemaleID)
+growthdiff$MaleID<-as.factor(growthdiff$MaleID)
+
+#look at cross differences by Male and Female ID
+ggplot(data = growthdiff, aes(x = MaleID, y = Diff)) + 
+  geom_point(aes(colour=FemaleID)) + 
+  labs(x = "Male ID", y = "Change in larvae growth (um/day) per family\nfrom control to OA conditions") + 
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(), panel.background = element_blank(), 
+        axis.line = element_line(colour = "black"), panel.border=element_rect(colour="black", fill=NA))+
+   theme(axis.text.x = element_text(angle = 90, vjust = 0.5))
+
+#get the means of the differences to visualize overall differences
+meangrdiff<- aggregate(Diff~ParentTrt, data=growthdiff, FUN=mean)
+segrdiff<-  aggregate(Diff~ParentTrt, data=growthdiff, FUN=se)
+
+ggplot(data = meangrdiff, aes(x = ParentTrt, y = Diff)) + 
+  geom_bar(stat="identity", aes(fill="gray45"), position="dodge") + 
+  labs(x = "Parental Treatment", y = "Change in larvae growth (um) per family\nfrom control to OA conditions") + 
+  scale_x_discrete(breaks = c("Control", "Exposed"), labels = c("Control", "OA")) + 
+  scale_fill_manual(values = "gray45") + 
+  geom_errorbar(aes(ymin= meangrdiff$Diff-segrdiff$Diff, ymax=meangrdiff$Diff+segrdiff$Diff),width=0.2, position=position_dodge(.9))+
+  theme(legend.position = "none", panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(), panel.background = element_blank(), 
+        axis.line = element_line(colour = "black"))
+
+diffgrttest<- t.test(Diff~ParentTrt, data=growthdiff, var.equal=T)
+diffgrttest #significant effect of parent treatment on growth. 
+```
+
+
+Look at larvae area
+```{r}
+boxplot(LarvaeAreaum2~Block*ParentTrt, data=LarvaeDat)
+#quick anova to look for potential differences
+anovarea<- aov(LarvaeAreaum2~ParentTrt*JarTrt, data=LarvaeDat)
+anova(anovarea)
+shapiro.test(anovarea$residuals) #doesn't meet assumption of normality
+par(mfcol=c(2,2))
+plot(anovarea)
+par(mfcol=c(1,1))
+#create most complex model and then use the step function to see which model is best fit for the data; these are for ParentTrt and JarTrt as fixed effects not covariates
+larvarea<-lmer(LarvaeAreaum2~WCa_pHDIC*JarOmegaCalcite+ (1|FemaleID)+(1|MaleID)+(1|CrossID)+(1|JarSeatable)+(1|JarID)+(1|TrtTankID)+(1|AccTankID)+(1|Block) , data=LarvaeDat)
+
+steppedlarvarea<-step(larvarea)
+print(steppedlarvarea)
+
+#final model chosen by the lme4 step function: y~JarOmegaCalcite+(1|FemaleID)+(1|MaleID)+ (1|JarSeatable)+(1|JarID)
+larvareafin<- lmer(LarvaeAreaum2~JarOmegaCalcite+(1|FemaleID)+(1|MaleID)+ (1|JarSeatable)+(1|JarID), data=LarvaeDat)
+
+
+#check the final model to see that it meets assumptions
+plot(larvareafin) #seems to meet assumption of linearity and homoscedasticity
+qqnorm(resid(larvareafin))
+qqline(resid(larvareafin)) #has relatively long tails, doesn't seem to meet assumption of normality. 
+summary(larvareafin)
+#look at autocorrelation. 
+acf(resid(larvareafin)) #this looks fine to me. 
+
+#plot the data using the means for each jar
+ggplot(LarvaeDat,
+       aes(fill = WCa_pHDIC, y = LarvaeAreaum2, x = JarOmegaCalcite)) +
+  geom_point(aes(shape= Block, colour=WCa_pHDIC)) +
+  ggtitle("Larvae area by larvae treatment")+ 
+  ylab("Larvae Area (um2)")+
+  theme_classic()
+#get means and SE of larvae areas
+meanarea<- aggregate(LarvaeAreaum2~ParentTrt*JarTrt, data=LarvaeDat, FUN=mean)
+searea<- aggregate(LarvaeAreaum2~ParentTrt*JarTrt, data=LarvaeDat, FUN=se)
+
+#use a bargraph to plot the mean Larvae area +/- SE
+ggplot(data = meanarea, aes(x = ParentTrt, y = LarvaeAreaum2, fill=JarTrt)) +
+  geom_bar(stat="identity", aes(fill=JarTrt), position="dodge")+
+  labs(x = "Parent Treatment", y = "Larvae Area (um2)") +
+  scale_fill_manual(name = "Larvae Treatment", labels = c("Control", "OA"), values = c("skyblue2", "red2")) +
+  geom_errorbar(aes(ymin= meanarea$LarvaeAreaum2-searea$LarvaeAreaum2, ymax=meanarea$LarvaeAreaum2+searea$LarvaeAreaum2),width=0.2, position=position_dodge(.9))+
+  theme_classic()
+#now plot the difference between parental treatments for larvae area
+
+areadiff <- data.frame(tapply(LarvaeDat$LarvaeAreaum2, list(LarvaeDat$CrossID, LarvaeDat$JarTrt), mean)) %>%
+  rownames_to_column("CrossID") %>%
+  mutate(CrossTemp = CrossID) %>%
+  mutate(ParentTrt = ifelse(startsWith(CrossID, "E"), "Exposed", "Control")) %>%
+  separate(CrossTemp, c("FemaleID", "MaleID", "BlockID", "Fourth"), sep="_") %>% select(-Fourth) %>%
+  mutate(Diff = Exposed - Control)
+
+areadiff$CrossID<- as.factor(crossdiff$CrossID)
+areadiff$FemaleID<-as.factor(crossdiff$FemaleID)
+areadiff$MaleID<-as.factor(crossdiff$MaleID)
+
+#look at cross differences by Male and Female ID
+ggplot(data = areadiff, aes(x = MaleID, y = Diff)) + 
+  geom_point(aes(colour=FemaleID)) + 
+  labs(x = "Male ID", y = "Change in mean shell area (um2) per family\nfrom control to OA conditions") + 
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(), panel.background = element_blank(), 
+        axis.line = element_line(colour = "black"), panel.border=element_rect(colour="black", fill=NA))+
+   theme(axis.text.x = element_text(angle = 90, vjust = 0.5))
+
+#get the means of the differences to visualize overall differences
+meanareadiff<- aggregate(Diff~ParentTrt, data=areadiff, FUN=mean)
+seareadiff<-  aggregate(Diff~ParentTrt, data=areadiff, FUN=se)
+
+ggplot(data = meanareadiff, aes(x = ParentTrt, y = Diff)) + 
+  geom_bar(stat="identity", aes(fill="gray45"), position="dodge") + 
+  labs(x = "Parental Treatment", y = "Change in mean shell area (um2) per family\nfrom control to OA conditions") + 
+  scale_x_discrete(breaks = c("Control", "Exposed"), labels = c("Control", "OA")) + 
+  scale_fill_manual(values = "gray45") + 
+  geom_errorbar(aes(ymin= meanareadiff$Diff-seareadiff$Diff, ymax=meanareadiff$Diff+seareadiff$Diff),width=0.2, position=position_dodge(.9))+
+  theme(legend.position = "none", panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(), panel.background = element_blank(), 
+        axis.line = element_line(colour = "black"))
+
+diffareattest<- t.test(Diff~ParentTrt, data=areadiff)
+diffareattest #mean shell area difference is not significantly higher for OA parent treatment
+
+```
+
+Look at growth in terms of area
+```{r}
+#just subtract egg area from larvae area and then divide by 3
+LarvaeDat$AreaGrowthPerDay<- (LarvaeDat$LarvaeAreaum2-LarvaeDat$EggAreaum2)/3
+
+#create LMM for growth per day
+larvgrowarea<-lmer(AreaGrowthPerDay~WCa_pHDIC*JarOmegaCalcite+ (1|FemaleID)+(1|MaleID)+(1|CrossID)+(1|JarSeatable)+(1|JarID)+(1|TrtTankID)+(1|AccTankID)+(1|Block) , data=LarvaeDat)
+
+steppedlarvgrowarea<- step(larvgrowarea)
+print(steppedlarvgrowarea)
+
+#final model chosen by the lme4 step function: y~JarOmegaCalcite+(1|FemaleID)+(1|CrossID)+ (1|MaleID)+ (1|JarSeatable)+(1|JarID)
+larvgrowareafin<- lmer(AreaGrowthPerDay~JarTrt+(1|FemaleID)+(1|MaleID)+ (1|CrossID)+ (1|JarSeatable)+(1|JarID), data=LarvaeDat)
+
+
+#check the final model to see that it meets assumptions
+plot(larvgrowareafin) #seems to meet assumption of linearity and homoscedasticity
+qqnorm(resid(larvgrowareafin))
+qqline(resid(larvgrowareafin)) #has relatively long tails, doesn't seem to meet assumption of normality. 
+summary(larvgrowareafin)
+
+#look at autocorrelation. 
+acf(resid(larvgrowareafin)) #this looks fine to me. 
+
+#plot growth per day
+ggplot(LarvaeDat,
+       aes(fill = WCa_pHDIC, y = AreaGrowthPerDay, x = JarOmegaCalcite)) +
+  geom_point(aes(shape= Block, colour=WCa_pHDIC)) +
+  ggtitle("Larvae growth by larvae treatment")+ 
+  ylab("Area Growth (um/day)")+
+  theme_classic()
+
+#get means and SE of larvae growth
+meanareagrowth<- aggregate(AreaGrowthPerDay~ParentTrt*JarTrt, data=LarvaeDat, FUN=mean)
+seareagrowth<- aggregate(AreaGrowthPerDay~ParentTrt*JarTrt, data=LarvaeDat, FUN=se)
+
+#use a bargraph to plot the mean Larvae area +/- SE
+ggplot(data = meanareagrowth, aes(x = ParentTrt, y = AreaGrowthPerDay, fill=JarTrt)) +
+  geom_bar(stat="identity", aes(fill=JarTrt), position="dodge")+
+  labs(x = "Parent Treatment", y = "Larvae Growth (um2/day)") +
+  scale_fill_manual(name = "Larvae Treatment", labels = c("Control", "OA Exposed"), values = c("skyblue2", "red2")) +
+  geom_errorbar(aes(ymin= meanareagrowth$AreaGrowthPerDay-seareagrowth$AreaGrowthPerDay, ymax=meanareagrowth$AreaGrowthPerDay+seareagrowth$AreaGrowthPerDay),width=0.2, position=position_dodge(.9))+
+  theme_classic()
+
+#now plot the difference between parental treatments for larvae growth
+areagrowthdiff <- data.frame(tapply(LarvaeDat$AreaGrowthPerDay, list(LarvaeDat$CrossID, LarvaeDat$JarTrt), mean)) %>%
+  rownames_to_column("CrossID") %>%
+  mutate(CrossTemp = CrossID) %>%
+  mutate(ParentTrt = ifelse(startsWith(CrossID, "E"), "Exposed", "Control")) %>%
+  separate(CrossTemp, c("FemaleID", "MaleID", "BlockID", "Fourth"), sep="_") %>% select(-Fourth) %>%
+  mutate(Diff = Exposed - Control)
+
+areagrowthdiff$CrossID<- as.factor(areagrowthdiff$CrossID)
+areagrowthdiff$FemaleID<-as.factor(areagrowthdiff$FemaleID)
+areagrowthdiff$MaleID<-as.factor(areagrowthdiff$MaleID)
+
+#look at cross differences by Male and Female ID
+ggplot(data = areagrowthdiff, aes(x = MaleID, y = Diff)) + 
+  geom_point(aes(colour=FemaleID)) + 
+  labs(x = "Male ID", y = "Change in larvae growth area (um2/day) per family\nfrom control to OA conditions") + 
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(), panel.background = element_blank(), 
+        axis.line = element_line(colour = "black"), panel.border=element_rect(colour="black", fill=NA))+
+   theme(axis.text.x = element_text(angle = 90, vjust = 0.5))
+
+#get the means of the differences to visualize overall differences
+meanardiff<- aggregate(Diff~ParentTrt, data=areagrowthdiff, FUN=mean)
+seardiff<-  aggregate(Diff~ParentTrt, data=areagrowthdiff, FUN=se)
+
+ggplot(data = meanardiff, aes(x = ParentTrt, y = Diff)) + 
+  geom_bar(stat="identity", aes(fill="gray45"), position="dodge") + 
+  labs(x = "Parental Treatment", y = "Change in larvae growth area (um2) per family\nfrom control to OA conditions") + 
+  scale_x_discrete(breaks = c("Control", "Exposed"), labels = c("Control", "OA")) + 
+  scale_fill_manual(values = "gray45") + 
+  geom_errorbar(aes(ymin= meanardiff$Diff-seardiff$Diff, ymax=meanardiff$Diff+seardiff$Diff),width=0.2, position=position_dodge(.9))+
+  theme(legend.position = "none", panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(), panel.background = element_blank(), 
+        axis.line = element_line(colour = "black"))
+
+diffarttest<- t.test(Diff~ParentTrt, data=areagrowthdiff)
+diffarttest #significant effect of parent treatment on growth. 
+```
+
+Characterize the larvae by the ratio of major and minor axis
+```{r}
+#make a column for the ratio of major to minor axis
+LarvaeDat$MajMinRat<- LarvaeDat$LarvaeMajorAxisLengthPix/LarvaeDat$LarvaeMinorAxisLengthPix
+
+#get the mean ratio for the treatments to plot
+meanrat<- ddply(LarvaeDat, .(JarTrt, ParentTrt), numcolwise(mean, na.rm=T))
+serat<- ddply(LarvaeDat, .(JarTrt, ParentTrt), numcolwise(se, na.rm=T))
+
+ggplot(data = meanrat, aes(x = ParentTrt, y = MajMinRat, fill=JarTrt)) +
+  geom_bar(stat="identity", aes(fill=JarTrt), position="dodge")+
+  labs(x = "Parent Treatment", y = "Ratio of Major to Minor Axis") +
+  scale_fill_manual(name = "Larvae Treatment", labels = c("Control", "OA Exposed"), values = c("skyblue2", "red2")) +
+  geom_errorbar(aes(ymin= meanrat$MajMinRat-serat$MajMinRat, ymax=meanrat$MajMinRat+serat$MajMinRat),width=0.2, position=position_dodge(.9))+
+  theme_classic()
+
+#quick test to see if there is a significant difference
+larvrat<-lmer(MajMinRat~WCa_pHDIC*JarOmegaCalcite+ (1|FemaleID)+(1|MaleID)+(1|JarSeatable)+(1|JarID) , data=LarvaeDat)
+
+lmrat1<- lm(MajMinRat~WCa_pHDIC*JarOmegaCalcite, data=LarvaeDat)
+plot(resid(lmrat1)~LarvaeDat$FemaleID)
+
+#check the model to see that it meets assumptions
+plot(larvrat) #seems to meet assumption of linearity and homoscedasticity
+qqnorm(resid(larvrat))
+qqline(resid(larvrat)) #has relatively long tails, doesn't seem to meet assumption of normality. 
+summary(larvrat) #no significant differences, but interaction between parent treatment and larval treatment are both nearly significant
+
+#look at autocorrelation. 
+acf(resid(larvrat)) #this looks fine to me.
+
+
+
+```
+
+Look at eccentricity
+```{r}
+#look at the eccentricity data
+hist(LarvaeDat$LarvaeEccentricity)#data are left skewed. 
+#get the mean eccentricity for the treatments to plot
+meaneccen<- aggregate(LarvaeEccentricity~ParentTrt*JarTrt, data=LarvaeDat, FUN=mean)
+seeccen<- aggregate(LarvaeEccentricity~ParentTrt*JarTrt, data=LarvaeDat, FUN=se)
+
+ggplot(data = meaneccen, aes(x = ParentTrt, y = LarvaeEccentricity, fill=JarTrt)) +
+  geom_bar(stat="identity", aes(fill=JarTrt), position="dodge")+
+  labs(x = "Parent Treatment", y = "Larvae Eccentricity") +
+  scale_fill_manual(name = "Larvae Treatment", labels = c("Control", "OA"), values = c("skyblue2", "red2")) +
+  geom_errorbar(aes(ymin= meaneccen$LarvaeEccentricity-seeccen$LarvaeEccentricity, ymax=meaneccen$LarvaeEccentricity+seeccen$LarvaeEccentricity),width=0.2, position=position_dodge(.9))+
+  theme_classic()
+
+#quick test to see if there is a significant difference
+larveccen<-lmer(LarvaeEccentricity~WCa_pHDIC*JarOmegaCalcite+ (1|FemaleID)+(1|MaleID)+(1|CrossID)+(1|JarSeatable)+(1|JarID)+(1|TrtTankID)+(1|AccTankID)+(1|Block) , data=LarvaeDat)
+
+steppedlarveccen<- step(larveccen)
+print(steppedlarveccen)
+
+#final model only had JarTrt
+larveccenfin<- lmer(LarvaeEccentricity~JarOmegaCalcite+ (1|FemaleID)+(1|JarID), data=LarvaeDat)
+
+#check the model to see that it meets assumptions
+plot(larveccenfin) #seems to meet assumption of linearity and homoscedasticity
+qqnorm(resid(larveccenfin))
+qqline(resid(larveccenfin)) #has relatively long tails, doesn't meet assumption of normality. 
+summary(larveccenfin) #significant effect of JarTrt
+
+#look at autocorrelation. 
+acf(resid(larveccenfin)) #this looks fine to me.
+
+#see if a square root transformation helps
+larveccent<-lmer((LarvaeEccentricity^2)~JarOmegaCalcite+ (1|FemaleID)+(1|JarID) , data=LarvaeDat)
+
+#check the model to see that it meets assumptions
+plot(larveccent) #seems to meet assumption of linearity and homoscedasticity
+qqnorm(resid(larveccent))
+qqline(resid(larveccent)) #has relatively long tails, doesn't meet assumption of normality. transformation helped
+summary(larveccent) #no significant differences 
+
+```
+
+Look at larvae perimeter
+```{r}
+hist(LarvaeDat$LarvaePerimeterum)
+
+#test to see if there is a significant difference
+larvperim<-lmer(LarvaePerimeterum~WCa_pHDIC*JarOmegaCalcite+ (1|FemaleID)+(1|MaleID)+(1|CrossID)+(1|JarSeatable)+(1|JarID)+(1|TrtTankID)+(1|AccTankID)+(1|Block) , data=LarvaeDat)
+
+steppedlarvperim<- step(larvperim)
+print(steppedlarvperim)
+
+#final model chosen by the step function: LarvaePerimeterum~WCa_pHDIC*JarOmegaCalcite+ (1|FemaleID)+(1|MaleID)+(1|CrossID)+(1|JarSeatable)+(1|JarID)
+larvperimfin<- lmer(LarvaePerimeterum~WCa_pHDIC*JarOmegaCalcite+ (1|FemaleID)+(1|MaleID)+(1|CrossID)+(1|JarSeatable)+(1|JarID), data=LarvaeDat)
+
+#check the model to see that it meets assumptions
+plot(larvperimfin) #seems to meet assumption of linearity and homoscedasticity
+qqnorm(resid(larvperimfin))
+qqline(resid(larvperimfin)) #has relatively long tails, doesn't meet assumption of normality. 
+summary(larvperimfin)
+
+#look at autocorrelation. 
+acf(resid(larvperimfin)) #this looks fine to me.
+
+ggplot(LarvaeDat,
+       aes(fill = WCa_pHDIC, y = LarvaePerimeterum, x = JarOmegaCalcite)) +
+  geom_point(aes(shape= Block, colour=WCa_pHDIC)) +
+  ggtitle("Larvae area by larvae treatment")+ 
+  ylab("Larvae Perimeter (um)")+
+  theme_classic()
+
+meanperim<- ddply(LarvaeDat, .(JarTrt, ParentTrt), numcolwise(mean, na.rm=T))
+seperim<- ddply(LarvaeDat, .(JarTrt, ParentTrt), numcolwise(se, na.rm=T))
+
+ggplot(data = meanperim, aes(x = ParentTrt, y = LarvaePerimeterum, fill=JarTrt)) +
+  geom_bar(stat="identity", aes(fill=JarTrt), position="dodge")+
+  labs(x = "Parent Treatment", y = "Larvae Perimeter (um)") +
+  scale_fill_manual(name = "Larvae Treatment", labels = c("Control", "OA Exposed"), values = c("skyblue2", "red2")) +
+  geom_errorbar(aes(ymin= meanperim$LarvaePerimeterum-seperim$LarvaePerimeterum, ymax=meanperim$LarvaePerimeterum+seperim$LarvaePerimeterum),width=0.2, position=position_dodge(.9))+
+  theme_classic()
+
+
+#see if a square root transformation helps
+larvperimfint<- lmer(sqrt(LarvaePerimeterum)~WCa_pHDIC*JarOmegaCalcite+ (1|FemaleID)+(1|MaleID)+(1|CrossID)+(1|JarSeatable)+(1|JarID), data=LarvaeDat)
+
+#check the model to see that it meets assumptions
+plot(larvperimfint) #seems to meet assumption of linearity and homoscedasticity
+qqnorm(resid(larvperimfint))
+qqline(resid(larvperimfint)) #has relatively long tails, doesn't meet assumption of normality. #transformation didn't help
+summary(larvperimfint) #significant effect of JarOmegaCalcite and signficant interaction
+
+```
+
+Try different type of visualization: Make plot that looks at morphology by larvae and parent treatment
+```{r}
+par(mar = c(5, 4, 0.5, 0.5), bg = "transparent")
+boxplot(LarvByJarDat$LarvaeDiamum ~ LarvByJarDat$JarTrt * LarvByJarDat$ParentTrt, 
+        xlim = c(0, 5),
+        xlab = "Larvae Treatment",
+        ylab = "Diameter (um)",
+        ylim = c(0,85),
+        names = c("Control", "OA Exposed", "Control", "OA Exposed"), 
+        col = c("powderblue", "red"))
+rect(xleft = -0.2, 
+     ybottom = 0, 
+     xright = 2.5, 
+     ytop = 85,
+     border = FALSE,
+     col = rgb(0, 0, 0.5, alpha = 0.1))
+rect(xleft = 2.5, 
+     ybottom = 0, 
+     xright = 5.2, 
+     ytop = 85,
+     border = FALSE,
+     col = rgb(0.5, 0, 0, alpha = 0.1))
+text(x = 1.25, y = 84, "Control Parents")
+text(x = 3.75, y = 84, "OA Exposed Parents")
+boxplot(LarvByJarDat$LarvaeDiamum ~ LarvByJarDat$JarTrt * LarvByJarDat$ParentTrt, 
+        xlim = c(0, 5),
+        xlab = "Larvae Treatment",
+        ylab = "Diameter (um)",
+        names = c("Control", "OA Exposed", "Control", "OA Exposed"), 
+        col = c("powderblue", "red"),
+        add = TRUE)
+par(mfcol=c(1,1))
+```
+
+
+Try to analyze survival data
+```{r}
+boxplot(PropSurvived~ParentTrt*JarTrt, data=LarvByJarDat)
+boxplot(PropSurvived~CrossID*JarTrt, data=LarvByJarDat)
+#I don't know what we want to do about the larvae with proportion survived greater than one. For now, I will remove them. 
+LarvByJarDatSurv<- subset(LarvByJarDat, PropSurvived<=1)
+boxplot(PropSurvived~ParentTrt*JarTrt, data=LarvByJarDatSurv)
+#create linear mixed model
+surv1<- lmer(PropSurvived~WCa_pHDIC*JarOmegaCalcite+ (1|FemaleID)+(1|MaleID)+(1|CrossID)+(1|JarSeatable)+(1|TrtTankID)+(1|AccTankID), data=LarvByJarDatSurv)
+
+survstep<- step(surv1)
+print(survstep)
+
+#final model chosen by step function: PropSurvived~JarOmegaCalcite+ (1|CrossID)+(1|JarSeatable)
+survfin<- lmer(PropSurvived~JarOmegaCalcite+(1|CrossID)+(1|JarSeatable), data=LarvByJarDatSurv)
+
+plot(survfin) #this looks fine to me
+qqnorm(resid(survfin))
+qqline(resid(survfin)) #I think this is fine
+acf(survfin)
+
+summary(survfin)
+#Jar treatment significantly affects survival
+
+ggplot(LarvByJarDatSurv,
+       aes(fill = WCa_pHDIC, y = PropSurvived, x = JarOmegaCalcite)) +
+  geom_point(aes(colour=WCa_pHDIC)) +
+  ggtitle("Larvae survival by larvae treatment")+ 
+  ylab("Proportion of Larvae that Survived")+
+  theme_classic()
+
+meansurv<- ddply(LarvByJarDatSurv, .(JarTrt, CrossID), numcolwise(mean, na.rm=T))
+sesurv<- ddply(LarvByJarDatSurv, .(JarTrt, CrossID), numcolwise(se, na.rm=T))
+#make a shorter name for the CrossIDs
+meansurv$Cross<- substr(meansurv$CrossID, 1, 9)
+sesurv$Cross<- substr(sesurv$CrossID, 1, 9)
+
+ggplot(data = meansurv, aes(x = Cross, y = PropSurvived, fill=JarTrt)) +
+  geom_bar(stat="identity", aes(fill=JarTrt), position="dodge")+
+  labs(x = "Cross ID", y = "Proportion of Larvae that Survived") +
+  scale_fill_manual(name = "Larvae Treatment", labels = c("Control", "OA Exposed"), values = c("skyblue2", "red2")) +
+  geom_errorbar(aes(ymin= meansurv$PropSurvived-sesurv$PropSurvived, ymax=meansurv$PropSurvived+sesurv$PropSurvived),width=0.2, position=position_dodge(.9))+
+  theme(axis.text.x=element_text(angle=90))
+#EF03_EM05 only has control because the exposed all had survival >1. 
+
+#now just plot the JarTrt
+meanjarsurv<- ddply(LarvByJarDatSurv, .(JarTrt), numcolwise(mean, na.rm=T))
+sejarsurv<- ddply(LarvByJarDatSurv, .(JarTrt), numcolwise(se, na.rm=T))
+
+ggplot(data = meanjarsurv, aes(x = JarTrt, y = PropSurvived)) +
+  geom_bar(stat="identity", aes(fill="gray45"), position="dodge")+
+  labs(x = "Jar Treatment", y = "Proportion of Larvae that Survived") +
+  scale_fill_manual(values = "gray45") +
+  geom_errorbar(aes(ymin= meanjarsurv$PropSurvived-sejarsurv$PropSurvived, ymax=meanjarsurv$PropSurvived+sejarsurv$PropSurvived),width=0.2, position=position_dodge(.9))+
+  theme(legend.position = "none", panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(), panel.background = element_blank(), 
+        axis.line = element_line(colour = "black"))
+
+#try to use the cross difference code to look at the difference in survival.
+survdiff <- data.frame(tapply(LarvByJarDat$PropSurvived, list(LarvByJarDat$CrossID, LarvByJarDat$JarTrt), mean)) %>%
+  rownames_to_column("CrossID") %>%
+  mutate(CrossTemp = CrossID) %>%
+  mutate(ParentTrt = ifelse(startsWith(CrossID, "E"), "Exposed", "Control")) %>%
+  separate(CrossTemp, c("FemaleID", "MaleID", "BlockID", "Fourth"), sep="_") %>% select(-Fourth) %>%
+  mutate(Diff = Exposed - Control)
+
+survdiff$CrossID<- as.factor(survdiff$CrossID)
+survdiff$FemaleID<-as.factor(survdiff$FemaleID)
+survdiff$MaleID<-as.factor(survdiff$MaleID)
+
+#look at cross differences by Male and Female ID
+ggplot(data = survdiff, aes(x = FemaleID, y = Diff)) + 
+  geom_point(aes(colour=MaleID)) + 
+  labs(x = "Female ID", y = "Change in larvae survival per family\nfrom control to OA conditions") + 
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(), panel.background = element_blank(), 
+        axis.line = element_line(colour = "black"), panel.border=element_rect(colour="black", fill=NA))+
+   theme(axis.text.x = element_text(angle = 90, vjust = 0.5))
+
+#get the means of the differences to visualize overall differences
+meansurvdiff<- ddply(survdiff, .(ParentTrt), numcolwise(mean, na.rm=T))
+sesurvdiff<- ddply(survdiff, .(ParentTrt), numcolwise(se, na.rm=T))
+
+ggplot(data = meansurvdiff, aes(x = ParentTrt, y = Diff)) + 
+  geom_bar(stat="identity", aes(fill="gray45"), position="dodge") + 
+  labs(x = "Parental Treatment", y = "Change in larvae survival per family\nfrom control to OA conditions") + 
+  scale_fill_manual(values = "gray45") + 
+  geom_errorbar(aes(ymin= meansurvdiff$Diff-sesurvdiff$Diff, ymax=meansurvdiff$Diff+sesurvdiff$Diff),width=0.2, position=position_dodge(.9))+
+  theme(legend.position = "none", panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(), panel.background = element_blank(), 
+        axis.line = element_line(colour = "black"))
+
+diffsurvttest<- aov(Diff~ParentTrt, data=survdiff)
+anova(diffsurvttest) #no significant effect of parental treatment
+
+```
+
+Explore cilia extrusion. 
+```{r}
+#Plot cilia extrusion by size to see if there is a relationship (see Waldbusser et al 2015)
+#to do this Elise looked at a subset of Larvae for each jar treatment. 
+par(mfcol=c(1,1))
+testcil<- read.csv("../data/LarvMorphTest.csv")
+testcil$CilExtruded<- as.factor(testcil$CilExtruded)
+testcilsub<- subset(testcil, CilExtruded !="")
+testcilsub$Flag<- as.factor(testcilsub$Flag)
+testcilsub<- subset(testcilsub, Flag !="TRUE")
+#take a look at the data
+ggplot(testcilsub,
+       aes(fill = JarTrt, y = MaxFeretDiamum, x = CilExtruded)) +
+  geom_point(aes( shape=JarTrt, colour=JarTrt)) +
+  ggtitle("Larvae cilia extrusion by size")+ 
+  ylab("Larvae Diameter (um)")+
+  facet_grid(~JarTrt)+
+  theme_classic()
+#test for a relationship between size and cilia extruded within each jar treatment type. 
+exp<- subset(testcilsub, JarTrt=="Exposed")
+con<- subset(testcilsub, JarTrt=="Control")
+
+expcil1<-glm(CilExtruded~MaxFeretDiamum, data=exp, family=binomial)
+summary(expcil1) #no significant relationship between size and cilia extrusion
+boxplot(MaxFeretDiamum~CilExtruded,  data=exp)
+
+#now test the control jars for relationship between size and cilia extrusion. 
+concil1<-glm(CilExtruded~MaxFeretDiamum, data=con, family=binomial)
+summary(concil1) #looks like there is a significant relationship between size and cilia extrusion
+
+boxplot(MaxFeretDiamum~CilExtruded,  data=con)
+
+```
+
+
+Export Figures
+```{r}
+plots.dir.path<- list.files(tempdir(), pattern="rs-graphics", full.names= TRUE)
+plots.png.paths<- list.files(plots.dir.path, pattern=".png", full.names=TRUE)
+file.copy(from=plots.png.paths, to="../results")
+
+```
+
+
+
+
+
+
+From data exploration: 
+```{r}
+lm1<- lm(LarvaeDiamum~ParentTrt*JarTrt+EggDiamum, data=LarvaeDat)
+par(mfcol=c(2,2))
+plot(lm1) #does not appear to meet assumptions of normality
+par(mfcol=c(1,1))
+
+#plot the residuals of lm1 vs. Female and Male ID
+plot(resid(lm1)~LarvaeDat$FemaleID)
+abline(0,0)
+plot(resid(lm1)~LarvaeDat$MaleID)
+abline(0,0)
+
+#look at autocorrelation of lm1; elise is still struggling with this
+
+#add female ID to the model as a random effect, but take out EggDiamum then plot the residuals against MaleID
+lm1b<- lmer(LarvaeDiamum~ParentTrt*JarTrt+ (1|FemaleID), data=LarvaeDat)
+summary(lm1b)
+plot(lm1b) #this looks okay, seems to meet assumption of linearity and homoscedasticity
+qqnorm(resid(lm1b))
+qqline(resid(lm1b)) #doesn't look like it meets the assumption of normality
+
+#plot the residuals of lm1b vs. Male ID
+plot(resid(lm1b)~LarvaeDat$MaleID)
+abline(0,0)
+#I think we probably want to include the male ID in the model
+
+lm1c<- lmer(LarvaeDiamum~ParentTrt*JarTrt+ (1|FemaleID)+ (1|MaleID), data=LarvaeDat)
+summary(lm1c)
+plot(lm1c) #this looks okay, seems to meet assumption of linearity and homoscedasticity
+qqnorm(resid(lm1c))
+qqline(resid(lm1c)) #doesn't look like it meets the assumption of normality
+
+#plot the residuals of lm1c vs. TimeFiltered
+plot(resid(lm1c)~LarvaeDat$TimeFilter)
+abline(0,0)
+
+```
+
+Move on to next linear model to at least get the code down
+```{r}
+lm2<-lmer(LarvaeDiamum~ParentTrt*JarTrt + (1|FemaleID)+(1|MaleID), data=LarvaeDat)
+#check assumptions for lm2
+#Assumption 1: linearity: 
+plot(resid(lm2)~LarvaeDat$ParentTrt)
+plot(resid(lm2)~LarvaeDat$JarTrt) 
+#seem to meet assumption of linearity
+
+#Assumption 2: Homoscedasticity
+plot(lm2)# seems to meet assumption of homoscedasticity but check with Levene's test: 
+leveneTest(resid(lm2)~LarvaeDat$ParentTrt*LarvaeDat$JarTrt, center=mean) #p<0.05 so does not meet assumption of homoscedasticity
+
+#Assumption 3: residuals are normally distributed
+qqnorm(resid(lm2))
+qqline(resid(lm2)) #does not meet assumption of normality
+
+#will need to try to transform the data. I have been using the Larvae dataframe, not the LarbyJar dataframe. Is that the right call? 
+
+lm2t<-lmer(log(LarvaeDiamum)~ParentTrt*JarTrt + (1|FemaleID)+(1|MaleID), data=LarvaeDat)
+#check assumptions for lm2
+#Assumption 1: linearity: 
+plot(resid(lm2t)~LarvaeDat$ParentTrt)
+plot(resid(lm2t)~LarvaeDat$JarTrt) 
+#seem to meet assumption of linearity
+
+#Assumption 2: Homoscedasticity
+plot(lm2t)# seems to meet assumption of homoscedasticity but check with Levene's test: 
+leveneTest(resid(lm2t)~LarvaeDat$ParentTrt*LarvaeDat$JarTrt, center=mean) #p<0.05 still does not meet assumption of homoscedasticity
+
+#Assumption 3: residuals are normally distributed
+qqnorm(resid(lm2t))
+qqline(resid(lm2t)) #still does not meet assumption of normality
+
+#currently does not meet assumptions, but still write the code for looking at residuals for lm2 
+plot(resid(lm2t)~LarvaeDat$CrossID) # I don't see anything that would suggest we should account for this. 
+abline(0,0)
+plot(resid(lm2t)~LarvaeDat$JarID) #some of the jars have unusually high or low resids, so will have to account for this. 
+abline(0,0)
+plot(resid(lm2t)~LarvaeDat$TimeFilter) #we may want to account for this
+abline(0,0)
+plot(resid(lm2t)~LarvaeDat$BlockID.x) #does not seem to need to be accounted for
+
+#make a new model that accounts for JarID and TimeFilter then check assumptions again
+lm3 <- lmer(LarvaeDiamum~ParentTrt*JarTrt + (1|FemaleID)+(1|MaleID) + (1|JarID) + (1|TimeFilter), data=LarvaeDat)
+
+#check assumptions for lm3
+#Assumption 1: linearity: 
+plot(resid(lm3)~LarvaeDat$ParentTrt)
+plot(resid(lm3)~LarvaeDat$JarTrt) 
+#seem to meet assumption of linearity
+
+#Assumption 2: Homoscedasticity
+plot(lm3)# seems to meet assumption of homoscedasticity but check with Levene's test: 
+leveneTest(resid(lm3)~LarvaeDat$ParentTrt*LarvaeDat$JarTrt, center=mean) #p<0.05 still does not meet assumption of homoscedasticity
+
+#Assumption 3: residuals are normally distributed
+qqnorm(resid(lm3))
+qqline(resid(lm3)) #still does not meet assumption of normality
+
+#try transforming the data again
+lm3t <- lmer(log(LarvaeDiamum)~ParentTrt*JarTrt + (1|FemaleID)+(1|MaleID) + (1|JarID) + (1|TimeFilter), data=Larvae)
+
+#check assumptions for lm3
+#Assumption 1: linearity: 
+plot(resid(lm3t)~Larvae$ParentTrt)
+plot(resid(lm3t)~Larvae$JarTrt) 
+#seem to meet assumption of linearity
+
+#Assumption 2: Homoscedasticity
+plot(lm3t)# seems to meet assumption of homoscedasticity but check with Levene's test: 
+leveneTest(resid(lm3t)~Larvae$ParentTrt*Larvae$JarTrt, center=mean) #p<0.05 still does not meet assumption of homoscedasticity
+
+#Assumption 3: residuals are normally distributed
+qqnorm(resid(lm3t))
+qqline(resid(lm3t)) #still doesn't meet assumption of normality
+
+```
+
+Retry the above models but use the LarvByJar dataset
+```{r}
+ggplot(LarvByJar,
+       aes(fill = ParentTrt, y = LarvaeDiamum, x = EggDiamum)) +
+  geom_point(aes( shape=JarTrt, colour=ParentTrt)) +
+  ggtitle("Larvae diameter by egg diameter")+ 
+  ylab("Larvae Diameter (um)")+
+  facet_grid(~JarTrt)+
+  theme_classic()
+
+#start with a simple linear model 
+jar1<- lm(LarvaeDiamum~ParentTrt*JarTrt+EggDiamum, data=LarvByJar, na.action="na.exclude")
+par(mfcol=c(2,2))
+plot(jar1) #does not appear to meet assumptions of normality, try transforming
+par(mfcol=c(1,1))
+
+#plot the residuals of lm1 vs. Female and Male ID
+plot(resid(jar1)~LarvByJar$FemaleID)
+abline(0,0)
+plot(resid(jar1)~LarvByJar$MaleID)
+abline(0,0)
+#we will need to account for female and male ID
+
+jar2<-lmer(LarvaeDiamum~ParentTrt*JarTrt + (1|FemaleID)+(1|MaleID), data=LarvByJar, na.action = "na.exclude")
+#check assumptions for lm2
+#Assumption 1: linearity: 
+plot(resid(jar2)~LarvByJar$ParentTrt)
+plot(resid(jar2)~LarvByJar$JarTrt) 
+#seem to meet assumption of linearity
+
+#Assumption 2: Homoscedasticity
+plot(jar2)# seems to meet assumption of homoscedasticity but check with Levene's test: 
+leveneTest(resid(jar2)~LarvByJar$ParentTrt*LarvByJar$JarTrt, center=mean) #p<0.05 so does not meet assumption of homoscedasticity
+
+#Assumption 3: residuals are normally distributed
+qqnorm(resid(jar2))
+qqline(resid(jar2)) #does not meet assumption of normality
+
+#will need to try to transform the data. I have been using the Larvae dataframe, not the LarbyJar dataframe. Is that the right call? 
+
+jar2t<-lmer(log(LarvaeDiamum)~ParentTrt*JarTrt + (1|FemaleID)+(1|MaleID), data=LarvByJar, na.action= "na.exclude")
+#check assumptions for lm2
+#Assumption 1: linearity: 
+plot(resid(jar2t)~LarvByJar$ParentTrt)
+plot(resid(jar2t)~LarvByJar$JarTrt) 
+#seem to meet assumption of linearity
+
+#Assumption 2: Homoscedasticity
+plot(jar2t)# seems to meet assumption of homoscedasticity but check with Levene's test: 
+leveneTest(resid(jar2t)~LarvByJar$ParentTrt*LarvByJar$JarTrt, center=mean) #p<0.05 still does not meet assumption of homoscedasticity
+
+#Assumption 3: residuals are normally distributed
+qqnorm(resid(jar2t))
+qqline(resid(jar2t)) #still does not meet assumption of normality
+
+#currently does not meet assumptions, but still write the code for looking at residuals for jar2 
+plot(resid(jar2t)~LarvByJar$CrossID) # It seems that we will want to account for this. 
+abline(0,0)
+plot(resid(jar2t)~LarvByJar$TimeFilter) #we will want to account for this
+abline(0,0)
+plot(resid(jar2t)~LarvByJar$BlockID.x)#I think we will need to account for this
+
+#make a new model that accounts for CrossID, TimeFilter, and block then check assumptions again
+jar3 <- lmer(LarvaeDiamum~ParentTrt*JarTrt + (1|FemaleID)+(1|MaleID) + (1|CrossID) + (1|TimeFilter) +(1|BlockID.x), data=LarvByJar, na.action="na.exclude")
+
+#check assumptions for lm3
+#Assumption 1: linearity: 
+plot(resid(jar3)~LarvByJar$ParentTrt)
+plot(resid(jar3)~LarvByJar$JarTrt) 
+#seem to meet assumption of linearity
+
+#Assumption 2: Homoscedasticity
+plot(jar3)# seems to meet assumption of homoscedasticity but check with Levene's test: 
+leveneTest(resid(jar3)~LarvByJar$ParentTrt*LarvByJar$JarTrt, center=mean) #p<0.05 does not meet assumption of homoscedasticity
+
+#Assumption 3: residuals are normally distributed
+qqnorm(resid(jar3))
+qqline(resid(jar3)) #does not meet assumption of normality
+
+```
+
+
+Subset the data to only have Block 1 to see if that might resolve some of the abnormality problems
+```{r}
+B1<- subset(Larvae, BlockID.x =="B1")
+ggplot(B1,
+       aes(fill = ParentTrt, y = LarvaeDiamum, x = EggDiamum)) +
+  geom_point(aes( shape=JarTrt, colour=ParentTrt)) +
+  ggtitle("Larvae diameter by egg diameter")+ 
+  ylab("Larvae Diameter (um)")+
+  facet_grid(~JarTrt)+
+  theme_classic()
+
+#start with a simple linear model 
+larv1<- lm(LarvaeDiamum~ParentTrt*JarTrt+EggDiamum, data=B1)
+par(mfcol=c(2,2))
+plot(larv1) #does not seem to be normally distributed
+par(mfcol=c(1,1))
+
+#plot the residuals of lm1 vs. Female and Male ID
+plot(resid(larv1)~B1$FemaleID)
+plot(resid(larv1)~B1$MaleID)
+#does not seem to be a problem
+
+
+```
+
+Move on to next linear model to at least get the code down
+```{r}
+B1_2<-lmer(LarvaeDiamum~ParentTrt*JarTrt + (1|FemaleID)+(1|MaleID), data=B1)
+#check assumptions for B1_2
+#Assumption 1: linearity: 
+plot(resid(B1_2)~B1$ParentTrt)
+plot(resid(B1_2)~B1$JarTrt) 
+#seem to meet assumption of linearity
+
+#Assumption 2: Homoscedasticity
+plot(B1_2)# seems to meet assumption of homoscedasticity but check with Levene's test: 
+leveneTest(resid(B1_2)~B1$ParentTrt*B1$JarTrt, center=mean) #p<0.05 so does not meet assumption of homoscedasticity
+
+#Assumption 3: residuals are normally distributed
+qqnorm(resid(B1_2))
+qqline(resid(B1_2)) #does not meet assumption of normality
+
+#will need to try to transform the data.
+
+B1_2t<-lmer(log(LarvaeDiamum)~ParentTrt*JarTrt + (1|FemaleID)+(1|MaleID), data=B1)
+#check assumptions for B1_2t
+#Assumption 1: linearity: 
+plot(resid(B1_2t)~B1$ParentTrt)
+plot(resid(B1_2t)~B1$JarTrt) 
+#seem to meet assumption of linearity
+
+#Assumption 2: Homoscedasticity
+plot(B1_2t)# seems to meet assumption of homoscedasticity but check with Levene's test: 
+leveneTest(resid(B1_2t)~B1$ParentTrt*B1$JarTrt, center=mean) #p<0.05 still does not meet assumption of homoscedasticity
+
+#Assumption 3: residuals are normally distributed
+qqnorm(resid(B1_2t))
+qqline(resid(B1_2t)) #looks better maybe
+
+#code for looking at residuals for B1_2t 
+plot(resid(B1_2t)~B1$CrossID) # I don't see anything that would suggest we should account for this. 
+abline(0,0)
+plot(resid(B1_2t)~B1$JarID)
+abline(0,0)
+plot(resid(B1_2t)~B1$TimeFilter) #we may want to account for this
+abline(0,0)
+plot(resid(B1_2t)~B1$BlockID.x) #does not seem to need to be accounted for
+
+#make a new model that accounts for JarID and TimeFilter then check assumptions again
+B1_3 <- lmer(LarvaeDiamum~ParentTrt*JarTrt + (1|FemaleID)+(1|MaleID) + (1|JarID) + (1|TimeFilter), data=B1)
+
+#check assumptions for lm3
+#Assumption 1: linearity: 
+plot(resid(B1_3)~B1$ParentTrt)
+plot(resid(B1_3)~B1$JarTrt) 
+#seem to meet assumption of linearity
+
+#Assumption 2: Homoscedasticity
+plot(B1_3)# seems to meet assumption of homoscedasticity but check with Levene's test: 
+leveneTest(resid(B1_3)~B1$ParentTrt*B1$JarTrt, center=mean) #p<0.05 does not meet assumption of homoscedasticity
+
+#Assumption 3: residuals are normally distributed
+qqnorm(resid(B1_3))
+qqline(resid(B1_3)) #still does not meet assumption of normality
+
+#try transforming the data again
+B1_3t <- lmer(log(LarvaeDiamum)~ParentTrt*JarTrt + (1|FemaleID)+(1|MaleID) + (1|JarID) + (1|TimeFilter), data=B1)
+
+#check assumptions for lm3
+#Assumption 1: linearity: 
+plot(resid(B1_3t)~B1$ParentTrt)
+plot(resid(B1_3t)~B1$JarTrt) 
+#seem to meet assumption of linearity
+
+#Assumption 2: Homoscedasticity
+plot(B1_3t)# seems to meet assumption of homoscedasticity but check with Levene's test: 
+leveneTest(resid(B1_3t)~B1$ParentTrt*B1$JarTrt, center=mean) #p<0.05 still does not meet assumption of homoscedasticity
+
+#Assumption 3: residuals are normally distributed
+qqnorm(resid(B1_3t))
+qqline(resid(B1_3t)) #still doesn't meet assumption of normality
+
+```
+
+I want to try to do the stats with the pH values from the jars. I don't have the pH values for the adult tank water chem yet
+
+```{r}
+B1tlm <- lmer(log(LarvaeDiamum)~ParentTrt*JarpH + (1|FemaleID)+(1|MaleID) + (1|JarID) + (1|TimeFilter), data=B1)
+
+#check assumptions for lm3
+#Assumption 1: linearity: 
+plot(resid(B1tlm)~B1$ParentTrt)
+plot(resid(B1tlm)~B1$JarTrt) 
+#seem to meet assumption of linearity
+
+#Assumption 2: Homoscedasticity
+plot(B1tlm)# seems to meet assumption of homoscedasticity but check with Levene's test: 
+leveneTest(resid(B1tlm)~B1$ParentTrt*B1$JarTrt, center=mean) #p<0.05 still does not meet assumption of homoscedasticity
+
+#Assumption 3: residuals are normally distributed
+qqnorm(resid(B1tlm))
+qqline(resid(B1tlm)) #doesn't meet assumption of normality
+```
+
+
+
+BELOW CODE HASN'T BEEN CHECKED IN MARCH
+
+Subset data by larvae treatment and parent treatment
+
+#subset the data into exposed and control parent treatments
+exppar <- LarvaeMorph %>%
+  filter(CrossType == "Exposed")
+conpar <- LarvaeMorph %>%
+  filter(CrossType == "Control")
+#subset the data into exposed and control larvae treatments
+explar <- LarvaeMorph %>%
+  filter(JarTrt == "Exposed")
+conlar <- LarvaeMorph %>%
+  filter(JarTrt == "Control")
+
+
+#subset the data into exposed and control parent treatments for calcification data
+expparcalc <- LarvaeCalc %>%
+  filter(CrossType == "Exposed")
+conparcalc <- LarvaeCalc %>%
+  filter(CrossType == "Control")
+#subset the data into exposed and control larvae treatments
+explarcalc <- LarvaeCalc %>%
+  filter(JarTrt == "Exposed")
+conlarcalc <- LarvaeCalc %>%
+  filter(JarTrt == "Control")
+
+
+
+
+Start by looking at the relationship between egg size and larvae size
+
+
+ggplot(data=LarvaeCalc, aes(x=EggAreauM2, y=SurfaceAreaum2, fill=JarTrt))+
+  geom_point(aes(shape=CrossType, colour=JarTrt))+
+  theme_classic()
+
+egglarvsize<- lm(SurfaceAreaum2~EggAreauM2*JarTrt*CrossType, data=LarvaeCalc)
+plot(egglarvsize) #looks like it meets assumptions
+summary(egglarvsize) #egg area is not significant, but JarTrt is p=0.0389
+
+#need to explore this further, because if we look at length of the larvae then egg area is not signficant, but if we look at oyster surface area, then egg area is significant. 
+
+
+
+
+
+Look at data that might be count or weight outliers 
+
+plot(F1LarvaeCount~PercentFert, data=LarvaeCalc, col=JarTrt)
+ggplot(data=LarvaeCalc, aes(x=mLJarActual, y=F1LarvaeCount))+
+  geom_point(aes(shape=JarTrt, colour=PercentFert))
+
+plot(F1TotalLarvaeWtg~F1LarvaeCount, data=LarvaeCalc, col=JarTrt)
+plot(F1WtPerLarvae~F1LarvaeCount, data=LarvaeCalc, col=JarTrt)
+text(F1WtPerLarvae~F1LarvaeCount, labels=JarID, data=LarvaeCalc, font=2, cex=.9)
+
+
+
+The plots below can be used for all morphology data: length, perimeter, surface area
+
+#plot data by jar that are grouped by cross ID; but use JarSeatable instead of JarID so I can plot both exposed and control jars over one another
+#start with larvae of control parents
+ggplot(data = conpar, aes(x = JarSeatable, y = MaxFeretDiamum)) +
+  geom_point(aes(shape=JarTrt, colour=JarTrt))+
+  labs(x = "Replicate", y = "Shell Length (um)", title = "Larvae length control parents") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) +
+  scale_color_manual(name = "Larvae Treatment", labels = c("Control", "OA"), values = c("#00BFC4", "#F8766D")) + 
+  scale_shape_manual(name="Larvae Treatment", labels=c("Control","OA"), values =c(19,17))+
+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.border=element_rect(color="black", fill=NA),
+        panel.background = element_rect(colour="white"), axis.line = element_line(colour = "black")) + 
+  facet_grid(.~CrossID)
+
+#plot larvae of exposed parents
+ggplot(data = exppar, aes(x = JarSeatable, y = MaxFeretDiamum)) +
+  geom_point(aes(shape=JarTrt, colour=JarTrt))+
+  labs(x = "Replicate", y = "Shell Length (um)", title = "Larvae length exposed parents") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) +
+  scale_color_manual(name = "Larvae Treatment", labels = c("Control", "OA"), values = c("#00BFC4", "#F8766D")) + 
+  scale_shape_manual(name="Larvae Treatment", labels=c("Control","OA"), values =c(19,17))+
+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.border=element_rect(color="black", fill=NA),
+        panel.background = element_rect(colour="white"), axis.line = element_line(colour = "black")) + 
+  facet_grid(.~CrossID)
+
+#same plot structure as above, but using boxplots instead of points for each larvae measured
+#plot larvae of control parents
+ggplot(data = conpar, aes(x = JarSeatable, y = MaxFeretDiamum)) +
+  geom_boxplot(aes(colour=JarTrt))+
+  labs(x = "Replicate", y = "Shell Length (um)", title = "Larvae length control parents") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) +
+  scale_color_manual(name = "Larvae Treatment", labels = c("Control", "OA"), values = c("#00BFC4", "#F8766D")) + 
+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.border=element_rect(color="black", fill=NA),
+        panel.background = element_rect(colour="white"), axis.line = element_line(colour = "black")) + 
+  facet_grid(.~CrossID)
+
+#plot larvae of exposed parents
+ggplot(data = exppar, aes(x = JarSeatable, y = MaxFeretDiamum)) +
+  geom_boxplot(aes(colour=JarTrt))+
+  labs(x = "Replicate", y = "Shell Length (um)", title = "Larvae length exposed parents") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) +
+  scale_color_manual(name = "Larvae Treatment", labels = c("Control", "OA"), values = c("#00BFC4", "#F8766D")) + 
+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.border=element_rect(color="black", fill=NA),
+        panel.background = element_rect(colour="white"), axis.line = element_line(colour = "black")) + 
+  facet_grid(.~CrossID)
+
+
+
+Make boxplots by parental cross, plotting both larvae treatments over one another. Can be used for all morphology parameters: surface area, length, 
+
+ggplot(data = LarvaeMorph, aes(x = CrossID, y = MaxFeretDiamum)) +
+  geom_boxplot(aes(colour=JarTrt)) +
+  labs(x = "Parental Cross", y = "Shell Length (um)", title = "Larvae lengths") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) +
+  scale_color_manual(name = "Larvae Treatment", labels = c("Control", "OA"), 
+                      values = c("#00BFC4", "#F8766D"))+
+  scale_fill_manual(name = "Larvae Treatment", labels = c("Control", "OA"), 
+                      values = c("#00BFC4", "#F8766D")) + 
+  scale_y_continuous(breaks = seq(floor(min(LarvaeMorph$MaxFeretDiamum)), 
+                                ceiling(max(LarvaeMorph$MaxFeretDiamum)), 5)) +  
+
+ggplot(data = colar, aes(x = CrossID, y = MaxFeretDiamum, fill = ParTrt)) +
+  geom_boxplot() +
+  labs(x = "Parental Cross", y = "Shell Length (um)", title = "Control Larvae") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) +
+  scale_fill_manual(name = "Parental Treatment", labels = c("Control", "OA"), 
+                      values = c("#00BFC4", "#F8766D")) + 
+  scale_y_continuous(breaks = seq(floor(min(larvmorph$MaxFeretDiamum)), 
+                                  ceiling(max(larvmorph$MaxFeretDiamum)), 5), limits = c(floor(min(larvmorph$MaxFeretDiamum)), 
+                     ceiling(max(larvmorph$MaxFeretDiamum)))) + 
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+        panel.background = element_blank(), axis.line = element_line(colour = "black"))
+
+ggplot(data = exlar, aes(x = CrossID, y = MaxFeretDiamum, fill = ParTrt)) +
+  geom_boxplot() +
+  labs(x = "Parental Cross", y = "Shell Length (um)", title = "OA Larvae") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) +
+  scale_fill_manual(name = "Parental Treatment", labels = c("Control", "OA"), 
+                     values = c("#00BFC4", "#F8766D")) + 
+  scale_y_continuous(breaks = seq(floor(min(larvmorph$MaxFeretDiamum)), 
+                                  ceiling(max(larvmorph$MaxFeretDiamum)), 5), limits = c(floor(min(larvmorph$MaxFeretDiamum)), 
+                     ceiling(max(larvmorph$MaxFeretDiamum)))) + 
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+        panel.background = element_blank(), axis.line = element_line(colour = "black"), panel.border=element_rect(color="black",fill=NA))+
+  facet_grid(.~CrossType, scale="free_x")
+
+
+Plot calcification data
+
+#plot data by jar that are grouped by cross ID; but use JarSeatable instead of JarID so I can plot both exposed and control jars over one another
+#start with larvae of control parents
+ggplot(data = conparcalc, aes(x = JarID, y = F1WtPerLarvae)) +
+  geom_point(aes(shape=JarTrt, colour=JarTrt))+
+  labs(x = "Replicate", y = "F1 larvae count", title = "Larvae count control parents") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) +
+  scale_color_manual(name = "Larvae Treatment", labels = c("Control", "OA"), values = c("#00BFC4", "#F8766D")) + 
+  scale_shape_manual(name="Larvae Treatment", labels=c("Control","OA"), values =c(19,17))+
+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.border=element_rect(color="black", fill=NA),
+        panel.background = element_rect(colour="white"), axis.line = element_line(colour = "black")) + 
+  facet_grid(.~CrossID, scale="free_x")
+
+#plot larvae of exposed parents
+ggplot(data = expparcalc, aes(x = JarSeatable, y = F1WtPerLarvae)) +
+  geom_point(aes(shape=JarTrt, colour=JarTrt))+
+  labs(x = "Replicate", y = "F1 weight per larvae", title = "Larvae weight exposed parents") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) +
+  scale_color_manual(name = "Larvae Treatment", labels = c("Control", "OA"), values = c("#00BFC4", "#F8766D")) + 
+  scale_shape_manual(name="Larvae Treatment", labels=c("Control","OA"), values =c(19,17))+
+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.border=element_rect(color="black", fill=NA),
+        panel.background = element_rect(colour="white"), axis.line = element_line(colour = "black")) + 
+  facet_grid(.~CrossID)
+
+#same plot structure as above, but using boxplots instead of points for each cross measured
+#plot larvae of control parents
+ggplot(data = conparcalc, aes(x = CrossID, y = F1WtPerLarvae)) +
+  geom_boxplot(aes(colour=JarTrt))+
+  labs(x = "CrossID", y = "F1 weight per larvae", title = "Larvae weight control parents") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) +
+  scale_color_manual(name = "Larvae Treatment", labels = c("Control", "OA"), values = c("#00BFC4", "#F8766D")) + 
+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.border=element_rect(color="black", fill=NA),
+        panel.background = element_rect(colour="white"), axis.line = element_line(colour = "black")) 
+
+#plot larvae of exposed parents
+ggplot(data = expparcalc, aes(x = CrossID, y = F1WtPerLarvae)) +
+  geom_boxplot(aes(colour=JarTrt))+
+  labs(x = "CrossID", y = "F1 weight per larvae", title = "Larvae weight control parents") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) +
+  scale_color_manual(name = "Larvae Treatment", labels = c("Control", "OA"), values = c("#00BFC4", "#F8766D")) + 
+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.border=element_rect(color="black", fill=NA),
+        panel.background = element_rect(colour="white"), axis.line = element_line(colour = "black")) 
+
+
+
+Make boxplots by parental cross, plotting both larvae treatments over one another.For calcification data; can also be used for cilia counts
+
+ggplot(data = LarvaeCalc, aes(x = CrossID, y = F1WtPerLarvae)) +
+  geom_boxplot(aes(colour=JarTrt)) +
+  labs(x = "Parental Cross", y = "F1 Weight per larvae (g)", title = "Larvae weights") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) +
+  scale_color_manual(name = "Larvae Treatment", labels = c("Control", "OA"), 
+                      values = c("#00BFC4", "#F8766D"))+
+  scale_fill_manual(name = "Larvae Treatment", labels = c("Control", "OA"), 
+                      values = c("#00BFC4", "#F8766D")) +  
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+        panel.background = element_blank(), axis.line = element_line(colour = "black"), panel.border=element_rect(color="black",fill=NA))+
+  facet_grid(.~CrossType, scale="free_x")
+
+
+
+Plots of difference between parental treatments for morphology
+
+crossdiff <- data.frame(tapply(LarvaeMorph$MaxFeretDiamum, list(LarvaeMorph$CrossID, LarvaeMorph$JarTrt), median)) %>%
+  rownames_to_column("CrossID") %>%
+  mutate(CrossTemp = CrossID) %>%
+  mutate(ParentTrt = ifelse(startsWith(CrossID, "E"), "Exposed", "Control")) %>%
+  separate(CrossTemp, c("FemaleID", "MaleID", "BlockID", "Fourth"), sep="_") %>% select(-Fourth) %>%
+  mutate(Diff = Exposed - Control)
+
+crossdiff$CrossID<- as.factor(crossdiff$CrossID)
+crossdiff$FemaleID<-as.factor(crossdiff$FemaleID)
+crossdiff$MaleID<-as.factor(crossdiff$MaleID)
+
+#look at cross differences by Male and Female ID
+ggplot(data = crossdiff, aes(x = MaleID, y = Diff)) + 
+  geom_point(aes(shape=ParentTrt, colour=ParentTrt)) + 
+  labs(x = "Male ID", y = "Change in median shell length (um) per family\nfrom control to OA conditions") + 
+  scale_colour_manual(name="Parent treatment", labels= c("control", "OA"), values = c("#00BFC4", "#F8766D")) + 
+  scale_shape_manual(name="Parent treatment", labels= c("control", "OA"), values = c(19, 17))+
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(), panel.background = element_blank(), 
+        axis.line = element_line(colour = "black"), panel.border=element_rect(colour="black", fill=NA))+
+   theme(axis.text.x = element_text(angle = 90, vjust = 0.5))+
+           facet_grid(.~FemaleID, scale="free_x")
+
+#look at overall differences by parent treatment
+ggplot(data = crossdiff, aes(x = ParentTrt, y = Diff, fill = ParentTrt)) + 
+  geom_boxplot() + 
+  labs(x = "Parental Treatment", y = "Change in median shell length (um) per family\nfrom control to OA conditions") + 
+  scale_x_discrete(breaks = c("Control", "Exposed"), labels = c("Control", "OA")) + 
+  scale_fill_manual(values = c("#00BFC4", "#F8766D")) + 
+  theme(legend.position = "none", panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(), panel.background = element_blank(), 
+        axis.line = element_line(colour = "black"))
+
+#get mean of the parent treatments to make a bargraph
+diffmean<- aggregate(Diff~ParentTrt, data=crossdiff, FUN=mean)
+diffse<- aggregate(Diff~ParentTrt, data=crossdiff, FUN=se)
+
+#make a barplot
+ggplot(data = diffmean, aes(x = ParentTrt, y = Diff, fill="grey67")) +
+  geom_bar(stat="identity", position="dodge",aes(fill="grey67"))+
+  scale_fill_manual(values="grey67")+
+  labs(x = "Parent Treatment", y = "Change in Length") +
+  geom_errorbar(aes(ymin= diffmean$Diff-diffse$Diff, ymax=diffmean$Diff+diffse$Diff),width=0.2, position=position_dodge(.9))+
+  theme_classic()
+
+
+Look at differences for calcification
+
+crossdiffcalc <- data.frame(tapply(LarvaeCalc$F1WtPerLarvae, list(LarvaeCalc$CrossID, LarvaeCalc$JarTrt), median)) %>%
+  rownames_to_column("CrossID") %>%
+  mutate(CrossTemp = CrossID) %>%
+  mutate(ParentTrt = ifelse(startsWith(CrossID, "E"), "Exposed", "Control")) %>%
+  separate(CrossTemp, c("FemaleID", "MaleID", "BlockID", "Fourth"), sep="_") %>% select(-Fourth) %>%
+  mutate(Diff = Exposed - Control)
+
+crossdiffcalc$CrossID<- as.factor(crossdiffcalc$CrossID)
+crossdiffcalc$FemaleID<-as.factor(crossdiffcalc$FemaleID)
+crossdiffcalc$MaleID<-as.factor(crossdiffcalc$MaleID)
+
+#look at cross differences by Male and Female ID
+ggplot(data = crossdiffcalc, aes(x = FemaleID, y = Diff)) + 
+  geom_point(aes(shape=ParentTrt, colour=ParentTrt)) + 
+  labs(x = "Female ID", y = "Change in median weight per family\nfrom control to OA conditions") + 
+  scale_colour_manual(name="Parent treatment", labels= c("control", "OA"), values = c("#00BFC4", "#F8766D")) + 
+  scale_shape_manual(name="Parent treatment", labels= c("control", "OA"), values = c(19, 17))+
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(), panel.background = element_blank(), 
+        axis.line = element_line(colour = "black"))+
+   theme(axis.text.x = element_text(angle = 90, vjust = 0.5))+
+           facet_grid(.~MaleID, scale="free_x")
+
+#look at overall differences by parent treatment
+ggplot(data = crossdiffcalc, aes(x = ParentTrt, y = Diff, fill = ParentTrt)) + 
+  geom_boxplot() + 
+  labs(x = "Parental Treatment", y = "Change in median larvae weight per family\nfrom control to OA conditions") + 
+  scale_x_discrete(breaks = c("Control", "Exposed"), labels = c("Control", "OA")) + 
+  scale_fill_manual(values = c("#00BFC4", "#F8766D")) + 
+  theme(legend.position = "none", panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(), panel.background = element_blank(), 
+        axis.line = element_line(colour = "black"))
+
+
+
+Make plot that looks at calcification and cilia by larvae and parent treatment
+
+par(mar = c(5, 4, 0.5, 0.5), bg = "transparent")
+boxplot(LarvaeMorph$PercentCilia ~ LarvaeMorph$JarTrt * LarvaeMorph$CrossType, 
+        xlim = c(0, 5),
+        xlab = "Larvae Treatment",
+        ylab = "Percent Cilia",
+        names = c("Control", "OA", "Control", "OA"), 
+        col = c("powderblue", "red"))
+rect(xleft = -0.2, 
+     ybottom = 0, 
+     xright = 2.5, 
+     ytop = 1,
+     border = FALSE,
+     col = rgb(0, 0, 0.5, alpha = 0.1))
+rect(xleft = 2.5, 
+     ybottom = 0, 
+     xright = 5.2, 
+     ytop = 1,
+     border = FALSE,
+     col = rgb(0.5, 0, 0, alpha = 0.1))
+text(x = 1.25 , y = 0.000007, "Control Parents")
+text(x = 3.75, y = 0.000007, "OA Parents")
+boxplot(LarvaeMorph$PercentCilia ~ LarvaeMorph$JarTrt * LarvaeMorph$CrossType, 
+        xlim = c(0, 5),
+        xlab = "Larvae Treatment",
+        ylab = "",
+        names = c("Control", "OA", "Control", "OA"), 
+        col = c("powderblue", "red"),
+        add = TRUE)
+
+
+
+
+```
+
+#get plots for means of parent and larvae treatment; use LarvaeCalc dataset because it only has one value per jar
+
+ 
+#get the data as means for treatments
+meancil<- aggregate(PercentCilia~CrossType*JarTrt, data=LarvaeCalc, FUN= mean)
+secil<- aggregate(PercentCilia~CrossType*JarTrt, data=LarvaeCalc, FUN= se)
+#plot the data as bargraphs with ggplot
+ggplot(data = meancil, aes(x = CrossType, y = PercentCilia, fill=JarTrt)) +
+  geom_bar(stat="identity", aes(fill=JarTrt), position="dodge")+
+  labs(x = "Parent Treatment", y = "Proportion Cilia Extruded") +
+  scale_fill_manual(name = "Larvae Treatment", labels = c("Control", "OA"), values = c("blue4", "red2")) +
+  geom_errorbar(aes(ymin= meancil$PercentCilia-secil$PercentCilia, ymax=meancil$PercentCilia+secil$PercentCilia),width=0.2, position=position_dodge(.9))+
+  theme_classic()
+
+#look at the data within each group
+Histdata<-unite(LarvaeCalc, Group, c(CrossType, JarTrt), sep="_")
+ggplot(Histdata, aes(x=PercentCilia)) + geom_histogram()+ facet_grid(~Group)
+#run analysis to look for significance
+aov1<- aov(PercentCilia~CrossType*JarTrt, data=LarvaeCalc)
+summary(aov1)
+shapiro.test(aov1$residuals) #does not meet assumption
+leveneTest(aov1)# meets assumption
+
+#since the proportion data do not meet the assumption of normality, try a transformation
+
+
+
