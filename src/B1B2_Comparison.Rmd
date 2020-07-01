@@ -1,0 +1,415 @@
+---
+title: "ExposedLarvaeMorph"
+author: "Elise McNally"
+date: "May 13, 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+This R markdown tests just the exposed jars to compare block 1 and 2. Does not include any control jars. 
+
+# Load libraries
+```{r, include=FALSE}
+library(knitr)
+library(plyr)
+library(tidyverse)
+library(sciplot)
+library(reshape2)
+library(lme4)
+library(lmerTest)
+library(blme)
+library(grid)
+library(data.table)
+library(gridExtra)
+library(lattice)
+library(optimx)
+library(car)
+library(Hmisc)
+library(corrplot)
+library(emmeans)
+library(chron)
+library(GLMMadaptive)
+```
+
+```{r, echo=FALSE}
+knitr::opts_chunk$set(error = TRUE)
+```
+
+# Load data
+Name the data you export from FileMaker Pro by their exact table names and save them as CSVs, e.g. Larvae_Morphology.csv
+```{r}
+#setwd("~/Repos/LarvaeTransGen2018")
+setwd("~/R/GitHub/LarvaeTransGen2018/data") #Elise's working directory
+#upload all of the data tables for the larvae experiment
+Larvae_Morphology <- read.csv("../data/Larvae_Morphology.csv") #contains data from CellProfiler from the larvae outlines
+Barcode_Jar <- read.csv("../data/Barcode_Jar.csv") #contains data on CrossID, seatable, and whether or not larvae were present
+Block_ID <- read.csv("../data/Block_ID.csv") #contains data on the block
+Cross<- read.csv("../data/Cross.csv") #contains data on the female and male IDs for the cross and whether the cross was for QG or Meth
+Fert_QG<- read.csv("../data/Fert_QG.csv") #contains data on fertilization counts, the JarIDs for the crosses
+Header_WC<- read.csv("../data/Header_WC.csv") #contains data on the header tanks used to fill the jars
+Larvae_Calcification <- read.csv("../data/Larvae_Calcification.csv") #contains data on filter weights and counts
+Larvae_Counts <- read.csv("../data/Larvae_Counts.csv") #contains data on sedgewick rafter larvae counts
+Larvae_WC <- read.csv("../data/Larvae_WC.csv") #contains data on larvae jar water chemistry
+Parent_ID <- read.csv("../data/Parent_ID.csv") #contains data on the adults at the time of shucking. Includes Parent ID assignments
+Larvae_Cilia<- read.csv("../data/Larvae_Cilia.csv") #contains data on cilia extrusion of the larvae photographed for morphology
+Egg_Morphology<- read.csv("../data/Egg_Morphology.csv") #contains data on egg sizes from CellProfiler
+Adult_Sample<- read.csv("../data/Adult_Sample.csv") #contains data on adult oysters at the time of collection
+WC_Standard<- read.csv("../data/WC_Standard.csv") #contains data on the standards used for water chemistry
+Tank_WC<- read.csv("../data/Tank_WC.csv") #contains data on the adult tank water chemistry
+```
+
+Make required fields factors: 
+```{r}
+Adult_Sample$AccTankID<- as.factor(Adult_Sample$AccTankID)
+Adult_Sample$TrtTankID<- as.factor(Adult_Sample$TrtTankID)
+Barcode_Jar$JarSeatable<- as.factor(Barcode_Jar$JarSeatable)
+Barcode_Jar<- subset(Barcode_Jar, JarSeatable =="2" | JarSeatable =="4" | JarSeatable =="6")
+Tank_WC$ParentTrt<- as.factor(Tank_WC$ParentTrt)
+Tank_WC$Tank<- as.factor(Tank_WC$Tank)
+Tank_WC$Folder<- as.factor(Tank_WC$Folder)
+WC_Standard$CRM<- as.factor(WC_Standard$CRM)
+Larvae_WC$DateFilter<- as.factor(Larvae_WC$DateFilter)
+
+```
+
+Calculate average larval jar water chemistry based on the subset of bottles that were run on the VINDTA. May need to look to see if we want to use the mean or the median
+```{r}
+#start by joining Barcode_Jar and Larvae_WC datasets 
+JarChem<- merge(x=Barcode_Jar, y= Larvae_WC, by="JarID", all.x=TRUE)
+#combine Date filter and JarTrt columns to get a unique combo value for each
+JarChem<-unite(JarChem,BlockTrt, c("DateFilter","JarTrt"), sep='', remove=F)
+#get only jars with larvae
+JarChem<- subset(JarChem, Larvae =="TRUE")
+JarChem<- subset(JarChem, DateFilter !="20180810")
+boxplot(JarpHSW~BlockTrt, data=JarChem, ylim=c(6,8))
+
+#get means for the parameters
+JarMeans<- ddply(JarChem, .(BlockTrt), numcolwise(mean, na.rm=T))
+
+#remove the unnecessary columns from JarMeans
+JarMeans<- subset(JarMeans, select= c(BlockTrt,JarAlkCalc, JarpCO2, JarHCO3, JarCO3, JarCO2, JarOmegaCalcite, JarOmegaArg))   
+#add Est for "estimated" to the column names
+colnames(JarMeans)<- paste("Est", colnames(JarMeans), sep="")
+
+#add columns to JarChem for mean carb values
+JarChem<- merge(x=JarChem, y=JarMeans, by.x="BlockTrt", by.y="EstBlockTrt", all.x=TRUE)
+
+#use ifelse statement to fill in the na values in the original carb fields
+JarChem$JarpCO2<- ifelse((is.na(JarChem$JarpCO2)), paste(JarChem$EstJarpCO2), JarChem$JarpCO2)
+JarChem$JarAlkCalc<- ifelse((is.na(JarChem$JarAlkCalc)), paste(JarChem$EstJarAlkCalc), JarChem$JarAlkCalc)
+JarChem$JarHCO3<- ifelse((is.na(JarChem$JarHCO3)), paste(JarChem$EstJarHCO3), JarChem$JarHCO3)
+JarChem$JarCO3<- ifelse((is.na(JarChem$JarCO3)), paste(JarChem$EstJarCO3), JarChem$JarCO3)
+JarChem$JarCO2<- ifelse((is.na(JarChem$JarCO2)), paste(JarChem$EstJarCO2), JarChem$JarCO2)
+JarChem$JarOmegaCalcite<- ifelse((is.na(JarChem$JarOmegaCalcite)), paste(JarChem$EstJarOmegaCalcite), JarChem$JarOmegaCalcite)
+JarChem$JarOmegaArg<- ifelse((is.na(JarChem$JarOmegaArg)), paste(JarChem$EstJarOmegaArg), JarChem$JarOmegaArg)
+
+#get the carb parameters to numeric
+JarChem$JarpCO2<- as.numeric(JarChem$JarpCO2)
+JarChem$JarAlkCalc<- as.numeric(JarChem$JarAlkCalc)
+JarChem$JarHCO3<- as.numeric(JarChem$JarHCO3)
+JarChem$JarCO3<- as.numeric(JarChem$JarCO3)
+JarChem$JarCO2<- as.numeric(JarChem$JarCO2)
+JarChem$JarOmegaCalcite<- as.numeric(JarChem$JarOmegaCalcite)
+JarChem$JarOmegaArg<- as.numeric(JarChem$JarOmegaArg)
+#good to go!
+```
+
+
+Look at the water chemistry data for adult tanks
+```{r}
+#subset the tank data to only include B1 and B2
+Tank_WCB1B2<- subset(Tank_WC, Block != "B3")
+Tank_WCB1B2<- subset(Tank_WCB1B2, WCa_pHDIC !="")
+#test to see if tanks are significantly different. 
+#start by plotting the calcite saturation state for each tank
+boxplot(WCa_pHDIC~Tank, data=Tank_WCB1B2, na.omit=TRUE)
+
+hist(Tank_WCB1B2$WCa_pHDIC)
+#check for significant differences in saturation state
+Ca1_b1b2<- lm(WCa_pHDIC~ParentTrt*Tank, data=Tank_WCB1B2)
+ca2_b1b2<- lm(WCa_pHDIC~ParentTrt+Tank, data=Tank_WCB1B2)
+anova(Ca1_b1b2, ca2_b1b2) #select ca2_b1b2
+ca3_b1b2<- lm(WCa_pHDIC~ParentTrt, data=Tank_WCB1B2)
+anova(ca2_b1b2, ca3_b1b2) #select ca3_b1b2
+ca4_b1b2<- lm(WCa_pHDIC~Tank, data=Tank_WCB1B2)
+anova(ca3_b1b2, ca4_b1b2) #unclear which to select so look at AIC
+AIC(ca3_b1b2) 
+AIC(ca4_b1b2)
+#ca3_b1b2 had lowest AIC so select that model
+
+#check assumptions
+par(mfcol=c(2,2))
+plot(ca3_b1b2) #seems to meet assumptions of homoscedasticity and linearity. Normality could look better. 
+par(mfcol=c(1,1))
+acf(resid(ca3_b1b2)) #this looks good. 
+
+summary(ca3_b1b2)
+#There is a significant effect of ParentTrt, but not tank according to best model. 
+
+#create dataframe that has the mean values for each tank
+TankMeans<- ddply(Tank_WCB1B2, .(Tank, Block, ParentTrt), numcolwise(mean, na.rm=T))
+```
+
+Join the data into dataframes for analysis.
+```{r}
+#First dataframe will be for examining egg morphology for all eggs traced; multiple values for each adult
+ParentInfo<- merge(x=Adult_Sample, y=Parent_ID, by="AdultID", all.x=TRUE)
+ParentInfo<- merge(x=ParentInfo, y=TankMeans, by.x="TrtTankID", by.y="Tank", all.x=TRUE)
+Eggs<- merge(x=Egg_Morphology, y=ParentInfo, by.x="FemaleID", by.y="ParentBlockID", all.x=TRUE)
+Eggs$FemaleID<- as.factor(Eggs$FemaleID)
+#subset the data to include B1 and B2
+EggsB1B2<- subset(Eggs, Block !="B3")
+```
+
+Visualize the data for eggs to start. Again, using only blocks 1
+```{r}
+#look at the data to find outliers. 
+#look at the egg measurements for each female
+boxplot(EggDiamum~FemaleID, data=EggsB1B2)
+boxplot(EggDiamum~ParentTrt, data=EggsB1B2)
+
+#check for outliers using code from https://www.r-bloggers.com/identify-describe-plot-and-remove-the-outliers-from-the-dataset/. The function uses Tukey's method to ID ouliers ranged above and below the 1.5*IQR. 
+outlierKD <- function(dt, var) {
+     var_name <- eval(substitute(var),eval(dt))
+     na1 <- sum(is.na(var_name))
+     m1 <- mean(var_name, na.rm = T)
+     par(mfrow=c(2, 2), oma=c(0,0,3,0))
+     boxplot(var_name, main="With outliers")
+     hist(var_name, main="With outliers", xlab=NA, ylab=NA)
+     outlier <- boxplot.stats(var_name)$out
+     mo <- mean(outlier)
+     var_name <- ifelse(var_name %in% outlier, NA, var_name)
+     boxplot(var_name, main="Without outliers")
+     hist(var_name, main="Without outliers", xlab=NA, ylab=NA)
+     title("Outlier Check", outer=TRUE)
+     na2 <- sum(is.na(var_name))
+     cat("Outliers identified:", na2 - na1, "n")
+     cat("Propotion (%) of outliers:", round((na2 - na1) / sum(!is.na(var_name))*100, 1), "n")
+     cat("Mean of the outliers:", round(mo, 2), "n")
+     m2 <- mean(var_name, na.rm = T)
+     cat("Mean without removing outliers:", round(m1, 2), "n")
+     cat("Mean if we remove outliers:", round(m2, 2), "n")
+     response <- readline(prompt="Do you want to remove outliers and to replace with NA? [yes/no]: ")
+     if(response == "y" | response == "yes"){
+          dt[as.character(substitute(var))] <- invisible(var_name)
+          assign(as.character(as.list(match.call())$dt), dt, envir = .GlobalEnv)
+          cat("Outliers successfully removed", "n")
+          return(invisible(dt))
+     } else{
+          dt[as.character(substitute(var))] <- invisible(var_name)
+          assign(as.character(as.list(match.call())$dt), dt, envir = .GlobalEnv)
+          cat("Outliers successfully removed", "n")
+          return(invisible(dt))
+     }
+}
+
+outlierKD(EggsB1B2, EggDiamum)
+#I opted to remove outliers for now. 
+#Outliers identified: 48 nPropotion (%) of outliers: 11.5 nMean of the outliers: 57.63 nMean without removing outliers: 62.4 nMean if we remove outliers: 62.95 n
+
+#count how many eggs are left per female after removing the outliers. 
+outremB1B2<- aggregate(EggDiamum~FemaleID, data=EggsB1B2, FUN=length)
+#EF07_B1 had 10 eggs that were included the rest were removed. Keep EF07_B1 in the analysis for now. 
+#Remove CF06_B2 and CF08_B2 because they have fewer than 10 eggs
+EggsB1B2sub<- subset(EggsB1B2, FemaleID != "CF06_B2")
+EggsB1B2sub<- subset(EggsB1B2sub, FemaleID != "CF08_B2")
+#Plot again
+par(mfcol=c(1,1))
+boxplot(EggDiamum~FemaleID, data=EggsB1B2sub) 
+boxplot(EggDiamum~ParentTrt, data=EggsB1B2sub)
+
+#note that the eggs were filtered through a 70 um filter, but it appears many of them that were that large or larger made it through.We are going to keep these in for now because they aren't that outrageously large. 
+```
+
+
+```{r}
+#plot histograms of the egg data with outliers removed
+ggplot(EggsB1B2sub, aes(x=EggDiamum, color=ParentTrt))+
+  geom_histogram(alpha=0.5, position="identity")+
+  facet_grid(~Block)
+
+eggmeansB1B2<- aggregate(EggDiamum~Block*ParentTrt, data=EggsB1B2sub, FUN=mean) 
+eggmediansB1B2<- aggregate(EggDiamum~Block*ParentTrt, data=EggsB1B2sub, FUN=median)
+eggmeansB1B2
+eggmediansB1B2
+#I will use the mean egg size. 
+```
+
+Make datasets without the egg size outliers
+```{r}
+#start by removing the outliers from Egg_Morphology
+Egg_MorphNout<- Egg_Morphology
+outlierKD(Egg_MorphNout, EggDiamum)
+par(mfcol=c(1,1))
+meanegg<- ddply(Egg_MorphNout, .(FemaleID), numcolwise(mean, na.rm=T)) #get mean egg size
+FemAdults<- merge(x=ParentInfo, y= meanegg, by.x="ParentBlockID", by.y= "FemaleID", all.y=TRUE, all.x=TRUE)
+
+#Next dataframe will be for one line per traced larva, includes all the data for that jar, including average egg size for that jar 
+Larvae<-merge(x=Larvae_Morphology, y=JarChem, by="JarID", all.x=TRUE)
+#use gather function in tidyr to make the Fert_QG Jar ID columns in long form vs. wide form
+Fert_QG_long <- Fert_QG %>% tidyr::gather(Key, JarID, JarID1:JarID6)
+#use the gathered data frame to merge with Larvae
+Larvae<-merge(x=Larvae, y=Fert_QG_long, by.x= c("JarID", "CrossID"), by.y=c("JarID", "CrossID"), all.x=TRUE) #did the join by two columns so CrossID column wasn't duplicated
+Larvae<- merge(x=Larvae, y=Cross, by="CrossID", all.x=TRUE)
+Larvae<- merge(x=Larvae, y=FemAdults, by.x= "FemaleID", by.y="ParentBlockID", all.x=TRUE)
+Larvae<- merge(x=Larvae, y= Larvae_Counts, by="JarID", all.x=TRUE)
+#Remove jars without larvae
+Larvae<- subset(Larvae, Larvae=="TRUE")
+#get the growth per day for the larvae. Katie, do we have a column with the larvae age? 
+Larvae$GrowthPerDay<- (Larvae$LarvaeDiamum-Larvae$EggDiamum)/3
+Larvae$GrowthPerDayArea<- (Larvae$LarvaeAreaum2-Larvae$EggAreaum2/3)
+#Final dataframe will be one line per Jar, includes all data for the jar, including the average larvae size per jar and cilia
+LarvByJar<-merge(x=Larvae_Calcification, y=Larvae_Cilia, by="JarID", all.x=TRUE, all.y=TRUE)
+LarvByJar<- merge(x=LarvByJar, y=JarChem, by="JarID", all.x=TRUE)
+LarvByJar<- merge(x=LarvByJar, y=Fert_QG_long, by.x=c("JarID", "CrossID"), by.y=c("JarID","CrossID"), all.x=TRUE)
+LarvByJar<- merge(x=LarvByJar, y=Cross, by="CrossID", all.x=TRUE)
+LarvByJar<- merge(x=LarvByJar, y=FemAdults, by.x="FemaleID", by.y="ParentBlockID", all.x=TRUE)
+LarvByJar<- merge(x=LarvByJar, y=Larvae_Counts, by="JarID", all.x=TRUE)
+
+
+#get the means for larvae morphology and add to LarvByJar
+MeanLarvMorph<- ddply(Larvae_Morphology, .(JarID), numcolwise(mean, na.rm=T))
+SELarvMorph<- ddply(Larvae_Morphology, .(JarID), numcolwise(se, na.rm=T)) #get standard error of larvae size
+MeanLarvMorph<- full_join(MeanLarvMorph,SELarvMorph, by=c("JarID", "JarID"),suffix=c("","SE")) #join the mean and se larvae data
+LarvByJar<- merge(x=LarvByJar, y=MeanLarvMorph, by="JarID", all.x=TRUE)
+#Now let's add the survival data. See notes on "Larvae Survival" for more info on how we decided to count total larvae in the jar
+
+#Make columns for the two larvae counts for 1_5 and 2
+LarvByJar$v1_5SurvCount<- LarvByJar$SWRTotal+LarvByJar$F2LarvaeCount
+LarvByJar$v2SurvCount<- LarvByJar$F1LarvaeCount+LarvByJar$F2LarvaeCount
+#use ifelse statement to define the LarvaeSurvived column
+LarvByJar$LarvaeSurvived<- ifelse(LarvByJar$ProtocolVersion =="1", paste(LarvByJar$TotalLarvae), ifelse(LarvByJar$ProtocolVersion =="1_5", paste(LarvByJar$v1_5SurvCount), paste(LarvByJar$v2SurvCount)))
+LarvByJar$LarvaeSurvived<- as.numeric(LarvByJar$LarvaeSurvived)
+#elise checked the above code to make sure it resulted in the correct calculation and it does. 
+
+#get the total larvae for the control jars and exposed jars for each family and then get the ratio of exposed to control to get an idea of how good a male and female pair are at larvae surviving. Can also use this to create reaction norms. 
+SurvDat<- ddply(LarvByJar, .(CrossID, ParentTrt, JarTrt, MaleID, FemaleID, TrtTankID, AccTankID, Block), numcolwise(mean, na.rm=TRUE))
+SESurvDat<- ddply(LarvByJar, .(CrossID, ParentTrt, JarTrt, Block), numcolwise(se, na.rm=TRUE)) #get the standard errors for each mean count
+SESurvDat<- subset(SESurvDat, select= c(CrossID, JarTrt, LarvaeSurvived)) #rename the columns
+colnames(SESurvDat)<- paste("SE", colnames(SESurvDat), sep="")
+#merge the standard error data to the SurvDat dataframe
+SurvDat<- merge(SurvDat, SESurvDat, by.x= c("CrossID", "JarTrt"), by.y= c("SECrossID", "SEJarTrt"))
+#only keep the relevant fields because otherwise this is a huge dataframe
+SurvDat<- subset(SurvDat, select= c(CrossID, JarTrt, ParentTrt, MaleID, FemaleID, TrtTankID, AccTankID, LarvaeSurvived, Block, SELarvaeSurvived)) 
+SurvDat<- subset(SurvDat, Block!="B3")
+SurvDat<- subset(SurvDat, CrossID!="")
+#try to use the gather function to go from long form to wide form for the survival data
+#start by combining the LarvaeSurvived and SELarvaeSurvived columns into a single column because spread only works on a single column at a time. 
+SurvDatToWide<- unite(SurvDat, Value, c(LarvaeSurvived, SELarvaeSurvived), sep="_")
+#use spread function in tidyr to make the column in long form vs. wide form
+SurvWideDat<- spread(SurvDatToWide, JarTrt, value= Value)
+#now split the mean and SE apart again
+SurvWideDat<- separate(SurvWideDat, Control, into= c("MeanLarvSurvivedCon", "SELarvSurvivedCon"), sep="_")
+SurvWideDat<- separate(SurvWideDat, Exposed, into= c("MeanLarvSurvivedExp", "SELarvSurvivedExp"), sep="_")
+#make the means and ses numeric
+SurvWideDat$MeanLarvSurvivedExp<- as.numeric(SurvWideDat$MeanLarvSurvivedExp)
+SurvWideDat$MeanLarvSurvivedCon<- as.numeric(SurvWideDat$MeanLarvSurvivedCon)
+SurvWideDat$SELarvSurvivedExp<- as.numeric(SurvWideDat$SELarvSurvivedExp)
+SurvWideDat$SELarvSurvivedCon<- as.numeric(SurvWideDat$SELarvSurvivedCon)
+
+SurvWideDat$RatSurv<- SurvWideDat$MeanLarvSurvivedExp/SurvWideDat$MeanLarvSurvivedCon
+SurvWideDat$SurvChange<- (SurvWideDat$MeanLarvSurvivedCon-SurvWideDat$MeanLarvSurvivedExp)/SurvWideDat$MeanLarvSurvivedCon
+par(mfcol=c(1,1))
+boxplot(SurvChange~as.factor(ParentTrt), data=SurvWideDat)
+boxplot(SurvChange~as.factor(CrossID), data= SurvWideDat)
+
+#make reaction norms for survival color will be parent treatment. X will be jar treatment. Each cross will be its own line
+ggplot(SurvDat,aes(x=JarTrt, y=LarvaeSurvived, color = ParentTrt, group= CrossID)) +
+    geom_point(aes(color=ParentTrt))+
+  geom_line(aes(color=ParentTrt, group=CrossID))+
+  geom_errorbar(aes(ymin= LarvaeSurvived-SELarvaeSurvived, ymax=LarvaeSurvived+SELarvaeSurvived),width=0.05, position=position_dodge(0))+
+    labs(x = "Larvae Jar Treatment", y = "Number of Larvae Survived") +
+  scale_color_manual(values = c("skyblue2", "red2")) +
+  theme_classic()
+#now get the estimate of how many larvae were originally added to the jar. 
+LarvByJar$LarvaeStocked<- LarvByJar$LarvaePermL*LarvByJar$mLJarActual
+LarvByJar$PropSurvived<- LarvByJar$LarvaeSurvived/LarvByJar$LarvaeStocked
+#remove jars that did not have larvae: 
+LarvByJar<- subset(LarvByJar, Larvae=="TRUE")
+#now remove the data we do not want to analyze. 
+#For the Larvae datasets, that means removing blocks 2 and 3
+LarvaeDatB1B2<- subset(Larvae, Block != "B3")
+LarvaeDatB1B2<- subset(LarvaeDatB1B2, JarTrt == "Exposed")
+LarvaeDatB1B2$JarID<- as.factor(LarvaeDatB1B2$JarID)
+LarvaeDatB1B2$AccTankID<- as.factor(LarvaeDatB1B2$AccTankID)
+LarvaeDatB1B2$TrtTankID<- as.factor(LarvaeDatB1B2$TrtTankID)
+LarvaeDatB1B2$JarSeatable<- as.factor(LarvaeDatB1B2$JarSeatable)
+LarvaeDatB1B2$ParentTrt<- as.factor(LarvaeDatB1B2$ParentTrt)
+LarvaeDatB1B2$FemaleID<- as.factor(LarvaeDatB1B2$FemaleID)
+LarvaeDatB1B2$MaleID<- as.factor(LarvaeDatB1B2$MaleID)
+LarvaeDatB1B2$CrossID<- as.factor(LarvaeDatB1B2$CrossID)
+LarvaeDatB1B2$JarTrt<- as.factor(LarvaeDatB1B2$JarTrt)
+
+LarvByJarDatB1B2<- subset(LarvByJar, Block != "B3")
+LarvByJarDatB1B2<- subset(LarvByJarDatB1B2, JarTrt=="Exposed")
+LarvByJarDatB1B2$JarID<- as.factor(LarvByJarDatB1B2$JarID)
+LarvByJarDatB1B2$AccTankID<- as.factor(LarvByJarDatB1B2$AccTankID)
+LarvByJarDatB1B2$TrtTankID<- as.factor(LarvByJarDatB1B2$TrtTankID)
+LarvByJarDatB1B2$JarSeatable<- as.factor(LarvByJarDatB1B2$JarSeatable)
+LarvByJarDatB1B2$ParentTrt<- as.factor(LarvByJarDatB1B2$ParentTrt)
+LarvByJarDatB1B2$FemaleID<- as.factor(LarvByJarDatB1B2$FemaleID)
+LarvByJarDatB1B2$MaleID<- as.factor(LarvByJarDatB1B2$MaleID)
+LarvByJarDatB1B2$CrossID<- as.factor(LarvByJarDatB1B2$CrossID)
+```
+
+Look at growth per day
+
+```{r}
+boxplot(GrowthPerDay~FemaleID*Block, data=LarvaeDatB1B2)
+boxplot(GrowthPerDay~ParentTrt*Block, data=LarvaeDatB1B2)
+boxplot(GrowthPerDay~ParentTrt, data= LarvaeDatB1B2)
+boxplot(LarvaeDiamum~ParentTrt*Block, data=LarvaeDatB1B2) #block 2 has a wider range
+B1B2Grow<- lm(GrowthPerDay~ParentTrt, data=LarvaeDatB1B2)
+summary(B1B2Grow)
+B2larv<- subset(LarvaeDatB1B2, Block =="B2")
+#Just look at block 2 for differences
+b2grow<- lm(GrowthPerDay~WCa_pHDIC, data=B2larv)
+summary(b2grow)
+#Build a model with block as a random factor
+larvgrowB1B2<-lmer(GrowthPerDay~WCa_pHDIC+ (1|FemaleID)+(1|MaleID)+(1|CrossID)+(1|JarID)+(1|Block) , data=LarvaeDatB1B2)
+
+steppedlarvgrowB1B2<- step(larvgrowB1B2)
+print(steppedlarvgrowB1B2)
+
+#get means and SE of larvae growth
+meangrowthB1B2<- aggregate(GrowthPerDay~ParentTrt*Block, data=LarvaeDatB1B2, FUN=mean)
+segrowthB1B2<- aggregate(GrowthPerDay~ParentTrt*Block, data=LarvaeDatB1B2, FUN=se)
+meangrowthB1B2$Block<- as.factor(meangrowthB1B2$Block)
+segrowthB1B2$Block<- as.factor(segrowthB1B2$Block)
+
+#make plot like the Chirgwin et al. paper
+par(mar = c(5, 4, 0.5, 0.5), bg = "transparent")
+B1B2Exp <- barplot(meangrowthB1B2$GrowthPerDay~meangrowthB1B2$Block+meangrowthB1B2$ParentTrt,
+                      space= c(0,.25), 
+                      beside = TRUE, las = 1,
+                      ylim = c(0, 5),
+                      cex.names = 0.75,
+                      ylab = expression(paste("Growth (", mu, "m/day)")),
+                      xlab = "Parent Treatment",
+                      border = "black", axes = TRUE,
+                      legend.text = FALSE, col= c(rgb(0, 0, 1, alpha = 0.5), rgb(1, 0, 0, alpha = 0.5)))
+arrows(x0=barCenters, y0=meangrowth$GrowthPerDay[c(1,3,2,4)] - segrowth$GrowthPerDay[c(1,3,2,4)], y1=meangrowth$GrowthPerDay[c(1,3,2,4)] + segrowth$GrowthPerDay[c(1,3,2,4)], angle=90, code=3)
+rect(xleft = -0.2, 
+     ybottom = 0, 
+     xright = 2.37, 
+     ytop = 5,
+     border = TRUE,
+     col = rgb(0, 0, 1, alpha = 0.15))
+rect(xleft = 2.37, 
+     ybottom = 0, 
+     xright = 5.2, 
+     ytop = 5,
+     border = TRUE,
+     col = rgb(1, 0, 0, alpha = 0.15))
+barplot(meangrowth$GrowthPerDay~meangrowth$JarTrt+meangrowth$ParentTrt,
+                      space= c(0,.25), 
+                      beside = TRUE, las = 1,
+                      ylim = c(0, 5),
+                      cex.names = 0.75,
+                      border = "black", axes = FALSE,
+                      names=c("Control", "OA Exposed", "Control", "OA Exposed"),
+                      legend.text = FALSE, col= c(rgb(0, 0, 1, alpha = 0.5), rgb(1, 0, 0, alpha = 0.5)), add=TRUE)
+```
+

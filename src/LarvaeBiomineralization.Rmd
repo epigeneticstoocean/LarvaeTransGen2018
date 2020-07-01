@@ -411,6 +411,10 @@ eggarea6<- lm(EggAreaum2~FemaleID, data=CalEggs)
 anova(eggarea3, eggarea6)
 summary(eggarea6)
 
+#look at assumptions of eggarea5
+plot(eggarea5)
+qqnorm(resid(eggarea5))
+qqline(resid(eggarea5))
 #look at assumptions of eggarea6
 par(mfcol=c(2,2))
 plot(eggarea6)
@@ -445,6 +449,11 @@ eggeccen6<- lm(EggEccentricity~FemaleID, data=CalEggs)
 anova(eggeccen3, eggeccen6)
 summary(eggeccen6)
 
+#look at the assumptions of eggeccen5
+plot(eggeccen5)
+qqnorm(resid(eggeccen5))
+qqline(resid(eggeccen5))
+
 #look at assumptions of eggeccen6
 par(mfcol=c(2,2))
 plot(eggeccen6)
@@ -460,7 +469,7 @@ plot(EggEccentricity~FemaleID, data=CalEggs)
 Look at the water chemistry data for Jars
 ```{r}
 #start with omega calcite
-plot(JarOmegaCalcite~JarTrt, data=LarvByJarDat)
+boxplot(JarOmegaCalcite~Block*JarTrt, data=LarvByJarDat)
 #remove the Jars that have their pH as 0/NA
 CalDat<- subset(LarvByJarDat, JarOmegaCalcite!= "NA")
 
@@ -971,6 +980,13 @@ qqnorm(resid(larveccent))
 qqline(resid(larveccent)) #has relatively long tails, doesn't meet assumption of normality. transformation helped
 summary(larveccent) #no significant differences 
 
+#plot just by JarTrt
+ggplot(data = meaneccen, aes(x = JarTrt, y = LarvaeEccentricity)) +
+  geom_bar(stat="identity", aes(fill="gray45"), position="dodge")+
+  labs(x = "Parent Treatment", y = "Larvae Eccentricity") +
+  scale_fill_manual(values = c("gray45")) +
+  geom_errorbar(aes(ymin= meaneccen$LarvaeEccentricity-seeccen$LarvaeEccentricity, ymax=meaneccen$LarvaeEccentricity+seeccen$LarvaeEccentricity),width=0.2, position=position_dodge(.9))+
+  theme_classic()
 ```
 
 Look at larvae perimeter
@@ -1199,7 +1215,127 @@ file.copy(from=plots.png.paths, to="../results")
 
 ```
 
+Look at egg data with outliers included. 
+```{r}
+#start with models that have the response variable EggDiamum
+eggdiamY1<- lmer(EggDiamum~WCa_pHDIC*AdultLength + (1|FemaleID) + (1|Block) +(1|AccTankID), data=EggsYoutliers)
 
+#Check assumptions
+par(mfcol=c(1,1))
+qqnorm(resid(eggdiamY1))
+qqline(resid(eggdiamY1))
+plot(eggdiamY1)
+acf(eggdiamY1)
+
+summary(eggdiamY1)
+#try simplifying the model; step function gives me errors, so I ended up doing this manually
+eggdiamY2<- lmer(EggDiamum~WCa_pHDIC+ (1|FemaleID) + (1|Block) , data=eggdiamY1)
+anova(eggdiam1, eggdiam2)#Choose eggdiam2
+eggdiam3<- lm(EggDiamum~WCa_pHDIC, data=CalEggs)
+anova(eggdiam2, eggdiam3)#choose eggdiam2
+eggdiam4<- lmer(EggDiamum~WCa_pHDIC + (1|FemaleID), data=CalEggs)
+anova(eggdiam2, eggdiam4)#choose eggdiam4
+eggdiam5<- lmer(EggDiamum ~ 1 + (1|FemaleID), data=CalEggs)
+anova(eggdiam4, eggdiam5) #choose eggdiam5
+summary(eggdiam5)
+#look at assumptions of eggdiam 5
+par(mfcol=c(1,1))
+plot(eggdiam5)
+qqnorm(resid(eggdiam5))
+qqline(resid(eggdiam5))
+acf(eggdiam5)
+
+eggdiam6<- lm(EggDiamum~FemaleID, data=CalEggs)
+anova(eggdiam3, eggdiam6)
+summary(eggdiam6)
+
+#look at assumptions of eggdiam 6
+par(mfcol=c(2,2))
+plot(eggdiam6)
+par(mfcol=c(1,1))
+acf(eggdiam6)
+#FemaleID matters but not block, treatment or adult length. 
+
+plot(EggDiamum~FemaleID, data=CalEggs) #we need to account for FemaleID, but not egg size in Larvae models
+
+#now look at the response variable EggAreaum2
+eggarea1<- lmer(EggAreaum2~WCa_pHDIC*AdultLength + (1|FemaleID) + (1|Block) +(1|AccTankID), data=CalEggs)
+
+#Check assumptions
+qqnorm(resid(eggarea1))
+qqline(resid(eggarea1)) #definitely doesn't meet assumption of normality
+plot(eggarea1)
+acf(eggarea1)
+
+summary(eggarea1)
+
+#try simplifying the model; step function gives me errors, so I ended up doing this manually
+eggarea2<- lmer(EggAreaum2~WCa_pHDIC+ (1|FemaleID) + (1|Block) , data=EggsYoutliers)
+anova(eggarea1, eggarea2)#Choose eggarea2
+eggarea3<- lm(EggAreaum2~WCa_pHDIC, data=CalEggs)
+anova(eggarea2, eggarea3)#choose eggarea2
+eggarea4<- lmer(EggAreaum2~WCa_pHDIC + (1|FemaleID), data=CalEggs)
+anova(eggarea2, eggarea4)#choose eggarea4
+eggarea5<- lmer(EggAreaum2 ~ 1 + (1|FemaleID), data=CalEggs)
+anova(eggarea4, eggarea5) #choose eggarea5
+summary(eggarea5)
+eggarea6<- lm(EggAreaum2~FemaleID, data=CalEggs)
+anova(eggarea3, eggarea6)
+summary(eggarea6)
+
+#look at assumptions of eggarea5
+plot(eggarea5)
+qqnorm(resid(eggarea5))
+qqline(resid(eggarea5))
+#look at assumptions of eggarea6
+par(mfcol=c(2,2))
+plot(eggarea6)
+par(mfcol=c(1,1))
+acf(eggarea6)
+#FemaleID matters but not block, treatment or adult length. Same as diameter, but model doesn't seem to meet the assumption of normality
+
+plot(EggAreaum2~FemaleID, data=CalEggs)
+
+#look at EggEccentricity
+eggeccen1<- lmer(EggEccentricity~WCa_pHDIC*AdultLength + (1|FemaleID) + (1|Block) +(1|AccTankID), data=CalEggs)
+
+#Check assumptions
+qqnorm(resid(eggeccen1))
+qqline(resid(eggeccen1)) #looks good!
+plot(eggeccen1) #this looks good too
+acf(eggeccen1)
+
+summary(eggeccen1)
+
+#try simplifying the model; step function gives me errors, so I ended up doing this manually
+eggeccen2<- lmer(EggEccentricity~WCa_pHDIC+ (1|FemaleID) + (1|Block) , data=CalEggs)
+anova(eggeccen1, eggeccen2)#Choose eggeccen2
+eggeccen3<- lm(EggEccentricity~WCa_pHDIC, data=CalEggs)
+anova(eggeccen2, eggeccen3)#choose eggeccen2
+eggeccen4<- lmer(EggEccentricity~WCa_pHDIC + (1|FemaleID), data=CalEggs)
+anova(eggeccen2, eggeccen4)#choose eggeccen4
+eggeccen5<- lmer(EggEccentricity ~ 1 + (1|FemaleID), data=CalEggs)
+anova(eggeccen4, eggeccen5) #choose eggeccen5
+summary(eggeccen5)
+eggeccen6<- lm(EggEccentricity~FemaleID, data=CalEggs)
+anova(eggeccen3, eggeccen6)
+summary(eggeccen6)
+
+#look at the assumptions of eggeccen5
+plot(eggeccen5)
+qqnorm(resid(eggeccen5))
+qqline(resid(eggeccen5))
+
+#look at assumptions of eggeccen6
+par(mfcol=c(2,2))
+plot(eggeccen6)
+par(mfcol=c(1,1))
+acf(eggeccen6)
+#FemaleID matters but not block, treatment or adult length. Same as diameter
+
+plot(EggEccentricity~FemaleID, data=CalEggs)
+
+```
 
 
 
