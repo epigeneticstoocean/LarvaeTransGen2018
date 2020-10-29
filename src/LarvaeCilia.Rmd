@@ -178,10 +178,10 @@ FemAdults<- merge(x=FemaleInfo, y= meanegg, by.x="ParentBlockID", by.y= "FemaleI
 CiliaExtent<- subset(CiliaArea, CilType=="Extent")
 CiliaArea<- subset(CiliaArea, CilType=="Area")
 #now use ddply to get only one value for each morphID
-CiliaExtentAll<- ddply(CiliaExtent, .(LarvaeMorphID), numcolwise(mean, na.rm=TRUE))
-CiliaAreaAll<- ddply(CiliaArea, .(LarvaeMorphID), numcolwise(mean, na.rm=TRUE))
+CiliaExtentAll<- ddply(CiliaExtent, .(LarvaeMorphID, Batch), numcolwise(sum, na.rm=TRUE))
+CiliaAreaAll<- ddply(CiliaArea, .(LarvaeMorphID, Batch), numcolwise(sum, na.rm=TRUE))
 colnames(CiliaExtentAll)<- paste(colnames(CiliaExtentAll), "ciliaextent", sep="")
-colnames(CiliaAreaAll)<- paste(colnames(CiliaAreaAll), "ciliaarea", sep="")
+colnames(CiliaAreaAll)<- paste(colnames(CiliaAreaAll), "ciliaarea", sep="") #rename columns
 #merge the cilia info to larvae morphology
 Larvae_Morphology<- merge(Larvae_Morphology, CiliaExtentAll, by.x="LarvaeMorphID", by.y="LarvaeMorphIDciliaextent", all.x=TRUE)
 Larvae_Morphology<- merge(Larvae_Morphology, CiliaAreaAll, by.x="LarvaeMorphID", by.y="LarvaeMorphIDciliaarea", all.x=TRUE)
@@ -196,16 +196,19 @@ Larvae<- merge(x=Larvae, y=Cross, by="CrossID", all.x=TRUE)
 Larvae<- merge(x=Larvae, y=FemAdults, by.x= "FemaleID", by.y="ParentBlockID", all.x=TRUE)
 Larvae<- merge(x=Larvae, y=MaleInfo, by.x= "MaleID", by.y="MaleParentBlockID", all.x=TRUE)
 Larvae<- merge(x=Larvae, y= Larvae_Counts, by="JarID", all.x=TRUE)
+Larvae<- merge(x=Larvae, y=Larvae_Cilia, by="JarID", all.x=TRUE)
 #Remove jars without larvae
 Larvae<- subset(Larvae, Larvae=="TRUE")
 #get the growth per day for the larva
 Larvae$GrowthPerDay<- (Larvae$LarvaeDiamum-Larvae$EggDiamum)/3
+#convert pixels to um for extent and area
 Larvae$Areaciliaareaum2<- Larvae$Areaciliaarea/Larvae$LarvaePixPerum^2
 Larvae$Perimeterciliaareaum<- Larvae$Perimeterciliaarea/Larvae$LarvaePixPerum
 Larvae$MajorAxisLengthciliaextentum<- Larvae$MajorAxisLengthciliaextent/Larvae$LarvaePixPerum
-
+#get ratio of cilia extent to larvae perimeter
 Larvae$CilExtentMajorAxisLengthRatio<- Larvae$MajorAxisLengthciliaextentum/Larvae$LarvaePerimeterum
-Larvae$CilAreaRatio<- Larvae$Areaciliaareaum2/Larvae$LarvaeAreaum2
+Larvae$CilAreaRatio<- Larvae$Areaciliaareaum2/Larvae$LarvaeAreaum2 #get ratio of cilia area to larvae area
+
 #Final dataframe will be one line per Jar, includes all data for the jar, including the average larva size per jar and cilia
 LarvByJar<- merge(x=Larvae_Calcification, y=Larvae_Cilia, by="JarID", all.x=TRUE, all.y=TRUE)
 LarvByJar<- merge(x=LarvByJar, y=Barcode_Jar, by="JarID", all.x=TRUE)
@@ -268,17 +271,16 @@ LarvaeDat$PerimLenRat<-LarvaeDat$LarvaePerimeterum/LarvaeDat$LarvaeDiamum
 LarvByJarDat<- subset(LarvByJarDat, JarSatCalcite_SW !="NA")
 ```
 
+
 ```{r Cilia extent and area}
 CilDat<- subset(LarvaeDat, CilExtentMajorAxisLengthRatio !="")
 CilDatMeans<- ddply(CilDat, .(ParentTrt, JarTrt),numcolwise(mean, na.rm=T) )
 CilDatSe<- ddply(CilDat, .(ParentTrt, JarTrt),numcolwise(se, na.rm=T) )
-Ciliamod1<- lmer(CilExtentMajorAxisLengthRatio~ParentTrt*JarSatCalcite_SW+ (1|FemaleID)+(1|MaleID)+(1|JarID), data=CilDat)
+Ciliamod1<- lmer(CilExtentMajorAxisLengthRatio~ParentTrt+ (1|CrossID)+ (1|FemaleID)+(1|MaleID)+(1|JarID), data=CilDat)
 cilstep<- step(Ciliamod1)
 print(cilstep)
-Ciliamod2<- lm(CilExtentMajorAxisLengthRatio~ParentTrt*JarSatCalcite_SW, data=CilDat)
-Ciliamod3<- lm(CilExtentMajorAxisLengthRatio~ParentTrt+JarSatCalcite_SW, data=CilDat)
 Ciliamod4<- lm(CilExtentMajorAxisLengthRatio~ParentTrt, data=CilDat)
-Ciliamod5<- lm(CilExtentMajorAxisLengthRatio~JarSatCalcite_SW, data=CilDat)
+Ciliamod5<- lm(CilExtentMajorAxisLengthRatio~1, data=CilDat)
 anova(Ciliamod2,Ciliamod3)
 anova(Ciliamod3, Ciliamod4)
 anova(Ciliamod5, Ciliamod4)
@@ -286,14 +288,13 @@ par(mfcol=c(2,2))
 plot(Ciliamod5)
 par(mfcol=c(1,1))
 summary(Ciliamod5)
+summary(Ciliamod4)
 
-Ciliaarea1<- lmer(CilAreaRatio~ParentTrt*JarSatCalcite_SW+ (1|FemaleID)+(1|MaleID)+(1|JarID), data=CilDat)
+Ciliaarea1<- lmer(CilAreaRatio~ParentTrt+ (1|FemaleID)+(1|MaleID)+(1|CrossID)+(1|JarID), data=CilDat)
 cilareastep<- step(Ciliaarea1)
 print(cilareastep)
-Ciliaareamod2<- lm(CilAreaRatio~ParentTrt*JarSatCalcite_SW, data=CilDat)
-Ciliaareamod3<- lm(CilAreaRatio~ParentTrt+JarSatCalcite_SW, data=CilDat)
 Ciliaareamod4<- lm(CilAreaRatio~ParentTrt, data=CilDat)
-Ciliaareamod5<- lm(CilAreaRatio~JarSatCalcite_SW, data=CilDat)
+Ciliaareamod5<- lm(CilAreaRatio~1, data=CilDat)
 anova(Ciliaareamod2,Ciliaareamod3)
 anova(Ciliaareamod3, Ciliaareamod4)
 anova(Ciliaareamod5, Ciliaareamod4)
@@ -301,18 +302,20 @@ par(mfcol=c(2,2))
 plot(Ciliaareamod4)
 par(mfcol=c(1,1))
 summary(Ciliaareamod4)
+summary(Ciliaareamod5)
 
 ggplot(CilDatMeans,aes(x=ParentTrt, y=CilExtentMajorAxisLengthRatio)) +
     geom_point()+
    geom_errorbar(aes(ymin= CilExtentMajorAxisLengthRatio-CilDatSe$CilExtentMajorAxisLengthRatio, ymax=CilExtentMajorAxisLengthRatio+CilDatSe$CilExtentMajorAxisLengthRatio),width=0.2, position=position_dodge(.9))+
     labs(x = "Parent Treatment", y = "CiliaPerimenter Extent") +
-    theme_classic()
+      theme_classic()+
+  facet_grid(~)
 
 ggplot(CilDatMeans,aes(x=ParentTrt, y=CilAreaRatio)) +
     geom_point()+
    geom_errorbar(aes(ymin= CilAreaRatio-CilDatSe$CilAreaRatio, ymax=CilAreaRatio+CilDatSe$CilAreaRatio),width=0.2, position=position_dodge(.9))+
     labs(x = "Parent Treatment", y = "Cilia Area Extent") +
-    theme_classic()
+      theme_classic()
 
 #some people may say that the reason that there are more cilia extruded is just because of the size, larger ones have fewer cilia extruded. So let's check that
 ggplot(CilDat,aes(x=LarvaeDiamum, y=CilAreaRatio, color=ParentTrt)) +
@@ -322,3 +325,32 @@ ggplot(CilDat,aes(x=LarvaeDiamum, y=CilAreaRatio, color=ParentTrt)) +
 #this plot doesn't seem to support that idea. 
 
 ```
+
+```{r Replicated Fams}
+CilDatJar<- ddply(CilDat, .(JarID, ParentTrt, FemaleID, MaleID, Batchciliaarea,CrossID), numcolwise(mean, na.rm=T))
+CilDatJarSE<- ddply(CilDat, .(JarID, ParentTrt, FemaleID, MaleID, Batchciliaarea,CrossID), numcolwise(se, na.rm=T))
+
+mod1<- aov(CilAreaRatio~ParentTrt, data=CilDatJar)
+anova(mod1)
+stepmod1<- step(mod1)
+mod2<- lm(Areaciliaareaum2~ParentTrt, data=CilDatJar)
+par(mfcol=c(2,2))
+plot(mod2)
+par(mfcol=c(1,1))
+summary(mod2)
+ggplot(CilDatJar,aes(x=CrossID, y=CilAreaRatio)) +
+    geom_point()+
+   geom_errorbar(aes(ymin= CilAreaRatio-CilDatJarSE$CilAreaRatio, ymax=CilAreaRatio+CilDatJarSE$CilAreaRatio),width=0.2, position=position_dodge(.9))+
+    labs(x = "Parent Treatment", y = "Cilia Area Extent") +
+      theme_classic()
+```
+
+The two batches seem very different. Try to figure out why that might be. 
+```{r}
+plot(Areaciliaareaum2~PercentCilia, data=CilDat)
+areapercent<- lm(Areaciliaareaum2~PercentCilia, data=CilDatJar)
+summary(areapercent)
+plot(areapercent)
+#looks like percent cilia is nearly significant. 
+```
+

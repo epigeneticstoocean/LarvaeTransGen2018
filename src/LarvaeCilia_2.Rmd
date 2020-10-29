@@ -1,0 +1,358 @@
+---
+title: "Larvae Cilia Analysis"
+author: "Elise McNally"
+date: "June 25, 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Load libraries
+```{r LoadLibraries, include=FALSE}
+library(knitr)
+library(cowplot)
+library(plyr)
+library(tidyverse)
+library(sciplot)
+library(reshape2)
+library(lme4)
+library(lmerTest)
+library(blme)
+library(grid)
+library(data.table)
+library(gridExtra)
+library(lattice)
+library(optimx)
+library(car)
+library(Hmisc)
+library(corrplot)
+library(emmeans)
+library(chron)
+library(GLMMadaptive)
+library(calibrate)
+library(merTools)
+library(bootpredictlme4)
+library(visreg)
+```
+
+Load data
+Name the data you export from FileMaker Pro by their exact table names and save them as CSVs, e.g. Larvae_Morphology.csv
+```{r LoadData}
+#setwd("~/Repos/LarvaeTransGen2018")
+setwd("~/R/GitHub/LarvaeTransGen2018/data") #Elise's working directory
+#upload all of the data tables for the larvae experiment
+Larvae_Morphology <- read.csv("../data/Larvae_morphology.csv") #contains data from CellProfiler from the larvae outlines
+Barcode_Jar <- read.csv("../data/Barcode_Jar.csv") #contains data on CrossID, seatable, and whether or not larvae were present
+Block_ID <- read.csv("../data/Block_ID.csv") #contains data on the block
+Cross<- read.csv("../data/Cross.csv") #contains data on the female and male IDs for the cross and whether the cross was for QG or Meth
+Fert_QG<- read.csv("../data/Fert_QG.csv") #contains data on fertilization counts, the JarIDs for the crosses
+Header_WC<- read.csv("../data/Header_WC.csv") #contains data on the header tanks used to fill the jars
+Larvae_Calcification <- read.csv("../data/Larvae_Calcification.csv") #contains data on filter weights and counts
+Larvae_Calcification<- subset(Larvae_Calcification, JarID != "")
+Larvae_Counts <- read.csv("../data/Larvae_Counts.csv") #contains data on sedgewick rafter larvae counts
+Larvae_WC <- read.csv("../data/Larvae_WC.csv") #contains data on larvae jar water chemistry
+Parent_ID <- read.csv("../data/Parent_ID.csv") #contains data on the adults at the time of shucking. Includes Parent ID assignments
+Larvae_Cilia<- read.csv("../data/Larvae_Cilia.csv") #contains data on cilia extrusion of the larvae photographed for morphology
+Egg_Morphology<- read.csv("../data/Egg_Morphology.csv") #contains data on egg sizes from CellProfiler
+Egg_Morphology$EggPerimeterum<- Egg_Morphology$EggPerimeterPix/8.892  #add a column to convert egg perimeter to um based on the scaled slide
+Egg_Morphology$EggPerimDiamRat<- Egg_Morphology$EggPerimeterum/Egg_Morphology$EggDiamum #add a column for the ratio of perimeter to diameter
+Adult_Sample<- read.csv("../data/Adult_Sample.csv") #contains data on adult oysters at the time of collection
+WC_Standard<- read.csv("../data/WC_Standard.csv") #contains data on the standards used for water chemistry
+Tank_WC<- read.csv("../data/Tank_WC.csv") #contains data on the adult tank water chemistry
+CiliaArea<- read.csv("../data/Cilia_AreaLength.csv")
+```
+
+Make fields factors: 
+```{r MakeFieldsFactors}
+Adult_Sample$AccTankID<- as.factor(Adult_Sample$AccTankID)
+Adult_Sample$TrtTankID<- as.factor(Adult_Sample$TrtTankID)
+Barcode_Jar$JarSeatable<- as.factor(Barcode_Jar$JarSeatable)
+Barcode_Jar<- subset(Barcode_Jar, JarSeatable =="2" | JarSeatable =="4" | JarSeatable =="6")
+Tank_WC$ParentTrt<- as.factor(Tank_WC$ParentTrt)
+Tank_WC$Tank<- as.factor(Tank_WC$Tank)
+WC_Standard$CRM<- as.factor(WC_Standard$CRM)
+Larvae_WC$DateFilter<- as.factor(Larvae_WC$DateFilter)
+CiliaArea$LarvaeMorphID<- as.factor(CiliaArea$LarvaeMorphID)
+CiliaArea$CilType<- as.factor(CiliaArea$CilType)
+CiliaArea$Batch<- as.factor(CiliaArea$Batch)
+Larvae_Morphology$LarvaeMorphID<- as.factor(Larvae_Morphology$LarvaeMorphID)
+```
+
+Look at the water chemistry data for adult tanks
+```{r AdultTankChemistry}
+#subset the tank data to only include B1 
+Tank_WCB1<- subset(Tank_WC, UseForCalcite == "TRUE")
+Tank_WCB1$Tank<-droplevels(Tank_WCB1)$Tank #drop unused levels
+Tank_WCB1$ParentTrt<- droplevels(Tank_WCB1)$ParentTrt
+#create dataframe that has the mean values for each tank
+TankMeans<- ddply(Tank_WCB1, .(Tank, Block, ParentTrt), numcolwise(mean, na.rm=T))#can't use this for pH and salinity, remember, it is just for carb chem
+```
+
+Join the data into dataframe for Egg analysis
+```{r JoinDataForEggAnalysis}
+#First dataframe will be for examining egg morphology for all eggs traced; multiple values for each adult
+AdultSampParID<- merge(x=Adult_Sample, y=Parent_ID, by="AdultID", all.x=TRUE)
+AdultSampParID<- merge(x=AdultSampParID, y=TankMeans, by.x="TrtTankID", by.y="Tank", all.x=TRUE)
+AdultSampParID<- subset(AdultSampParID, ParentBlockID !="NA")
+AdultSampParID<- subset(AdultSampParID, Block =="B1")
+MaleInfo<- subset(AdultSampParID, Sex=="M")
+FemaleInfo<- subset(AdultSampParID, Sex=="F")
+colnames(MaleInfo)<- paste("Male", colnames(MaleInfo), sep="")
+Eggs<- merge(x=Egg_Morphology, y=FemaleInfo, by.x="FemaleID", by.y="ParentBlockID", all.x=TRUE)
+Eggs$FemaleID<- as.factor(Eggs$FemaleID)
+#subset the data to only include B1
+EggsB1<- subset(Eggs, Block =="B1")
+```
+
+Remove egg outliers
+```{r EggOutlierRemoval}
+#check for outliers using code from https://www.r-bloggers.com/identify-describe-plot-and-remove-the-outliers-from-the-dataset/. The function uses Tukey's method to ID ouliers ranged above and below the 1.5*IQR. 
+outlierKD <- function(dt, var) {
+     var_name <- eval(substitute(var),eval(dt))
+     na1 <- sum(is.na(var_name))
+     m1 <- mean(var_name, na.rm = T)
+     par(mfrow=c(2, 2), oma=c(0,0,3,0))
+     boxplot(var_name, main="With outliers")
+     hist(var_name, main="With outliers", xlab=NA, ylab=NA)
+     outlier <- boxplot.stats(var_name)$out
+     mo <- mean(outlier)
+     var_name <- ifelse(var_name %in% outlier, NA, var_name)
+     boxplot(var_name, main="Without outliers")
+     hist(var_name, main="Without outliers", xlab=NA, ylab=NA)
+     title("Outlier Check", outer=TRUE)
+     na2 <- sum(is.na(var_name))
+     cat("Outliers identified:", na2 - na1, "n")
+     cat("Propotion (%) of outliers:", round((na2 - na1) / sum(!is.na(var_name))*100, 1), "n")
+     cat("Mean of the outliers:", round(mo, 2), "n")
+     m2 <- mean(var_name, na.rm = T)
+     cat("Mean without removing outliers:", round(m1, 2), "n")
+     cat("Mean if we remove outliers:", round(m2, 2), "n")
+     response <- readline(prompt="Do you want to remove outliers and to replace with NA? [yes/no]: ")
+     if(response == "y" | response == "yes"){
+          dt[as.character(substitute(var))] <- invisible(var_name)
+          assign(as.character(as.list(match.call())$dt), dt, envir = .GlobalEnv)
+          cat("Outliers successfully removed", "n")
+          return(invisible(dt))
+     } else{
+          dt[as.character(substitute(var))] <- invisible(var_name)
+          assign(as.character(as.list(match.call())$dt), dt, envir = .GlobalEnv)
+          cat("Outliers successfully removed", "n")
+          return(invisible(dt))
+     }
+}
+outlierKD(EggsB1, EggDiamum) #I opted to remove outliers for now. 
+#Outliers identified: 48 nPropotion (%) of outliers: 11.5 nMean of the outliers: 57.63 nMean without removing outliers: 62.4 nMean if we remove outliers: 62.95 n
+yes #to remove outliers from EggsB1
+#count how many eggs are left per female after removing the outliers. 
+outrem<- aggregate(EggDiamum~FemaleID, data=EggsB1, FUN=length)
+#EF07_B1 had 10 eggs that were included the rest were removed. Keep EF07_B1 in the analysis
+```
+
+Visualize eggs without outliers
+```{r EggVisualizationNoOutliers}
+#Plot again without outliers
+par(mfcol=c(1,1))
+boxplot(EggDiamum~FemaleID, data=EggsB1) 
+boxplot(EggDiamum~ParentTrt, data=EggsB1)
+#get the range now
+range(EggsB1$EggDiamum, na.rm=TRUE)
+#note that the eggs were filtered through a 70 um filter, but it appears that larger ones made it through.We are going to keep these in for now because they aren't that outrageously large. 
+#plot histograms of the egg data with outliers removed
+ggplot(EggsB1, aes(x=EggDiamum, color=ParentTrt))+
+  geom_histogram(alpha=0.5, position="identity")
+eggmeans<- aggregate(EggDiamum~ParentTrt, data=EggsB1, FUN=mean) #400 = 63.45709; 2800= 62.36829
+eggmedians<- aggregate(EggDiamum~ParentTrt, data=EggsB1, FUN=median)#400 = 62.91200; 2800= 62.06727
+view(eggmeans)
+view(eggmedians)
+#I will use the mean egg size. 
+```
+
+Make datasets without the egg size outliers
+```{r MakeLarvaeDataframes}
+meanegg<- ddply(EggsB1, .(FemaleID), numcolwise(mean, na.rm=T)) #get mean egg size
+#select only columns that we need for egg morph
+meanegg<- subset(meanegg, select=c("FemaleID", "EggDiamum"))
+FemAdults<- merge(x=FemaleInfo, y= meanegg, by.x="ParentBlockID", by.y= "FemaleID", all.y=TRUE, all.x=TRUE)
+#get the cilia area and extent data ready
+CiliaExtent<- subset(CiliaArea, CilType=="Extent")
+CiliaArea<- subset(CiliaArea, CilType=="Area")
+#now use ddply to get only one value for each morphID
+CiliaExtentAll<- ddply(CiliaExtent, .(LarvaeMorphID, Batch), numcolwise(sum, na.rm=TRUE))
+CiliaAreaAll<- ddply(CiliaArea, .(LarvaeMorphID, Batch), numcolwise(sum, na.rm=TRUE))
+colnames(CiliaExtentAll)<- paste(colnames(CiliaExtentAll), "ciliaextent", sep="")
+colnames(CiliaAreaAll)<- paste(colnames(CiliaAreaAll), "ciliaarea", sep="") #rename columns
+#merge the cilia info to larvae morphology
+Larvae_Morphology<- merge(Larvae_Morphology, CiliaExtentAll, by.x="LarvaeMorphID", by.y="LarvaeMorphIDciliaextent", all.x=TRUE)
+Larvae_Morphology<- merge(Larvae_Morphology, CiliaAreaAll, by.x="LarvaeMorphID", by.y="LarvaeMorphIDciliaarea", all.x=TRUE)
+#Next dataframe will be for one line per traced larva, includes all the data for that jar, including average egg size for that jar 
+Larvae<-merge(x=Larvae_Morphology, y=Barcode_Jar, by="JarID", all.x=TRUE)
+Larvae<- merge(x=Larvae, y=Larvae_WC, by="JarID", all.x=TRUE, all.y=TRUE)
+#use gather function in tidyr to make the Fert_QG Jar ID columns in long form vs. wide form
+Fert_QG_long <- Fert_QG %>% tidyr::gather(Key, JarID, JarID1:JarID6)
+#use the gathered data frame to merge with Larvae
+Larvae<-merge(x=Larvae, y=Fert_QG_long, by.x= c("JarID", "CrossID"), by.y=c("JarID", "CrossID"), all.x=TRUE) #did the join by two columns so CrossID column wasn't duplicated
+Larvae<- merge(x=Larvae, y=Cross, by="CrossID", all.x=TRUE)
+Larvae<- merge(x=Larvae, y=FemAdults, by.x= "FemaleID", by.y="ParentBlockID", all.x=TRUE)
+Larvae<- merge(x=Larvae, y=MaleInfo, by.x= "MaleID", by.y="MaleParentBlockID", all.x=TRUE)
+Larvae<- merge(x=Larvae, y= Larvae_Counts, by="JarID", all.x=TRUE)
+Larvae<- merge(x=Larvae, y=Larvae_Cilia, by="JarID", all.x=TRUE)
+#Remove jars without larvae
+Larvae<- subset(Larvae, Larvae=="TRUE")
+#get the growth per day for the larva
+Larvae$GrowthPerDay<- (Larvae$LarvaeDiamum-Larvae$EggDiamum)/3
+#convert pixels to um for extent and area
+Larvae$Areaciliaareaum2<- Larvae$Areaciliaarea/Larvae$LarvaePixPerum^2
+Larvae$Perimeterciliaareaum<- Larvae$Perimeterciliaarea/Larvae$LarvaePixPerum
+Larvae$MajorAxisLengthciliaextentum<- Larvae$MajorAxisLengthciliaextent/Larvae$LarvaePixPerum
+#get ratio of cilia extent to larvae perimeter
+Larvae$CilExtentMajorAxisLengthRatio<- Larvae$MajorAxisLengthciliaextentum/Larvae$LarvaePerimeterum
+Larvae$CilAreaRatio<- Larvae$Areaciliaareaum2/Larvae$LarvaeAreaum2 #get ratio of cilia area to larvae area
+
+#Final dataframe will be one line per Jar, includes all data for the jar, including the average larva size per jar and cilia
+LarvByJar<- merge(x=Larvae_Calcification, y=Larvae_Cilia, by="JarID", all.x=TRUE, all.y=TRUE)
+LarvByJar<- merge(x=LarvByJar, y=Barcode_Jar, by="JarID", all.x=TRUE)
+LarvByJar<- merge(x=LarvByJar, y=Larvae_WC, by="JarID", all.x=TRUE)
+LarvByJar<- merge(x=LarvByJar, y=Fert_QG_long, by.x=c("JarID", "CrossID"), by.y=c("JarID","CrossID"), all.x=TRUE)
+LarvByJar<- merge(x=LarvByJar, y=Cross, by="CrossID", all.x=TRUE)
+LarvByJar<- merge(x=LarvByJar, y=FemAdults, by.x="FemaleID", by.y="ParentBlockID", all.x=TRUE)
+LarvByJar<- merge(x=LarvByJar, y=MaleInfo, by.x="MaleID", by.y="MaleParentBlockID", all.x=TRUE)
+LarvByJar<- merge(x=LarvByJar, y=Larvae_Counts, by="JarID", all.x=TRUE)
+#get the means for larvae morphology and add to LarvByJar
+MeanLarvMorph<- ddply(Larvae_Morphology, .(JarID), numcolwise(mean, na.rm=T))
+SELarvMorph<- ddply(Larvae_Morphology, .(JarID), numcolwise(se, na.rm=T)) #get standard error of larva size
+MeanLarvMorph<- full_join(MeanLarvMorph,SELarvMorph, by=c("JarID", "JarID"),suffix=c("","SE")) #join the mean and se larvae data
+LarvByJar<- merge(x=LarvByJar, y=MeanLarvMorph, by="JarID", all.x=TRUE)
+#Now let's add the survival data. See notes on "Larvae Survival" for more info on how we decided to count total larvae in the jar
+#Make columns for the two larvae counts for 1_5 and 2
+LarvByJar$v1_5SurvCount<- rowSums(LarvByJar[,c("SWRTotal", "F2LarvaeCount")], na.rm=TRUE)
+LarvByJar$v2SurvCount<- rowSums(LarvByJar[,c("F1LarvaeCount", "F2LarvaeCount")], na.rm=TRUE)
+#use ifelse statement to define the LarvaeSurvived column
+LarvByJar$LarvaeSurvived<- ifelse(LarvByJar$ProtocolVersion =="1", paste(LarvByJar$TotalLarvae), ifelse(LarvByJar$ProtocolVersion =="1_5", paste(LarvByJar$v1_5SurvCount), paste(LarvByJar$v2SurvCount)))
+LarvByJar$LarvaeSurvived<- as.numeric(LarvByJar$LarvaeSurvived)
+LarvByJar<- subset(LarvByJar, Larvae=="TRUE")
+#now remove the data we do not want to analyze.
+LarvaeDat<- subset(Larvae, Block == "B1")
+LarvaeDat$JarID<- as.factor(LarvaeDat$JarID)
+LarvaeDat$JarID<-droplevels(LarvaeDat)$JarID
+LarvaeDat$AccTankID<- as.factor(LarvaeDat$AccTankID)
+LarvaeDat$AccTankID<-droplevels(LarvaeDat)$AccTankID
+LarvaeDat$TrtTankID<- as.factor(LarvaeDat$TrtTankID)
+LarvaeDat$TrtTankID<-droplevels(LarvaeDat)$TrtTankID
+LarvaeDat$MaleTrtTankID<- as.factor(LarvaeDat$MaleTrtTankID)
+LarvaeDat$MaleTrtTankID<-droplevels(LarvaeDat)$MaleTrtTankID
+LarvaeDat$MaleAccTankID<- as.factor(LarvaeDat$MaleAccTankID)
+LarvaeDat$MaleAccTankID<-droplevels(LarvaeDat)$MaleAccTankID
+LarvaeDat$JarSeatable<- as.factor(LarvaeDat$JarSeatable)
+LarvaeDat$JarSeatable<-droplevels(LarvaeDat)$JarSeatable
+LarvaeDat$JarTrt<- as.factor(LarvaeDat$JarTrt)
+LarvaeDat$ParentTrt<- as.factor(LarvaeDat$ParentTrt)
+LarvaeDat$FemaleID<- as.factor(LarvaeDat$FemaleID)
+LarvaeDat$FemaleID<-droplevels(LarvaeDat)$FemaleID
+LarvaeDat$MaleID<- as.factor(LarvaeDat$MaleID)
+LarvaeDat$MaleID<-droplevels(LarvaeDat)$MaleID
+LarvaeDat$CrossID<- as.factor(LarvaeDat$CrossID)
+LarvaeDat$CrossID<-droplevels(LarvaeDat)$CrossID
+LarvByJarDat<- subset(LarvByJar, Block == "B1")
+LarvByJarDat$JarID<- as.factor(LarvByJarDat$JarID)
+LarvByJarDat$AccTankID<- as.factor(LarvByJarDat$AccTankID)
+LarvByJarDat$TrtTankID<- as.factor(LarvByJarDat$TrtTankID)
+LarvByJarDat$MaleAccTankID<- as.factor(LarvByJarDat$MaleAccTankID)
+LarvByJarDat$MaleTrtTankID<- as.factor(LarvByJarDat$MaleTrtTankID)
+LarvByJarDat$JarSeatable<- as.factor(LarvByJarDat$JarSeatable)
+LarvByJarDat$ParentTrt<- as.factor(LarvByJarDat$ParentTrt)
+LarvByJarDat$FemaleID<- as.factor(LarvByJarDat$FemaleID)
+LarvByJarDat$MaleID<- as.factor(LarvByJarDat$MaleID)
+LarvByJarDat$CrossID<- as.factor(LarvByJarDat$CrossID)
+LarvByJarDat$JarTrt<- as.factor(LarvByJarDat$JarTrt)
+#make a column for the ratio of major to minor axis
+LarvaeDat$MajMinRat<- LarvaeDat$LarvaeMajorAxisLengthPix/LarvaeDat$LarvaeMinorAxisLengthPix
+LarvaeDat$PerimLenRat<-LarvaeDat$LarvaePerimeterum/LarvaeDat$LarvaeDiamum
+LarvByJarDat<- subset(LarvByJarDat, JarSatCalcite_SW !="NA")
+```
+
+
+```{r Cilia extent and area}
+CilDat<- subset(LarvaeDat, Batchciliaarea !="")
+CilDatMeans<- ddply(CilDat, .(ParentTrt, JarTrt, Batchciliaarea),numcolwise(mean, na.rm=T) )
+CilDatSe<- ddply(CilDat, .(ParentTrt, Batchciliaarea),numcolwise(se, na.rm=T) )
+Ciliamod1<- lmer(CilExtentMajorAxisLengthRatio~ParentTrt+ (1|CrossID)+ (1|FemaleID)+(1|MaleID)+(1|JarID), data=CilDat)
+cilstep<- step(Ciliamod1)
+print(cilstep)
+Ciliamod4<- lm(CilExtentMajorAxisLengthRatio~ParentTrt, data=CilDat)
+Ciliamod5<- lm(CilExtentMajorAxisLengthRatio~1, data=CilDat)
+anova(Ciliamod2,Ciliamod3)
+anova(Ciliamod3, Ciliamod4)
+anova(Ciliamod5, Ciliamod4)
+par(mfcol=c(2,2))
+plot(Ciliamod5)
+par(mfcol=c(1,1))
+summary(Ciliamod5)
+summary(Ciliamod4)
+
+Ciliaarea1<- lmer(CilAreaRatio~ParentTrt+ (1|FemaleID)+(1|MaleID)+(1|CrossID)+(1|JarID), data=CilDat)
+cilareastep<- step(Ciliaarea1)
+print(cilareastep)
+Ciliaareamod4<- lm(CilAreaRatio~ParentTrt, data=CilDat)
+Ciliaareamod5<- lm(CilAreaRatio~1, data=CilDat)
+anova(Ciliaareamod2,Ciliaareamod3)
+anova(Ciliaareamod3, Ciliaareamod4)
+anova(Ciliaareamod5, Ciliaareamod4)
+par(mfcol=c(2,2))
+plot(Ciliaareamod4)
+par(mfcol=c(1,1))
+summary(Ciliaareamod4)
+summary(Ciliaareamod5)
+
+ggplot(CilDatMeans,aes(x=ParentTrt, y=CilExtentMajorAxisLengthRatio)) +
+    geom_point()+
+   geom_errorbar(aes(ymin= CilExtentMajorAxisLengthRatio-CilExtentMajorAxisLengthRatio, ymax=CilExtentMajorAxisLengthRatio+CilExtentMajorAxisLengthRatio),width=0.2, position=position_dodge(.9))+
+    labs(x = "Parent Treatment", y = "CiliaPerimenter Extent") +
+      theme_classic()+
+  facet_grid(~Batchciliaarea)
+
+ggplot(CilDatMeans,aes(x=ParentTrt, y=CilAreaRatio)) +
+    geom_point()+
+   geom_errorbar(aes(ymin= CilAreaRatio-CilDatSe$CilAreaRatio, ymax=CilAreaRatio+CilDatSe$CilAreaRatio),width=0.2, position=position_dodge(.9))+
+    labs(x = "Parent Treatment", y = "Cilia Area Extent") +
+      theme_classic()+
+  facet_grid(~Batchciliaarea)
+
+#some people may say that the reason that there are more cilia extruded is just because of the size, larger ones have fewer cilia extruded. So let's check that
+ggplot(CilDat,aes(x=LarvaeDiamum, y=CilAreaRatio, color=ParentTrt)) +
+    geom_point(aes(color=ParentTrt))+
+    labs(x = "Larvae Diameter", y = "Cilia Area Extent") +
+    theme_classic()
+#this plot doesn't seem to support that idea. 
+
+```
+
+```{r Replicated Fams}
+CilDatJar<- ddply(CilDat, .(JarID, ParentTrt, FemaleID, MaleID,CrossID), numcolwise(mean, na.rm=T))
+CilDatJarSE<- ddply(CilDat, .(JarID, ParentTrt, FemaleID, MaleID,CrossID), numcolwise(se, na.rm=T))
+
+mod1<- aov(CilAreaRatio~ParentTrt, data=CilDatJar)
+anova(mod1)
+stepmod1<- step(mod1)
+mod2<- lm(Areaciliaareaum2~ParentTrt, data=CilDatJar)
+par(mfcol=c(2,2))
+plot(mod2)
+par(mfcol=c(1,1))
+summary(mod2)
+ggplot(CilDatJar,aes(x=CrossID, y=CilAreaRatio)) +
+    geom_point()+
+   geom_errorbar(aes(ymin= CilAreaRatio-CilDatJarSE$CilAreaRatio, ymax=CilAreaRatio+CilDatJarSE$CilAreaRatio),width=0.2, position=position_dodge(.9))+
+    labs(x = "Parent Treatment", y = "Cilia Area Extent") +
+      theme_classic()
+```
+
+The two batches seem very different. Try to figure out why that might be. 
+```{r}
+plot(Areaciliaareaum2~PercentCilia, data=CilDat)
+areapercent<- lm(Areaciliaareaum2~PercentCilia, data=CilDatJar)
+summary(areapercent)
+plot(areapercent)
+#looks like percent cilia is nearly significant. 
+```
+
