@@ -309,6 +309,7 @@ LarvByJar<- merge(x=LarvByJar, y=Cross, by="CrossID", all.x=TRUE)
 LarvByJar<- merge(x=LarvByJar, y=FemAdults, by.x="FemaleID", by.y="ParentBlockID", all.x=TRUE)
 LarvByJar<- merge(x=LarvByJar, y=MaleInfo, by.x="MaleID", by.y="MaleParentBlockID", all.x=TRUE)
 LarvByJar<- merge(x=LarvByJar, y=Larvae_Counts, by="JarID", all.x=TRUE)
+LarvByJar$GrowthPerDay<- (LarvByJar$LarvaeDiamum-LarvByJar$EggDiamum)/3
 #get the means for larvae morphology and add to LarvByJar
 MeanLarvMorph<- ddply(Larvae_Morphology, .(JarID), numcolwise(mean, na.rm=T))
 SELarvMorph<- ddply(Larvae_Morphology, .(JarID), numcolwise(se, na.rm=T)) #get standard error of larva size
@@ -405,6 +406,7 @@ LarvByJarDat$MaleIDPlain<- vapply(strsplit(as.character(LarvByJarDat$MaleID),"_"
 LarvaeDat$MajMinRat<- LarvaeDat$LarvaeMajorAxisLengthPix/LarvaeDat$LarvaeMinorAxisLengthPix
 LarvaeDat$PerimLenRat<-LarvaeDat$LarvaePerimeterum/LarvaeDat$LarvaeDiamum
 LarvByJarDat<- subset(LarvByJarDat, JarSatArg_SW !="NA")
+LarvByJarDat$GrowthPerDay<- (LarvByJarDat$LarvaeDiamum-LarvByJarDat$EggDiamum)/3
 ```
 
 Analyze jar chemistry data
