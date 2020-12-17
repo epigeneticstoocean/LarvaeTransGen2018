@@ -1,0 +1,174 @@
+---
+title: "McNally_etal_Supplemental_Code"
+author: "Elise McNally"
+date: "11/9/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r LoadLibraries, include=FALSE}
+library(knitr)
+library(cowplot)
+library(plyr)
+library(tidyverse)
+library(sciplot)
+library(reshape2)
+library(lme4)
+library(lmerTest)
+library(blme)
+library(grid)
+library(data.table)
+library(gridExtra)
+library(lattice)
+library(optimx)
+library(car)
+library(Hmisc)
+library(DescTools)
+library(corrplot)
+library(emmeans)
+library(chron)
+library(GLMMadaptive)
+library(calibrate)
+library(merTools)
+library(bootpredictlme4)
+library(visreg)
+library(lubridate)
+library(marelac)
+```
+
+# Load Data
+```{r Load Data}
+setwd("~/R/GitHub/LarvaeTransGen2018/data") #Elise's working directory
+BARN<- read.csv("Barn_Botts.csv")
+LoggerRawData<- read.csv("BARN_pHLogger.csv")
+LoggerCalib<- read.csv("BARN_pHLoggerCalib.csv")
+CondRawData<- read.csv("BARN_CondLogger.csv")
+KnownSals<- read.csv("BARN_KnownSals.csv")
+
+```
+
+# Work on getting salinity from conductivity logger
+We measure salinity directly from water samples taken at the time of launching the logger. To correct for drift we need to: 
+1) ID times on the logger that correspond to times that salinity was measured
+2) Convert known salinities to conductivity
+3) Get drift of the conductivity logger between salinity measurement points
+4) Convert measured conductivity to actual conductivity using the drift correction
+5) convert the corrected conductivity to salinity
+6) Match the logged salinity values to the pH logger data
+
+The function convert_StoR provides a salinity to conductivity ratio conversion. Equation is valid for salinity 2-42 in the world ocean. Here is the usage for the code: 
+convert_StoR(S= SALINITYppt, t= TEMPCels, p=PRESSURE, P=applied pressure)
+1bar= seasurface
+
+The conductivity ratio is the measured conductivity divided by the conductivity of 35ppt seawater at 15C and 0 pressure, which is 42.914 mS/cm = 42914 uS/cm
+
+Load libraries
+```{r}
+library(marelac)
+
+```
+
+Load data
+```{r}
+#set working directory
+setwd("~/R/GitHub/FieldSamples/data")
+sal<- read.csv("KnownSal.csv")
+```
+
+Get conductivity from salinity
+```{r}
+#Create foreloop to get the ratios for each of the bottles that were collected
+for(i in 1:length(sal$Sal)){
+  sal$CondRatio[i]<- convert_StoR(S=sal$Sal[i], t= sal$TempC[i], p=sal$Pressure[i])
+}
+
+sal$Conductivity<- 42914*sal$CondRatio
+#now use that conductivity to correct the logger data. 
+
+write.csv(sal, "~/R/GitHub/FieldSamples/data/KnownCond.csv")
+
+```
+
+
+Code from Adrienne to get salinities
+```{r}
+#if salinity is not converted from the HydroCAT here is the formula to do it
+library(oce)
+
+test$cond=test$`Spec Conductivity`*0.001
+
+test$Salinity=swSCTp(test$cond, T90fromT68(test$Temperature), pressure = (test$Pressure), conductivityUnit = "mS/cm", eos = "unesco")
+```
+
+
+
+
+# Work on getting pH to the NBS and Total scales accounting for liquid junction effects
+
+1) ID times that the CRM was measured; noting if Cu was on or off
+2) Get measured pH from the logger
+3) Use CO2SYS to calculate the certified pH of the CRM on the NBS scale for the measured temperature
+4) Calculate the correction factor for liquid junction effects (Cert-Meas pH)/Crm salinity
+5) Remove correction factor outliers
+6) Get the average correction factor per unit of salinity
+7) Add the LJCorr factor for each electrode to the LoggerRawData 
+8) Get the correction to the total scale (not salinity dependent)
+9) Use the LJCorr and total correction along with the salinity measurements to get the pH data to the NBSD and total scales. 
+
+
+
+#Subset data
+```{r Subset to only include May-July}
+#Make dates in the date format for R
+BARN$Date<- ymd(BARN$Date)
+Logger$DateTimeGMT<- ymd_hms(Logger$DateTimeGMT)
+
+#get the months
+BARN$Month<- month(BARN$Date)
+Logger$Month<- month(Logger$DateTimeGMT)
+Logger$Day<- day(Logger$DateTimeGMT) #make a simple month and day field
+Logger$DayMonth<- as.factor(paste(Logger$Month, Logger$Day, sep="-"))
+#subset to only include may-july and only tidal samples for bottles
+BARN$SampType<- as.factor(BARN$SampType)
+BARNsub<- subset(BARN, SampType=="Tidal" & Month!=10)
+LoggerSub<- subset(Logger, Month==5 | Month==6| Month==7)
+
+```
+
+# Make figures using bottle data
+```{r Bottle Figures}
+#round relative tide
+BARNsub$RelTideRounded<- round(BARNsub$RelTide)
+BottMeans<- ddply(BARNsub, .(RelTideRounded), numcolwise(mean, na.rm=TRUE))
+BottSes<- ddply(BARNsub, .(RelTideRounded), numcolwise(se, na.rm=TRUE))
+
+plot(OmegaAr~RelTideRounded, data=BottMeans, pch=19, xlab="Relative Tide Time", ylab= expression(paste( Omega[Aragonite])), ylim=c(0, 2.0))
+abline(b=0, a=1)
+arrows(x0=BottMeans$RelTideRounded, x1=BottMeans$RelTideRounded,y0=BottMeans$OmegaAr-BottSes$OmegaAr, y1=BottMeans$OmegaAr+BottSes$OmegaAr, angle=90, code=3, length=0.05, col="black")
+
+plot(pCO2~RelTideRounded, data=BottMeans, pch=19, xlab="Relative Tide Time", ylab= expression(paste(pCO[2], " (ppm)")), ylim=c(0, 3000))
+arrows(x0=BottMeans$RelTideRounded, x1=BottMeans$RelTideRounded,y0=BottMeans$pCO2-BottSes$pCO2, y1=BottMeans$pCO2+BottSes$pCO2, angle=90, code=3, length=0.05, col="black")
+
+plot(CO3~RelTideRounded, data=BottMeans, pch=19, xlab="Relative Tide Time", ylab= expression(paste("[", CO[3], "] (", mu, "m)")), ylim=c(0, 125))
+arrows(x0=BottMeans$RelTideRounded, x1=BottMeans$RelTideRounded,y0=BottMeans$CO3-BottSes$CO3, y1=BottMeans$CO3+BottSes$CO3, angle=90, code=3, length=0.05, col="black")
+
+```
+
+# Make figures using pH logger data
+```{r Logger figures}
+
+LoggerSub$Yearday<- yday(LoggerSub$DateTimeGMT) #get the year day of the data
+LogMeans<- ddply(LoggerSub, .(Yearday), numcolwise(mean, na.rm=TRUE))
+
+LogSes<- ddply(LoggerSub, .(Yearday), numcolwise(se, na.rm=TRUE))
+
+Plot<- plot(pH~Yearday, data=LogMeans, pch=19, type="p", xaxt="n", xlab="Month and Day", ylim=c(7.5, 8.05))
+axis(1,at=LoggerSub$Yearday, labels=LoggerSub$DayMonth)
+arrows(x0=LogMeans$Yearday, x1=LogMeans$Yearday, y0=LogMeans$pH - LogSes$pH, y1=LogMeans$pH + LogSes$pH, code=3, angle=90)
+```
+
+

@@ -1326,18 +1326,19 @@ Do simple t-tests on the means for oa-exposed and control exposed parents within
 Lexp<- subset(LarvaeDat, JarTrt=="Exposed")
 Lcon<- subset(LarvaeDat, JarTrt=="Control")
 
-t.test(GrowthPerDay~ParentTrt, data=Lexp)
-t.test(GrowthPerDay~ParentTrt, data=Lcon)
+t.test(GrowthPerDay~ParentTrt, data=Lexp, var.equal=TRUE) 
+t.test(GrowthPerDay~ParentTrt, data=Lcon, var.equal=TRUE)
 
-t.test(LarvaeDiamum~ParentTrt, data=Lexp)
-t.test(LarvaeDiamum~ParentTrt, data=Lcon)#not significantly different for control larvae
+t.test(LarvaeDiamum~ParentTrt, data=Lexp, var.equal=TRUE)
+t.test(LarvaeDiamum~ParentTrt, data=Lcon, var.equal=TRUE)#not significantly different for control larvae
 
-t.test(LarvaeAreaum2~ParentTrt, data=Lexp)
-t.test(LarvaeAreaum2~ParentTrt, data=Lcon) #not signficantly different for control larvae
 
-t.test(LarvaePerimeterum~ParentTrt, data=Lexp)
-t.test(LarvaePerimeterum~ParentTrt, data=Lcon) #not significantly different for control larvae
+t.test(sqrt(LarvaeAreaum2)~ParentTrt, data=Lexp, var.equal=TRUE)
+t.test(sqrt(LarvaeAreaum2)~ParentTrt, data=Lcon, var.equal=TRUE) #not significantly different for control larvae
 
-t.test(PerimLenRat~ParentTrt, data=Lexp)
-t.test(PerimLenRat~ParentTrt, data=Lcon)#not significantly different for control larvae
+t.test(LarvaePerimeterum~ParentTrt, data=Lexp, var.equal=TRUE)
+t.test(LarvaePerimeterum~ParentTrt, data=Lcon, var.equal=TRUE) #not significantly different for control larvae
+
+t.test(PerimLenRat~ParentTrt, data=Lexp, var.equal=TRUE)
+t.test(PerimLenRat~ParentTrt, data=Lcon, var.equal=TRUE)#not significantly different for control larvae
 ```
