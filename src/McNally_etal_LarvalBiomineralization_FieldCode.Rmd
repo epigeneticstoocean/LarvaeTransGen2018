@@ -69,7 +69,7 @@ The conductivity ratio is the measured conductivity divided by the conductivity 
 Load libraries
 ```{r}
 library(marelac)
-
+library(lubridate)
 ```
 
 Load data
@@ -125,17 +125,24 @@ test$Salinity=swSCTp(test$cond, T90fromT68(test$Temperature), pressure = (test$P
 ```{r Subset to only include May-July}
 #Make dates in the date format for R
 BARN$Date<- ymd(BARN$Date)
-Logger$DateTimeGMT<- ymd_hms(Logger$DateTimeGMT)
-
+LoggerRawData$DateTimeGMT<- ymd_hms(LoggerRawData$DateTimeGMT)
+Logger<- LoggerRawData
 #get the months
 BARN$Month<- month(BARN$Date)
 Logger$Month<- month(Logger$DateTimeGMT)
 Logger$Day<- day(Logger$DateTimeGMT) #make a simple month and day field
 Logger$DayMonth<- as.factor(paste(Logger$Month, Logger$Day, sep="-"))
+Logger$Year<- year(Logger$DateTimeGMT)
 #subset to only include may-july and only tidal samples for bottles
 BARN$SampType<- as.factor(BARN$SampType)
 BARNsub<- subset(BARN, SampType=="Tidal" & Month!=10)
-LoggerSub<- subset(Logger, Month==5 | Month==6| Month==7)
+LoggerSub<- subset(Logger, Year==2018 | Year== 2019) %>% 
+  subset(Month == 5 |Month== 6 | Month == 7 | Month == 8)
+
+LoggerSub$SimpleDate<- date(LoggerSub$DateTimeGMT)
+LoggerSub$pH<- as.numeric(LoggerSub$pH)
+LogAgg<- aggregate(pH ~ SimpleDate, data=LoggerSub, FUN= mean)
+plot(pH~SimpleDate, data=LogAgg)
 
 ```
 
@@ -166,9 +173,9 @@ LogMeans<- ddply(LoggerSub, .(Yearday), numcolwise(mean, na.rm=TRUE))
 
 LogSes<- ddply(LoggerSub, .(Yearday), numcolwise(se, na.rm=TRUE))
 
-Plot<- plot(pH~Yearday, data=LogMeans, pch=19, type="p", xaxt="n", xlab="Month and Day", ylim=c(7.5, 8.05))
+Plot<- plot(pH~Yearday, data=LogMeans, pch=19, type="p", xaxt="n", xlab="Date", ylim=c(7.5, 8.05), ylab= "pH (NBS)")
 axis(1,at=LoggerSub$Yearday, labels=LoggerSub$DayMonth)
-arrows(x0=LogMeans$Yearday, x1=LogMeans$Yearday, y0=LogMeans$pH - LogSes$pH, y1=LogMeans$pH + LogSes$pH, code=3, angle=90)
+arrows(x0=LogMeans$Yearday, x1=LogMeans$Yearday, y0=LogMeans$pH - LogSes$pH, y1=LogMeans$pH + LogSes$pH, code=3, angle=90, length= 0.1)
 ```
 
 

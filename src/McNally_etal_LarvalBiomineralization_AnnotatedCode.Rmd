@@ -5,7 +5,9 @@ output: html_document
 
 ```{r LoadLibraries, include=FALSE}
 library(knitr)
+library(lmodel2)
 library(cowplot)
+library(effects)
 library(plyr)
 library(tidyverse)
 library(sciplot)
@@ -286,6 +288,11 @@ Fert_QG_long <- Fert_QG %>% tidyr::gather(Key, JarID, JarID1:JarID6)
 Larvae<-merge(x=Larvae, y=Fert_QG_long, by.x= c("JarID", "CrossID"), by.y=c("JarID", "CrossID"), all.x=TRUE) %>% merge(y=Cross, by="CrossID", all.x=TRUE) %>%  merge(y=FemAdults, by.x= "FemaleID", by.y="ParentBlockID", all.x=TRUE) %>% merge(y=MaleInfo, by.x= "MaleID", by.y="MaleParentBlockID", all.x=TRUE) %>% merge(y= Larvae_Counts, by="JarID", all.x=TRUE)
 #Remove jars without larvae
 Larvae<- subset(Larvae, Larvae=="TRUE")
+#Get a fixed date and time column
+str(Larvae$DateFixed)
+Larvae$FixedDateFormatted<- as.Date(as.character(Larvae$DateFixed),format="%Y%m%d")
+Larvae$FixedDateTime<- as.POSIXct(paste(Larvae$FixedDateFormatted, Larvae$TimeFixed), format="%Y-%m-%d %H:%M")
+
 #get the growth per day for the larva
 Larvae$GrowthPerDay<- (Larvae$LarvaeDiamum-Larvae$EggDiamum)/3
 #Final data frame will be one line per Jar, includes all data for the jar, including the average larva size per jar and cilia
@@ -385,6 +392,8 @@ LarvByJarDat$FemaleID<-droplevels(LarvByJarDat)$FemaleID
 LarvByJarDat$CrossID<-droplevels(LarvByJarDat)$CrossID
 LarvByJarDat$FemIDPlain<- vapply(strsplit(as.character(LarvByJarDat$FemaleID),"_"), `[`, 1, FUN.VALUE=character(1))
 LarvByJarDat$MaleIDPlain<- vapply(strsplit(as.character(LarvByJarDat$MaleID),"_"), `[`, 1, FUN.VALUE=character(1))
+LarvByJarDat$MaleIDNumber<- substr(LarvByJarDat$MaleIDPlain, 3, 4 )
+LarvByJarDat$FemaleIDNumber<- substr(LarvByJarDat$FemIDPlain, 3, 4 )
 
 LarvaeDat$PerimLenRat<-LarvaeDat$LarvaePerimeterum/LarvaeDat$LarvaeDiamum
 ```
@@ -535,6 +544,14 @@ summary(larvlenfin)
 ```
 
 ## Analyze larvae growth with adult trt as fixed effect and jar as covariate
+```{r Look at GPD with no random effects}
+#remove data with nas for JarSatArg_Total
+LarvaeDatSub<- subset(LarvaeDat, is.na(JarSatArg_Total)==FALSE)
+simpleGPDmod <- lm(GrowthPerDay~ParentTrt*JarSatArg_Total, data= LarvaeDatSub)
+LarvaeDatSub$SimpleModelResids<- simpleGPDmod$residuals
+plot(SimpleModelResids~JarSeatable, data=LarvaeDatSub)
+```
+
 ```{r LarvGrowthStat}
 larvgrow<-lmer(GrowthPerDay~ParentTrt*JarSatArg_Total+(1|MaleID)+(1|CrossID)+(1|JarID) +(1|JarSeatable)+(1|TrtTankID)+(1|MaleTrtTankID), data=LarvaeDat)
 steppedlarvgrow<- step(larvgrow)
@@ -906,14 +923,48 @@ legend.enhanced <- function (x, y = NULL, legend, fill = NULL, col = par("col"),
 
 ## Create multipanel figure
 ```{r MultipanelFigure}
-par(mfcol=c(1,1), mar=c(4,4.3, .75,1))
-p1=visreg(larvgrowfin, "JarSatArg_Total", by="ParentTrt", overlay=TRUE, ylab=expression(paste("Growth (", mu, "m/day)")), xlab=expression(paste("Larvae Treatment ", Omega[Aragonite])), legend=FALSE)
-par(mfcol=c(2,2))
-p2<-visreg(larvlenfin, "JarSatArg_Total", by="ParentTrt", overlay=TRUE, ylab=expression(paste("Length (", mu, "m)")), xlab="", legend=FALSE)
-p3<-visreg(larvareafint, "JarSatArg_Total", by="ParentTrt", overlay=TRUE, ylab=expression(sqrt(paste("Area (", mu, m^2,")"))), xlab=expression(paste("Larvae Treatment ", Omega[Aragonite])), legend=FALSE)
-p4<-visreg(larvperimfin, "JarSatArg_Total", by="ParentTrt", overlay=TRUE, ylab=expression(paste("Perimeter (", mu, "m)")), xlab="", legend=FALSE)
-p5<-visreg(PerDiRatFin, "JarSatArg_Total", by="ParentTrt", overlay=TRUE, ylab="Perimeter :Length", xlab=expression(paste("Larvae Treatment ", Omega[Aragonite])), legend=FALSE)
+
+par(mfcol=c(1,1), mar=c(4,4.3, 2,2), xpd=TRUE)
+p1<- visreg(larvgrowfin, "JarSatArg_Total", by="ParentTrt", overlay=TRUE, ylab=expression(paste("Growth (", mu, "m/day)")), xlab=expression(paste("Larvae Treatment ", Omega[Aragonite])), legend=FALSE, line=list(col=c("#004D4F", "#F7645A"), lwd=c(2,2)),
+              fill=list(col=c("#3BFAFF", "#FCCECB")),
+        points=list(col=c("#007367","#F98880"), pch=19, cex=0.4))
+plot(p1,overlay=TRUE, legend=FALSE, ylab=expression(paste("Growth (", mu, "m/day)")),xlab=expression(paste("Larvae Treatment ", Omega[Aragonite])), line=list(col=c("#004D4F", "#F7645A"), lwd=c(2,2)),
+              fill=list(col=c("#3BFAFF", "#FCCECB")),
+        points=list(col=c("#007367","#F98880"), pch=19, cex=0.4) )
+
+legend.enhanced("topright",
+   c("Control", "OA-exposed"),
+   pch=19,
+   col=c("#007367","#F98880"),
+   bty="n",
+   title="Parent Treatment",
+   horiz=TRUE,
+   y.intersp=.7,
+   x.intersp=0.5,
+   title.adj=c(.5,0),
+   title.col="black",
+   seg.len =1,
+   cex=.7,
+   yjust=0.5,
+   text.font = NULL,
+   inset = c(0,-.15)
+   )
+
+par(mfcol=c(2,2), mar=c(5,4.6, .5,1))
+p2<-visreg(larvlenfin, "JarSatArg_Total", by="ParentTrt", overlay=TRUE, ylab=expression(paste("Length (", mu, "m)")), xlab="", legend=FALSE, line=list(col=c("#004D4F", "#F7645A"), lwd=c(2,2)),
+              fill=list(col=c("#3BFAFF", "#FCCECB")),
+        points=list(col=c("#007367","#F98880"), pch=19, cex=0.4))
+p3<-visreg(larvareafint, "JarSatArg_Total", by="ParentTrt", overlay=TRUE, ylab=expression(sqrt(paste("Area (", mu, m^2,")"))), xlab=expression(paste("Larvae Treatment ", Omega[Aragonite])), legend=FALSE, cex=0.6, line=list(col=c("#004D4F", "#F7645A"), lwd=c(2,2)),
+              fill=list(col=c("#3BFAFF", "#FCCECB")),
+        points=list(col=c("#007367","#F98880"), pch=19, cex=0.4))
+p4<-visreg(larvperimfin, "JarSatArg_Total", by="ParentTrt", overlay=TRUE, ylab=expression(paste("Perimeter (", mu, "m)")), xlab="", legend=FALSE, cex=0.6, line=list(col=c("#004D4F", "#F7645A"), lwd=c(2,2)),
+              fill=list(col=c("#3BFAFF", "#FCCECB")),
+        points=list(col=c("#007367","#F98880"), pch=19, cex=0.4))
+p5<-visreg(PerDiRatFin, "JarSatArg_Total", by="ParentTrt", overlay=TRUE, ylab="Perimeter :Length", xlab=expression(paste("Larvae Treatment ", Omega[Aragonite])), legend=FALSE, cex=0.6, line=list(col=c("#004D4F", "#F7645A"), lwd=c(2,2)),
+              fill=list(col=c("#3BFAFF", "#FCCECB")),
+        points=list(col=c("#007367","#F98880"), pch=19, cex=0.4))
 ```
+
 
 ## Get ratio of OA to control to understand differences in calcification
 ```{r OA:Control Calcification}
@@ -930,78 +981,154 @@ FamMeansWide$OACont_P<- (FamMeansWide$LarvaePerimeterum_Exposed-FamMeansWide$Lar
 write.csv(FamMeansWide,"~/R/GitHub/LarvaeTransGen2018/data/CalcPercDiffs.csv", row.names = FALSE)
 ```
 
+## Get descriptive statistics
+```{r GetDescriptiveStats}
+#get the mean length of the oysters collected (n=80)
+mean(Adult_Sample$AdultLength*2.54)
+sd(Adult_Sample$AdultLength*2.54)
+se(Adult_Sample$AdultLength*2.54)
+#get means for the data
+meanJarTrt<- ddply(LarvByJarDat, .(JarTrt, ParentTrt), numcolwise(mean, na.rm=T))
+seJarTrt<- ddply(LarvByJarDat, .(JarTrt, ParentTrt), numcolwise(se, na.rm=T))
+mgpd<- subset(meanJarTrt, select= c(JarTrt, ParentTrt, MeanGPD, LarvaeDiamum, LarvaeAreaum2, LarvaePerimeterum))
+(mgpd$MeanGPD[3]-mgpd$MeanGPD[4])/mgpd$MeanGPD[4]
+(mgpd$MeanGPD[1]-mgpd$MeanGPD[2])/mgpd$MeanGPD[2]
+(mgpd$LarvaeDiamum[3]-mgpd$LarvaeDiamum[4])/mgpd$LarvaeDiamum[4]
+(mgpd$LarvaeDiamum[1]-mgpd$LarvaeDiamum[2])/mgpd$LarvaeDiamum[2]
+mean(mgpd$LarvaeDiamum[1:2])/mean(mgpd$LarvaeDiamum[3:4])
+(mgpd$LarvaeAreaum2[3]-mgpd$LarvaeAreaum2[4])/mgpd$LarvaeAreaum2[4]
+(mgpd$LarvaeAreaum2[1]-mgpd$LarvaeAreaum2[2])/mgpd$LarvaeAreaum2[2]
+mean(mgpd$LarvaeAreaum2[1:2])/mean(mgpd$LarvaeAreaum2[3:4])
+
+(mgpd$LarvaePerimeterum[3]-mgpd$LarvaePerimeterum[4])/mgpd$LarvaePerimeterum[4]
+(mgpd$LarvaePerimeterum[1]-mgpd$LarvaePerimeterum[2])/mgpd$LarvaePerimeterum[2]
+mean(mgpd$LarvaePerimeterum[1:2])/mean(mgpd$LarvaePerimeterum[3:4])
+
+mean(SurvWideDat$RatSurv, na.rm=TRUE)
+
+#get difference in gpd within parental treatments
+(mgpd$MeanGPD[4]- mgpd$MeanGPD[2])/mgpd$MeanGPD[2] #control parents
+(mgpd$MeanGPD[3]- mgpd$MeanGPD[1])/mgpd$MeanGPD[1] #exposed parents
+(mgpd$MeanGPD[3]- mgpd$MeanGPD[2])/mgpd$MeanGPD[2] #exposed parents exposed larvae vs. control parents control larvae
+
+#get descriptive statistics for parental effect 
+meanParentTrt<- ddply(LarvByJarDat, .(ParentTrt), numcolwise(mean, na.rm=T))
+seParentTrt<- ddply(LarvByJarDat, .(ParentTrt), numcolwise(se, na.rm=T))
+Parentmgpd<- subset(meanParentTrt, select= c(ParentTrt, MeanGPD, LarvaeDiamum, LarvaeAreaum2, LarvaePerimeterum))
+
+((Parentmgpd$LarvaeDiamum[1]-Parentmgpd$LarvaeDiamum[2])/Parentmgpd$LarvaeDiamum[1])
+((Parentmgpd$LarvaeAreaum2[1]-Parentmgpd$LarvaeAreaum2[2])/Parentmgpd$LarvaeAreaum2[1])
+((Parentmgpd$LarvaePerimeterum[1]-Parentmgpd$LarvaePerimeterum[2])/Parentmgpd$LarvaePerimeterum[1])
+
+meanLarvTrt<- ddply(LarvByJarDat, .(JarTrt), numcolwise(mean, na.rm=T))
+seLarvTrt<- ddply(LarvByJarDat, .(JarTrt), numcolwise(se, na.rm=T))
+Larvmgpd<- subset(meanLarvTrt, select= c(JarTrt, MeanGPD, LarvaeDiamum, LarvaeAreaum2, LarvaePerimeterum))
+((Larvmgpd$MeanGPD[2]-Larvmgpd$MeanGPD[1])/Larvmgpd$MeanGPD[1])
+```
+
 # Visualize variance among families: Calcification
 Right now this is using the mean for each jar (not all larvae measured could do that with LarvaeDat)
 ```{r Visualize Calcification Variance}
+#pull means for the control larvae control parents 
+ConConMeans<- meanJarTrt %>% 
+  filter(JarTrt=="Control" & ParentTrt=="400") %>% 
+  subset(select= c("MeanGPD", "LarvaePerimeterum", "LarvaeAreaum2",  "LarvaeDiamum"))
+ConExpMeans<- meanJarTrt %>% 
+  filter(JarTrt=="Exposed" & ParentTrt=="400") %>% 
+  subset(select= c("MeanGPD", "LarvaePerimeterum", "LarvaeAreaum2",  "LarvaeDiamum"))
 #EF01_EM01 only has one cross, so a boxplot won't work. Remove from the data before trying to make the plots: 
 LarvByJarVarVizDat<- subset(LarvByJarDat, CrossID !="EF01_EM01_B1_QG")
-par(mfcol=c(2,2))
-ggplot(LarvByJarVarVizDat, aes(y=MeanGPD,x=as.factor(MaleIDPlain), color=JarTrt))+
+LarvByJarVarVizDat$ParentTrt<- factor(LarvByJarVarVizDat$ParentTrt, levels= c("400", "2600"))
+ggplot(LarvByJarVarVizDat, aes(y=MeanGPD,x=as.factor(MaleIDNumber), color=JarTrt))+
   geom_boxplot(alpha=0.5, position="identity") +
-  facet_grid(~FemIDPlain, scale="free_x")+ 
-  labs(x = "Male ID", y= expression(paste("Growth (", mu, "m/day)")), title = "Female ID") + 
-  scale_color_manual(name = "Larval Treatment", labels = c("Control", "OA"), values = c("#00BFC4", "#F8766D"))+
+  facet_grid(~ParentTrt*FemaleIDNumber, scale="free_x")+ 
+  geom_rect(aes(xmin=-Inf, xmax=Inf, ymin=-Inf, ymax=Inf, fill = ParentTrt), colour=NA)+
+  scale_fill_manual(values =c("#B1FDFF", "#FCCECB"))+
+   geom_boxplot(alpha=0.5, position="identity") +
+  labs(x = "Male ID", y= expression(paste("Growth (", mu, "m/day)")), title = "Female ID") +
+  scale_color_manual(name = "Larval Treatment", labels = c("Control", "OA"), values = c("#004D4F", "#F7645A"))+
   geom_hline(yintercept=0)+
+  geom_hline(yintercept=ConConMeans$MeanGPD, color="navyblue", lty=2)+
+  geom_hline(yintercept=0, ConExpMeans$MeanGPD, color="red", lty=2)+
     theme_classic() +
   theme(axis.title.y.right = element_blank(),                # hide right axis title
         axis.text.y.right = element_blank(),                 # hide right axis labels
         axis.ticks.y = element_blank(),                      # hide left/right axis ticks
         axis.text.y = element_text(margin = margin(r = 0)),  # move left axis labels closer to axis
-        panel.spacing = unit(0.7, "mm"),                    # remove spacing between facets
-        strip.background = element_rect(size = 0.5), axis.text.x=element_text(angle=90),plot.title = element_text(size=10, hjust = 0.5)) 
+        panel.spacing = unit(0, "mm"),                    # remove spacing between facets
+        strip.background = element_rect(colour="white", fill="white"), axis.text.x=element_text(angle=90),plot.title = element_text(size=10, hjust = 0.5), panel.border= element_blank()) 
   
-ggplot(LarvByJarVarVizDat, aes(y=LarvaeAreaum2,x=MaleIDPlain, color=JarTrt))+
+ggplot(LarvByJarVarVizDat, aes(y=LarvaeAreaum2,x=as.factor(MaleIDNumber), color=JarTrt))+
   geom_boxplot(alpha=0.5, position="identity") +
-  facet_grid(~FemIDPlain, scale="free_x")+ 
-  labs(x = "Male ID", y= expression(paste("Surface Area (", mu, m^2,")")), title = "Female ID") + 
-  scale_color_manual(name = "Larval Treatment", labels = c("Control", "OA"), values = c("#00BFC4", "#F8766D"))+
+  facet_grid(~ParentTrt*FemaleIDNumber, scale="free_x")+ 
+  geom_rect(aes(xmin=-Inf, xmax=Inf, ymin=-Inf, ymax=Inf, fill = ParentTrt), colour=NA)+
+  scale_fill_manual(values =c("#B1FDFF", "#FCCECB"))+
+   geom_boxplot(alpha=0.5, position="identity") +
+  labs(x = "Male ID", y= expression(paste("Surface Area (", mu, m^2,")")), title = "Female ID") +
+  scale_color_manual(name = "Larval Treatment", labels = c("Control", "OA"), values = c("#004D4F", "#F7645A"))+
+  geom_hline(aes(yintercept=ConConMeans$LarvaeAreaum2), color= "navyblue", lty=2)+
+  geom_hline(aes(yintercept=ConExpMeans$LarvaeAreaum2), color= "red", lty=2)+ 
     theme_classic() +
   theme(axis.title.y.right = element_blank(),                # hide right axis title
         axis.text.y.right = element_blank(),                 # hide right axis labels
         axis.ticks.y = element_blank(),                      # hide left/right axis ticks
         axis.text.y = element_text(margin = margin(r = 0)),  # move left axis labels closer to axis
-        panel.spacing = unit(0.7, "mm"),                    # remove spacing between facets
-        strip.background = element_rect(size = 0.5), axis.text.x=element_text(angle=90),plot.title = element_text(size=10, hjust = 0.5)) 
+        panel.spacing = unit(0, "mm"),                    # remove spacing between facets
+        strip.background = element_rect(colour="white", fill="white"), axis.text.x=element_text(angle=90),plot.title = element_text(size=10, hjust = 0.5), panel.border= element_blank())
 
-ggplot(LarvByJarVarVizDat, aes(y=LarvaeDiamum ,x=MaleIDPlain, color=JarTrt))+
-  geom_boxplot(alpha=0.5, position="identity") +
-  facet_grid(~FemIDPlain, scale="free_x")+ 
+ggplot(LarvByJarVarVizDat, aes(y=LarvaeDiamum ,x=MaleIDNumber, color=JarTrt))+
+   geom_boxplot(alpha=0.5, position="identity") +
+  facet_grid(~ParentTrt*FemaleIDNumber, scale="free_x")+ 
+  geom_rect(aes(xmin=-Inf, xmax=Inf, ymin=-Inf, ymax=Inf, fill = ParentTrt), colour=NA)+
+  scale_fill_manual(values =c("#B1FDFF", "#FCCECB"))+
+   geom_boxplot(alpha=0.5, position="identity") +
   labs(x = "Male ID", y= expression(paste("Length (", mu, "m)")), title = "Female ID") + 
-  scale_color_manual(name = "Larval Treatment", labels = c("Control", "OA"), values = c("#00BFC4", "#F8766D"))+
+    scale_color_manual(name = "Larval Treatment", labels = c("Control", "OA"), values = c("#004D4F", "#F7645A"))+
+  
+  geom_hline(yintercept=ConConMeans$LarvaeDiamum, color="midnightblue", lty=2)+
+  geom_hline(yintercept=ConExpMeans$LarvaeDiamum, color="red", lty=2)+
     theme_classic() +
   theme(axis.title.y.right = element_blank(),                # hide right axis title
         axis.text.y.right = element_blank(),                 # hide right axis labels
         axis.ticks.y = element_blank(),                      # hide left/right axis ticks
         axis.text.y = element_text(margin = margin(r = 0)),  # move left axis labels closer to axis
-        panel.spacing = unit(0.7, "mm"),                    # remove spacing between facets
-        strip.background = element_rect(size = 0.5), axis.text.x=element_text(angle=90),plot.title = element_text(size=10, hjust = 0.5)) 
+        panel.spacing = unit(0, "mm"),                    # remove spacing between facets
+        strip.background = element_rect(colour="white", fill="white"), axis.text.x=element_text(angle=90),plot.title = element_text(size=10, hjust = 0.5), panel.border= element_blank())
 
-ggplot(LarvByJarVarVizDat, aes(y=LarvaePerimeterum ,x=MaleIDPlain, color=JarTrt))+
-  geom_boxplot(alpha=0.5, position="identity") +
-  facet_grid(~FemIDPlain, scale="free_x")+ 
+ggplot(LarvByJarVarVizDat, aes(y=LarvaePerimeterum ,x=MaleIDNumber, color=JarTrt))+
+    geom_boxplot(alpha=0.5, position="identity") +
+  facet_grid(~ParentTrt*FemaleIDNumber, scale="free_x")+ 
+  geom_rect(aes(xmin=-Inf, xmax=Inf, ymin=-Inf, ymax=Inf, fill = ParentTrt), colour=NA)+
+  scale_fill_manual(values =c("#B1FDFF", "#FCCECB"))+
+   geom_boxplot(alpha=0.5, position="identity") + 
   labs(x = "Male ID", y= expression(paste("Perimeter (", mu, "m)")), title = "Female ID") + 
-  scale_color_manual(name = "Larval Treatment", labels = c("Control", "OA"), values = c("#00BFC4", "#F8766D"))+
+      scale_color_manual(name = "Larval Treatment", labels = c("Control", "OA"), values = c("#004D4F", "#F7645A"))+
+  
+  geom_hline(yintercept=ConConMeans$LarvaePerimeterum, color="midnightblue", lty=2)+
+  geom_hline(yintercept=ConExpMeans$LarvaePerimeterum, color="red", lty=2)+
     theme_classic() +
   theme(axis.title.y.right = element_blank(),                # hide right axis title
         axis.text.y.right = element_blank(),                 # hide right axis labels
         axis.ticks.y = element_blank(),                      # hide left/right axis ticks
         axis.text.y = element_text(margin = margin(r = 0)),  # move left axis labels closer to axis
-        panel.spacing = unit(0.7, "mm"),                    # remove spacing between facets
-        strip.background = element_rect(size = 0.5), axis.text.x=element_text(angle=90),plot.title = element_text(size=10, hjust = 0.5)) 
+        panel.spacing = unit(0, "mm"),                    # remove spacing between facets
+        strip.background = element_rect(colour="white", fill="white"), axis.text.x=element_text(angle=90),plot.title = element_text(size=10, hjust = 0.5), panel.border= element_blank())
 
-ggplot(LarvByJarVarVizDat, aes(y=(LarvaePerimeterum/LarvaeDiamum),x=MaleIDPlain, color=JarTrt))+
+ggplot(LarvByJarVarVizDat, aes(y=(LarvaePerimeterum/LarvaeDiamum),x=MaleIDNumber, color=JarTrt))+
   geom_boxplot(alpha=0.5, position="identity") +
-  facet_grid(~FemIDPlain, scale="free_x")+ 
+  facet_grid(~ParentTrt*FemaleIDNumber, scale="free_x")+ 
+  geom_rect(aes(xmin=-Inf, xmax=Inf, ymin=-Inf, ymax=Inf, fill = ParentTrt), colour=NA)+
+  scale_fill_manual(values =c("#B1FDFF", "#FCCECB"))+
+   geom_boxplot(alpha=0.5, position="identity") +
   labs(x = "Male ID", y= paste("Perimeter:Length"), title = "Female ID") + 
-  scale_color_manual(name = "Larval Treatment", labels = c("Control", "OA"), values = c("#00BFC4", "#F8766D"))+
-  geom_hline(yintercept= 3.142)+
+    scale_color_manual(name = "Larval Treatment", labels = c("Control", "OA"), values = c("#004D4F", "#F7645A"))+
     theme_classic() +
   theme(axis.title.y.right = element_blank(),                # hide right axis title
         axis.text.y.right = element_blank(),                 # hide right axis labels
         axis.ticks.y = element_blank(),                      # hide left/right axis ticks
         axis.text.y = element_text(margin = margin(r = 0)),  # move left axis labels closer to axis
-        panel.spacing = unit(0.7, "mm"),                    # remove spacing between facets
-        strip.background = element_rect(size = 0.5), axis.text.x=element_text(angle=90),plot.title = element_text(size=10, hjust = 0.5)) 
+        panel.spacing = unit(0, "mm"),                    # remove spacing between facets
+        strip.background = element_rect(colour="white", fill="white"), axis.text.x=element_text(angle=90),plot.title = element_text(size=10, hjust = 0.5), panel.border= element_blank()) 
 ```
 
 # Visualize variance in a faceted way
@@ -1102,24 +1229,34 @@ SESurvDat<- ddply(SurvWideDat, .(ParentTrt), numcolwise(se, na.rm=T))
 SESurvDat$ParentTrt<- factor(SESurvDat$ParentTrt, levels= c("400", "2600"))
 #make reaction norms for survival color will be parent treatment. X will be jar treatment. Each cross will be its own line
 ParTreat<- c("400"="Control-exposed Parents", "2600"="OA-exposed Parents")
+LarvTreat<- c("Control"= "Control", "Exposed" = "OA-Exposed")
 ggplot(SurvDat,aes(x=JarTrt, y=LarvaeSurvived, color = "black45", group= CrossID)) +
+  geom_rect(aes(xmin=-Inf, xmax=Inf, ymin=-Inf, ymax=Inf, fill = ParentTrt), colour=NA)+
+  scale_fill_manual(values =c("#B1FDFF", "#FCCECB"))+
     geom_point(aes(color="black45"))+
   geom_line(aes(color="black45", group=CrossID))+
+  scale_x_discrete(labels=LarvTreat)+
   geom_errorbar(aes(ymin= LarvaeSurvived-SELarvaeSurvived, ymax=LarvaeSurvived+SELarvaeSurvived),width=0.05, position=position_dodge(0))+
     labs(x = "Larvae Treatment", y = "Number of Larvae Survived") +
   scale_color_manual(values="black")+
+  
   facet_grid(.~ParentTrt, labeller =labeller(ParentTrt = ParTreat))+
-  theme_classic()
+  theme_classic() + 
+  theme(panel.spacing = unit(0.2, "mm"),                    # remove spacing between facets
+        strip.background = element_rect(colour="white", fill="white"), panel.border= element_blank())
 #make bar graph of survival
 ggplot(data = MeanSurvDat, aes(x = ParentTrt, y = RatSurv, fill="gray45")) +
   geom_bar(stat="identity", position="dodge")+
   ylim(c(0,1))+
   geom_hline(yintercept=1)+
   geom_errorbar(aes(ymin= RatSurv-SESurvDat$RatSurv, ymax=RatSurv+SESurvDat$RatSurv),width=0.2, position=position_dodge(.9))+
-  labs(x = "Parent Treatment", y = "Proportion of Surviving Larvae") +
+  labs(x = "Parent Treatment", y = "Proportion of Surviving Larvae \n (OA:Control)") +
   scale_x_discrete(breaks=c("400","2600"),
         labels=c("Control", "OA"))+
   scale_fill_manual(values = "gray45") +
+   geom_text(aes(label=c("a", "a"), 
+            position = 3,
+            size=2), vjust = -1)+
   theme_classic()
 
 ```
@@ -1143,50 +1280,6 @@ ggplot(LarvByJarVarVizDat, aes(y=LarvaeSurvived,x=MaleIDPlain, color=JarTrt))+
         strip.background = element_rect(size = 0.5), axis.text.x=element_text(angle=90),plot.title = element_text(size=10, hjust = 0.5)) 
 ```
 
-## Get descriptive statistics
-```{r GetDescriptiveStats}
-#get the mean length of the oysters collected (n=80)
-mean(Adult_Sample$AdultLength*2.54)
-sd(Adult_Sample$AdultLength*2.54)
-se(Adult_Sample$AdultLength*2.54)
-#get means for the data
-meanJarTrt<- ddply(LarvByJarDat, .(JarTrt, ParentTrt), numcolwise(mean, na.rm=T))
-seJarTrt<- ddply(LarvByJarDat, .(JarTrt, ParentTrt), numcolwise(se, na.rm=T))
-mgpd<- subset(meanJarTrt, select= c(JarTrt, ParentTrt, MeanGPD, LarvaeDiamum, LarvaeAreaum2, LarvaePerimeterum))
-(mgpd$MeanGPD[3]-mgpd$MeanGPD[4])/mgpd$MeanGPD[4]
-(mgpd$MeanGPD[1]-mgpd$MeanGPD[2])/mgpd$MeanGPD[2]
-(mgpd$LarvaeDiamum[3]-mgpd$LarvaeDiamum[4])/mgpd$LarvaeDiamum[4]
-(mgpd$LarvaeDiamum[1]-mgpd$LarvaeDiamum[2])/mgpd$LarvaeDiamum[2]
-mean(mgpd$LarvaeDiamum[1:2])/mean(mgpd$LarvaeDiamum[3:4])
-(mgpd$LarvaeAreaum2[3]-mgpd$LarvaeAreaum2[4])/mgpd$LarvaeAreaum2[4]
-(mgpd$LarvaeAreaum2[1]-mgpd$LarvaeAreaum2[2])/mgpd$LarvaeAreaum2[2]
-mean(mgpd$LarvaeAreaum2[1:2])/mean(mgpd$LarvaeAreaum2[3:4])
-
-(mgpd$LarvaePerimeterum[3]-mgpd$LarvaePerimeterum[4])/mgpd$LarvaePerimeterum[4]
-(mgpd$LarvaePerimeterum[1]-mgpd$LarvaePerimeterum[2])/mgpd$LarvaePerimeterum[2]
-mean(mgpd$LarvaePerimeterum[1:2])/mean(mgpd$LarvaePerimeterum[3:4])
-
-mean(SurvWideDat$RatSurv, na.rm=TRUE)
-
-#get difference in gpd within parental treatments
-(mgpd$MeanGPD[4]- mgpd$MeanGPD[2])/mgpd$MeanGPD[2] #control parents
-(mgpd$MeanGPD[3]- mgpd$MeanGPD[1])/mgpd$MeanGPD[1] #exposed parents
-(mgpd$MeanGPD[3]- mgpd$MeanGPD[2])/mgpd$MeanGPD[2] #exposed parents exposed larvae vs. control parents control larvae
-
-#get descriptive statistics for parental effect 
-meanParentTrt<- ddply(LarvByJarDat, .(ParentTrt), numcolwise(mean, na.rm=T))
-seParentTrt<- ddply(LarvByJarDat, .(ParentTrt), numcolwise(se, na.rm=T))
-Parentmgpd<- subset(meanParentTrt, select= c(ParentTrt, MeanGPD, LarvaeDiamum, LarvaeAreaum2, LarvaePerimeterum))
-
-((Parentmgpd$LarvaeDiamum[1]-Parentmgpd$LarvaeDiamum[2])/Parentmgpd$LarvaeDiamum[1])
-((Parentmgpd$LarvaeAreaum2[1]-Parentmgpd$LarvaeAreaum2[2])/Parentmgpd$LarvaeAreaum2[1])
-((Parentmgpd$LarvaePerimeterum[1]-Parentmgpd$LarvaePerimeterum[2])/Parentmgpd$LarvaePerimeterum[1])
-
-meanLarvTrt<- ddply(LarvByJarDat, .(JarTrt), numcolwise(mean, na.rm=T))
-seLarvTrt<- ddply(LarvByJarDat, .(JarTrt), numcolwise(se, na.rm=T))
-Larvmgpd<- subset(meanLarvTrt, select= c(JarTrt, MeanGPD, LarvaeDiamum, LarvaeAreaum2, LarvaePerimeterum))
-((Larvmgpd$MeanGPD[2]-Larvmgpd$MeanGPD[1])/Larvmgpd$MeanGPD[1])
-```
 
 
 # Try to look at trade offs between growth and survival
@@ -1353,6 +1446,8 @@ EPmod1Step<- step(EPmod1)
 print(EPmod1Step)
 EPmodSurvWide<- lmer(RatSurv~MeanGPDExp*ParentTrt+ (1|FemaleID)+ (1|MaleID), data=SurvWideDat)
 steppedsurvwide<- step(EPmodSurvWide)
+
+#use a type II regression
 Bothpars<- lm(RatSurv~MeanGPDExp*ParentTrt, data=SurvWideDat)
 Bothpars2<-  lm(RatSurv~MeanGPDExp+ParentTrt, data=SurvWideDat)
 Bothpars3<-  lm(RatSurv~MeanGPDExp, data=SurvWideDat)
@@ -1362,7 +1457,6 @@ AIC(Bothpars2)
 AIC(Bothpars3)
 AIC(Bothpars4)
 
-Anova(lm(RatSurv ~ MeanGPDExp, data=ExpFams, type=2))
 #all are so close, so choose the most complex
 par(mfcol=c(2,2))
 plot(Bothpars)
@@ -1374,20 +1468,28 @@ qqline(resid(EPmodfin))
 acf(resid(EPmodfin))
 summary(EPmodfin)
 
-EPmodlm<- lm(RatSurv~MeanGPDExp, data=ExpFams)
+#do Type II regression with data from each parent treatment separately
+#I will use an OLS method and have MeanGPDExp be the y variable because it has the largest error. 
+EPmodlm<- lmodel2(RatSurv~MeanGPDExp, data=ExpFams, nperm= 1000)
 EPmodlmsimp<- lm(RatSurv~1, data=ExpFams)
-AIC(EPmodlm)
-AIC(EPmodlmsimp)
 par(mfcol=c(2,2))
 plot(EPmodlm)
-EPmodlmcon<- lm(RatSurv~MeanGPDExp, data=ConFams)
+EPmodlmcon<- lmodel2(RatSurv~MeanGPDExp, data=ConFams, nperm=1000)
 EPmodlmconsimp<- lm(RatSurv~1, data=ConFams)
-AIC(EPmodlmcon)
-AIC(EPmodlmconsimp)
+
 plot(EPmodlmcon)
 par(mfcol=c(1,1))
-Anova(EPmodlm, type="II")
-Anova((EPmodlmcon), type="II")
+EPmodlm
+EPmodlmcon
+
+qqnorm(ExpFams$MeanGPDExp)
+qqline(ExpFams$MeanGPDExp)
+qqnorm(ExpFams$RatSurv)
+qqline(ExpFams$RatSurv)
+qqnorm(ConFams$MeanGPDExp)
+qqline(ConFams$MeanGPDExp)
+qqnorm(ConFams$RatSurv)
+qqline(ConFams$RatSurv)
 
 EPmod2<- lmer(RatSurv~MeanGPDCon*ParentTrt+(1|FemaleID)+(1|MaleID), data=SurvWideDat)
 EPmod2Step<- step(EPmod2)
@@ -1404,14 +1506,61 @@ plot(MeanLarvSurvivedExp~MeanLarvSurvivedCon, data=SurvWideDat, pch=19)
 
 plot(RatSurv~MeanGPDCon, data=ConFams, pch=19, xlim=c(-1.5, 5.5), ylim=c(0.6, 1.5))
 points(RatSurv~MeanGPDCon, data=ExpFams, pch=19, col="pink")
-plot(RatSurv~MeanGPDExp, data=ConFams, pch=19, col="deepskyblue", xlim=c(-2, 2.4), ylim=c(0.6, 1.4), xlab="Mean Family Growth (um/day)", ylab="Proportion of Surviving Larvae \n (OA:Control)")
-arrows(x0=(SurvWideDat$MeanGPDExp-SurvWideDat$SEMeanGPDCExp), x1= (SurvWideDat$MeanGPDExp+SurvWideDat$SEMeanGPDCExp), y0 = SurvWideDat$RatSurv, y1= SurvWideDat$RatSurv, code=3, angle=90, len=.1)
-points(RatSurv~MeanGPDExp, data=ConFams, pch=19, col="deepskyblue")
-points(RatSurv~MeanGPDExp, data=ExpFams, pch=19, col="brown1")
 
+par(mar=c(5,6,1,1), mfrow=c(1,1))
+plot(RatSurv~MeanGPDExp, data=ConFams, pch=19, col="#007367", xlim=c(-2, 2.4), ylim=c(0.6, 1.4), xlab= expression(paste("Mean Family Growth (", mu, "m/day)")), ylab="Proportion of Surviving Larvae \n (OA:Control)")
+arrows(x0=(SurvWideDat$MeanGPDExp-SurvWideDat$SEMeanGPDCExp), x1= (SurvWideDat$MeanGPDExp+SurvWideDat$SEMeanGPDCExp), y0 = SurvWideDat$RatSurv, y1= SurvWideDat$RatSurv, code=3, angle=90, len=.1)
+points(RatSurv~MeanGPDExp, data=ConFams, pch=19, col="#007367")
+points(RatSurv~MeanGPDExp, data=ExpFams, pch=19, col="#F98880")
+par(xpd=TRUE)
+legend.enhanced("topright",
+   c("Control", "OA-exposed"),
+   pch=19,
+   col=c("#007367","#F98880"),
+   bty="n",
+   title="Parent Treatment",
+   horiz=TRUE,
+   y.intersp=.7,
+   x.intersp=0.5,
+   title.adj=c(.5,0),
+   title.col="black",
+   seg.len =1,
+   cex=.7,
+   yjust=0.5,
+   text.font = NULL,
+   inset = c(0,-.15)
+   )
 ```
 
+## look at egg size vs. growth per day
+```{r Egg size vs. growth per day}
+#get data just in exposed larvae conditions for control parents
+ExpLarConParByJar<- subset(LarvByJarDatConParents, JarTrt=="Exposed")
+ExpLarExpParByJar<- subset(LarvByJarDatExpParents, JarTrt=="Exposed")
+Eggmodlm<- lmodel2(MeanGPD~EggDiamum, data=ExpLarConParByJar, nperm=1000)
+Eggmodlmsimp<- lm(MeanGPD~1, data=ExpLarConParByJar)
+par(mfcol=c(2,2))
+plot(Eggmodlm)
+Eggmodlmexp<- lmodel2(MeanGPD~EggDiamum, data=ExpLarExpParByJar, nperm=1000)
+Eggmodlmexpsimp<- lm(MeanGPD~1, data=ExpLarExpParByJar)
 
+plot(EPmodlmcon)
+par(mfcol=c(1,1), xpd=FALSE)
+Eggmodlm
+Eggmodlmexp
+
+#plot the egg diameter and growth per day data
+plot(MeanGPD~EggDiamum, data=ExpLarExpParByJar, ylim=c(-2, 3), pch=19)
+points(MeanGPD~EggDiamum, data=ExpLarConParByJar, pch=19, col="red")
+
+hist(ExpLarExpParByJar$EggDiamum)
+qqnorm(ExpLarExpParByJar$EggDiamum)
+qqline(ExpLarExpParByJar$EggDiamum)
+hist(ExpLarExpParByJar$MeanGPD)
+qqnorm(ExpLarConParByJar$EggDiamum)
+qqline(ExpLarConParByJar$EggDiamum)
+hist(ExpLarConParByJar$MeanGPD)
+```
 
 Export Figures
 ```{r ExportFigures, include=FALSE}
@@ -1419,14 +1568,6 @@ plots.dir.path<- list.files(tempdir(), pattern="rs-graphics", full.names= TRUE)
 plots.png.paths<- list.files(plots.dir.path, pattern=".png", full.names=TRUE)
 file.copy(from=plots.png.paths, to="../results")
 ```
-
-```{r}
-
-
-
-
-```
-
 
 Do simple t-tests on the means for oa-exposed and control exposed parents within each larvae treatment
 ```{r t-tests}
@@ -1453,37 +1594,34 @@ t.test(PerimLenRat~ParentTrt, data=Lexp, var.equal=TRUE)
 t.test(PerimLenRat~ParentTrt, data=Lcon, var.equal=TRUE)#not significantly different for control larvae
 ```
 
-```{r}
-OALarvae<- subset(LarvByJarDat, JarTrt=="Exposed", select=c(JarTrt, CrossID, ProtocolVersion, LarvaeSurvived))
-controlLarvae<- subset(LarvByJarDat, JarTrt== "Control", select=c(JarTrt, CrossID, ProtocolVersion, LarvaeSurvived))
-boxplot(LarvaeSurvived~CrossID*ProtocolVersion, data=OALarvae, col="gray45", ylim=c(0,2500))
-par(new=T)
-boxplot(LarvaeSurvived~CrossID*ProtocolVersion, data=controlLarvae, col="white", ylim=c(0,2500))
 
-#run a paired t test to see if protocol version impacts 
-ProtDattoWide<- subset(LarvByJarDat, select=c(ProtocolVersion, CrossID, JarTrt, LarvaeSurvived), sep="_")
+Protocol versions
+```{r Test Protocol versions}
+ProtCheck<- LarvByJarDat
+ProtCheck$ProtFixed<- ifelse(ProtCheck$ProtocolVersion=="1_5", paste("2"), paste(ProtCheck$ProtocolVersion))
 
-OALarvaeProt1<- subset(OALarvae, ProtocolVersion!=2)
-colnames(OALarvaeProt1)<- paste(c("JarTrt", "CrossID", "ProtVers", "LSurvivedProt1"))
-OALarvaeProt2<- subset(OALarvae, ProtocolVersion==2)
-colnames(OALarvaeProt2)<- paste(c("JarTrt", "CrossID", "ProtVers2", "LSurvivedProt2"))
-OALarv<- merge(OALarvaeProt1, OALarvaeProt2, by=c("CrossID", "JarTrt"))
-OALarvMeans<- ddply(OALarv, .(CrossID), FUN=mean)
-t.test(OALarvMeans$LSurvivedProt1, OALarvMeans$LSurvivedProt2, paired=T)
-qqnorm((OALarvMeans$LSurvivedProt1-OALarvMeans$LSurvivedProt2))
-qqline((OALarvMeans$LSurvivedProt1-OALarvMeans$LSurvivedProt2))
-OALarvMeans$Diffs<- (OALarvMeans$LSurvivedProt1-OALarvMeans$LSurvivedProt2)
-OALarvMeans<- subset(OALarvMeans, Diffs != "NA")
-OALarvMeans$PercDiff<- (OALarvMeans$Diffs/OALarvMeans$LSurvivedProt2)*100
+ggplot(ProtCheck,aes(x=CrossID, y=LarvaeSurvived, color = ProtFixed, shape= JarTrt)) +
+    geom_point(aes(color=ProtFixed))+
+    labs(x = "Family", y = "Number of Larvae Survived") +
+  scale_color_manual(values=c("black", "red"))+
+  
+  facet_grid(.~ParentTrt, labeller =labeller(ParentTrt = ParTreat), scale="free_x" )+
+  theme_classic() + 
+  theme(panel.spacing = unit(0.2, "mm"),                    # remove spacing between facets
+        strip.background = element_rect(colour="white", fill="white"), panel.border= element_blank())
 
-ConLarvProt1<- subset(controlLarvae, ProtocolVersion !=2)
-ConLarvProt2<- subset(controlLarvae, ProtocolVersion ==2)
-colnames(ConLarvProt1)<- paste(c("JarTrt", "CrossID", "ProtVers", "LSurvivedProt1"))
-colnames(ConLarvProt2)<- paste(c("JarTrt", "CrossID", "Protvers2", "LSurvivedProt2"))
-ConLarv<- merge(ConLarvProt1, ConLarvProt2, by= c("JarTrt", "CrossID"))
-t.test(ConLarv$LSurvivedProt1, ConLarv$LSurvivedProt2, paired=T)
-qqnorm((ConLarv$LSurvivedProt1-ConLarv$LSurvivedProt2))
-qqline((ConLarv$LSurvivedProt1-ConLarv$LSurvivedProt2))
+ProtTestMod<- lmer(LarvaeSurvived~ParentTrt*JarTrt + (1|ProtFixed)+ (1|FemaleID)+ (1|MaleID)+ (1|CrossID)+(1|TrtTankID)+(1|MaleTrtTankID), data=ProtCheck)
+Protstep<- step(ProtTestMod)
+print(Protstep) #drops protocol version from model
+summary(ProtTestMod) 
+(versionvariance<-(596.0   /(77747.3  +31078.3  +571.9   +18786.5  +596.0   +12817.6  )))*100
+#protocol version accounts for 0.42 percent of variance in the full model. 
 
+table(ProtCheck$ProtFixed)
+131/(138+131)
+
+Prot1.5<- ProtCheck %>% 
+  filter(ProtocolVersion=="1_5")
+write.csv(Prot1.5, "~/R/GitHub/LarvaeTransGen2018/data/Prot1.5.csv")
 ```
 
