@@ -620,21 +620,6 @@ acf(resid(larvareafint)) #this looks fine to me.
 summary(larvareafint)
 ```
 
-## Look at the ratio of perimeter to diameter with Parent as a covariate and JarTrt as a fixed effect. For a circle, this would be equal to pi
-```{r PerimeterToLengthStat}
-PerDiRat<- lmer((LarvaePerimeterum/LarvaeDiamum)~ParentTrt*JarSatArg_Total+(1|FemaleID)+(1|MaleID)+(1|JarSeatable)+(1|JarID) +(1|CrossID)+(1|TrtTankID)+(1|MaleTrtTankID), data=LarvaeDat)
-PerDiStep<- step(PerDiRat)
-print(PerDiStep)
-#final model chosen PerimDiamRat ~ SatArag_ATDIC * JarTrt + (1 | FemaleID) + (1 | JarID)
-PerDiRatFin<- lmer((LarvaePerimeterum/LarvaeDiamum) ~ ParentTrt*JarSatArg_Total + (1 | FemaleID) + (1 | JarID)+(1|JarSeatable), data=LarvaeDat)
-#check the model to see that it meets assumptions
-plot(PerDiRatFin) #seems to meet assumption of linearity and homoscedasticity
-qqnorm(resid(PerDiRatFin))
-qqline(resid(PerDiRatFin)) #this looks fine
-acf(resid(PerDiRatFin))
-summary(PerDiRatFin)
-```
-
 Test Larvae perimeter
 ```{r PerimeterStat}
 larvperim<-lmer(LarvaePerimeterum~ParentTrt*JarSatArg_Total+ (1|FemaleID)+(1|MaleID)+(1|CrossID)+(1|JarSeatable)+(1|JarID)+(1|TrtTankID)+(1|MaleTrtTankID), data=LarvaeDat)
@@ -677,7 +662,6 @@ summary(larvgrowfin)
 summary(larvareafint)
 summary(larvlenfin)
 summary(larvperimfin)
-summary(PerDiRatFin)
 ```
 
 ```{r LegendEnhanced function, include=FALSE}
@@ -958,45 +942,26 @@ legend.enhanced <- function (x, y = NULL, legend, fill = NULL, col = par("col"),
 ## Create multipanel figure
 ```{r MultipanelFigure}
 
-par(mfcol=c(1,1), mar=c(4,4.3, 2,2), xpd=TRUE)
-p1<- visreg(larvgrowfin, "JarSatArg_Total", by="ParentTrt", overlay=TRUE, ylab=expression(paste("Growth (", mu, "m/day)")), xlab=expression(paste("Larvae Treatment ", Omega[Aragonite])), legend=FALSE, line=list(col=c( "#F7645A", "#004D4F"), lwd=c(2,2)),
+par(mfcol=c(4,1), mar=c(2,4.6, .1,1), xpd=TRUE)
+p1<- visreg(larvgrowfin, "JarSatArg_Total", by="ParentTrt", overlay=TRUE, ylab=expression(paste("Growth (", mu, "m/day)")), xlab="", legend=FALSE, line=list(col=c( "#F7645A", "#004D4F"), lwd=c(2,2)),
               fill=list(col=c("#FCCECB", "#3BFAFF")),
         points=list(col=c("#F98880", "#007367"), pch=19, cex=0.4))
-plot(p1,overlay=TRUE, legend=FALSE, ylab=expression(paste("Growth (", mu, "m/day)")),xlab=expression(paste("Larvae Treatment ", Omega[Aragonite])), line=list(col=c("#F7645A", "#004D4F"), lwd=c(2,2)),
-              fill=list(col=c("#FCCECB", "#3BFAFF")),
-        points=list(col=c("#F98880", "#007367"), pch=19, cex=0.4) )
 
-legend.enhanced("topright",
-   c("Control", "OA-exposed"),
-   pch=19,
-   col=c("#007367","#F98880"),
-   bty="n",
-   title="Parent Treatment",
-   horiz=TRUE,
-   y.intersp=.7,
-   x.intersp=0.5,
-   title.adj=c(.5,0),
-   title.col="black",
-   seg.len =1,
-   cex=.7,
-   yjust=0.5,
-   text.font = NULL,
-   inset = c(0,-.15)
-   )
+#legend.enhanced("topright",c("Control", "OA-exposed"),   pch=19,   col=c("#007367","#F98880"),   bty="n",   title="Parent Treatment",   horiz=TRUE,  y.intersp=.7,   x.intersp=0.5,   title.adj=c(.5,0),   title.col="black",   seg.len =1,   cex=.7,   yjust=0.5,   text.font = NULL,   inset = c(0,-.15)   )
 
-par(mfcol=c(2,2), mar=c(5,4.6, .5,1))
+
 p2<-visreg(larvlenfin, "JarSatArg_Total", by="ParentTrt", overlay=TRUE, ylab=expression(paste("Length (", mu, "m)")), xlab="", legend=FALSE, line=list(col=c( "#F7645A", "#004D4F"), lwd=c(2,2)),
               fill=list(col=c("#FCCECB", "#3BFAFF")),
         points=list(col=c("#F98880", "#007367"), pch=19, cex=0.4))
-p3<-visreg(larvareafint, "JarSatArg_Total", by="ParentTrt", overlay=TRUE, ylab=expression(sqrt(paste("Area (", mu, m^2,")"))), xlab=expression(paste("Larvae Treatment ", Omega[Aragonite])), legend=FALSE, cex=0.6, line=list(col=c( "#F7645A", "#004D4F"), lwd=c(2,2)),
+p3<-visreg(larvareafint, "JarSatArg_Total", by="ParentTrt", overlay=TRUE, ylab=expression(sqrt(paste("Area (", mu, m^2,")"))), xlab="", legend=FALSE, cex=0.6, line=list(col=c( "#F7645A", "#004D4F"), lwd=c(2,2)),
               fill=list(col=c("#FCCECB", "#3BFAFF")),
         points=list(col=c("#F98880", "#007367"), pch=19, cex=0.4))
-p4<-visreg(larvperimfin, "JarSatArg_Total", by="ParentTrt", overlay=TRUE, ylab=expression(paste("Perimeter (", mu, "m)")), xlab="", legend=FALSE, cex=0.6, line=list(col=c( "#F7645A", "#004D4F"), lwd=c(2,2)),
+p4<-visreg(larvperimfin, "JarSatArg_Total", by="ParentTrt", overlay=TRUE, ylab=expression(paste("Perimeter (", mu, "m)")),  xlab=expression(paste("Larvae Treatment ", Omega[Aragonite])), legend=FALSE, cex=0.6, line=list(col=c( "#F7645A", "#004D4F"), lwd=c(2,2)),
               fill=list(col=c("#FCCECB", "#3BFAFF")),
         points=list(col=c("#F98880", "#007367"), pch=19, cex=0.4))
-p5<-visreg(PerDiRatFin, "JarSatArg_Total", by="ParentTrt", overlay=TRUE, ylab="Perimeter :Length", xlab=expression(paste("Larvae Treatment ", Omega[Aragonite])), legend=FALSE, cex=0.6, line=list(col=c( "#F7645A", "#004D4F"), lwd=c(2,2)),
-              fill=list(col=c("#FCCECB", "#3BFAFF")),
-        points=list(col=c("#F98880", "#007367"), pch=19, cex=0.4))
+
+
+par(mfcol=c(1,1), xpd=F)
 ```
 
 
