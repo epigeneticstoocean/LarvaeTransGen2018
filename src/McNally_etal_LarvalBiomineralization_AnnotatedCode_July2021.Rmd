@@ -32,6 +32,8 @@ library(merTools)
 library(bootpredictlme4)
 library(visreg)
 library(viridis)
+library(plotrix)
+library(MuMIn)
 ```
 
 ```{r, echo=FALSE}
@@ -326,7 +328,7 @@ Larvae$FixedDateFormatted<- as.Date(as.character(Larvae$DateFixed),format="%Y%m%
 Larvae$FixedDateTime<- as.POSIXct(paste(Larvae$FixedDateFormatted, Larvae$TimeFixed), format="%Y-%m-%d %H:%M")
 
 #get the growth per day for the larva
-Larvae$GrowthPerDay<- (Larvae$LarvaeDiamum-Larvae$EggDiamum)/3
+Larvae$GrowthPerDay<- (Larvae$LarvaeDiamum*(mean(eggmeans$EggDiamum)/Larvae$EggDiamum))/3
 #Final data frame will be one line per Jar, includes all data for the jar, including the average larva size per jar and cilia
 
 LarvByJar<- merge(x=Larvae_Calcification, y=Barcode_Jar, by="JarID", all.x=TRUE) %>%  merge(y=Larvae_WC, by="JarID", all.x=TRUE)%>% merge(y=Fert_QG_long, by.x=c("JarID", "CrossID"), by.y=c("JarID","CrossID"), all.x=TRUE) %>% merge(y=Cross, by="CrossID", all.x=TRUE) %>% 
@@ -337,7 +339,7 @@ MeanLarvMorph<- ddply(Larvae_Morphology, .(JarID), numcolwise(mean, na.rm=T))
 SELarvMorph<- ddply(Larvae_Morphology, .(JarID), numcolwise(se, na.rm=T)) #get standard error of larva size
 MeanLarvMorph<- full_join(MeanLarvMorph,SELarvMorph, by="JarID", suffix=c("", "SE")) #join the mean and se larvae data
 LarvByJar<- merge(x=LarvByJar, y=MeanLarvMorph, by="JarID", all.x=TRUE)
-LarvByJar$MeanGPD<- (LarvByJar$LarvaeDiamum-LarvByJar$EggDiamum)/3
+LarvByJar$MeanGPD<- (LarvByJar$LarvaeDiamum*(mean(eggmeans$EggDiamum)/LarvByJar$EggDiamum))/3
 
 #Now let's add the survival data. See notes on "Larvae Survival" for more info on how we decided to count total larvae in the jar
 #Make columns for the two larvae counts for 1_5 and 2
@@ -565,15 +567,6 @@ qqnorm(resid(larvlenfin))
 qqline(resid(larvlenfin)) #has relatively long tails, I think this should be acceptable
 acf(resid(larvlenfin)) #this looks good 
 summary(larvlenfin)
-```
-
-## Analyze larvae growth with adult trt as fixed effect and jar as covariate
-```{r Look at GPD with no random effects}
-#remove data with nas for JarSatArg_Total
-LarvaeDatSub<- subset(LarvaeDat, is.na(JarSatArg_Total)==FALSE)
-simpleGPDmod <- lm(GrowthPerDay~ParentTrt*JarSatArg_Total, data= LarvaeDatSub)
-LarvaeDatSub$SimpleModelResids<- simpleGPDmod$residuals
-plot(SimpleModelResids~JarSeatable, data=LarvaeDatSub)
 ```
 
 ```{r LarvGrowthStat}
@@ -1062,6 +1055,9 @@ FamWideDat$LengthPercDiff<- with(FamWideDat, (MeanLarvaeDiamExp-MeanLarvaeDiamCo
 FamWideDat$PerimPercDiff<- with(FamWideDat, (MeanLarvaePerimExp-MeanLarvaePerimCon)/MeanLarvaePerimCon)
 FamWideDat$SAPercDiff<- with(FamWideDat, (MeanLarvaeAreaExp-MeanLarvaeAreaCon)/MeanLarvaeAreaCon)
 FamWideDat$SurvPercDiff<- with(FamWideDat, (MeanLarvSurvivedExp-MeanLarvSurvivedCon)/MeanLarvSurvivedCon)
+
+min(FamWideDat$GPDPercDiff)
+max(FamWideDat$GPDPercDiff)
 ```
 
 
@@ -1086,9 +1082,8 @@ ggplot(LarvByJarVarVizDat, aes(y=MeanGPD,x=as.factor(MaleIDNumber), color=JarTrt
    geom_boxplot(alpha=0.5, position="identity") +
   labs(x = "Male ID", y= expression(paste("Growth (", mu, "m/day)")), title = "Female ID") +
   scale_color_manual(name = "Larval Treatment", labels = c("Control", "OA"), values = c("#004D4F", "#F7645A"))+
-  geom_hline(yintercept=0)+
   geom_hline(yintercept=ConConMeans$MeanGPD, color="navyblue", lty=2)+
-  geom_hline(yintercept=0, ConExpMeans$MeanGPD, color="red", lty=2)+
+  geom_hline(yintercept=ConExpMeans$MeanGPD, color="red", lty=2)+
     theme_classic() +
   theme(axis.title.y.right = element_blank(),                # hide right axis title
         axis.text.y.right = element_blank(),                 # hide right axis labels
@@ -1342,7 +1337,7 @@ plot(EPmodlmcon)
 par(mfcol=c(1,1))
 EPmodlm
 EPmodlmcon
-
+EPmodlmconTidy<- tidy(EPmodlmcon)
 qqnorm(ExpFams$MeanGPDExp)
 qqline(ExpFams$MeanGPDExp)
 qqnorm(ExpFams$RatSurv)
@@ -1352,28 +1347,21 @@ qqline(ConFams$MeanGPDExp)
 qqnorm(ConFams$RatSurv)
 qqline(ConFams$RatSurv)
 
-EPmod2<- lmer(RatSurv~MeanGPDCon*ParentTrt+(1|FemaleID)+(1|MaleID), data=SurvWideDat)
-EPmod2Step<- step(EPmod2)
-print(EPmod2Step)
-EPmod2fin<- lmer(RatSurv~ (1|FemaleID), data=SurvWideDat)
-plot(EPmod2fin)
-qqnorm(resid(EPmod2fin))
-qqline(resid(EPmod2fin))
-acf(resid(EPmod2fin))
-summary(EPmod2fin)
 
 plot(MeanGPDExp~MeanGPDCon, data=SurvWideDat, pch=19)
 plot(MeanLarvSurvivedExp~MeanLarvSurvivedCon, data=SurvWideDat, pch=19)
 
-plot(RatSurv~MeanGPDCon, data=ConFams, pch=19, xlim=c(-1.5, 5.5), ylim=c(0.6, 1.5))
+plot(RatSurv~MeanGPDCon, data=ConFams, pch=19, ylim=c(.5,1.3), xlim=c(19,27))
 points(RatSurv~MeanGPDCon, data=ExpFams, pch=19, col="pink")
 
+plot(EPmodlmcon, "OLS")
 
-par(mar=c(5,6,1,1), mfrow=c(1,1))
-plot(RatSurv~MeanGPDExp, data=ConFams, pch=19, col="#007367", xlim=c(-2, 2.4), ylim=c(0.6, 1.4), xlab= expression(paste("Mean Family Growth (", mu, "m/day)")), ylab="Proportion of Surviving Larvae \n (OA:Control)")
+par(mar=c(5,6,1,1), mfrow=c(1,1), xpd=F)
+plot(RatSurv~MeanGPDExp, data=ConFams, pch=19, col="#007367",ylim=c(.5,1.3), xlim=c(19,24), xlab= expression(paste("Mean Family Growth (", mu, "m/day)")), ylab="Proportion of Surviving Larvae \n (OA:Control)")
 arrows(x0=(SurvWideDat$MeanGPDExp-SurvWideDat$SEMeanGPDCExp), x1= (SurvWideDat$MeanGPDExp+SurvWideDat$SEMeanGPDCExp), y0 = SurvWideDat$RatSurv, y1= SurvWideDat$RatSurv, code=3, angle=90, len=.1)
 points(RatSurv~MeanGPDExp, data=ConFams, pch=19, col="#004D4F")
 points(RatSurv~MeanGPDExp, data=ExpFams, pch=19, col="#F7645A")
+ablineclip(a=-0.1018317, b=0.04652294, x1=min(ConFams$MeanGPDExp), x2=max(ConFams$MeanGPDExp), col="#007367", lwd=2.5)
 par(xpd=TRUE)
 legend.enhanced("topright",
    c("Control", "OA-exposed"),

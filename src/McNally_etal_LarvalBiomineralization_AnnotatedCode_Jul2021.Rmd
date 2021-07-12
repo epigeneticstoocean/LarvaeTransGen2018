@@ -347,37 +347,7 @@ LarvByJar$v2SurvCount<- rowSums(LarvByJar[,c("F1LarvaeCount", "F2LarvaeCount")],
 LarvByJar$LarvaeSurvived<- ifelse(LarvByJar$ProtocolVersion =="1", paste(LarvByJar$TotalLarvae), ifelse(LarvByJar$ProtocolVersion =="1_5", paste(LarvByJar$v1_5SurvCount), paste(LarvByJar$v2SurvCount)))
 LarvByJar$LarvaeSurvived<- as.numeric(LarvByJar$LarvaeSurvived)
 #get the total larvae for the control jars and exposed jars for each family and then get the ratio of exposed to control to get an idea of how good a male and female pair are at larvae surviving. Can also use this to create reaction norms. 
-SurvDat<- ddply(LarvByJar, .(CrossID, ParentTrt, JarTrt, MaleID, FemaleID, TrtTankID,MaleTrtTankID, AccTankID, Block), numcolwise(mean, na.rm=TRUE))
-SESurvDat<- ddply(LarvByJar, .(CrossID, ParentTrt, JarTrt, Block), numcolwise(se, na.rm=TRUE)) #get the standard errors for each mean count
-SESurvDat<- subset(SESurvDat, select= c(CrossID, JarTrt, LarvaeSurvived, SatArag_ATDIC, JarSatArg_Total, MeanGPD)) #select only certain columns. 
-colnames(SESurvDat)<- paste("SE", colnames(SESurvDat), sep="")
-#merge the standard error data to the SurvDat dataframe
-SurvDat<- merge(SurvDat, SESurvDat, by.x= c("CrossID", "JarTrt"), by.y= c("SECrossID", "SEJarTrt"))
-#only keep the relevant fields because otherwise this is a huge data frame
-SurvDat<- subset(SurvDat, select= c(CrossID, JarTrt, ParentTrt, MaleID, FemaleID, TrtTankID,MaleTrtTankID, AccTankID, LarvaeSurvived, Block, SELarvaeSurvived, SatArag_ATDIC, MeanGPD, SEMeanGPD)) 
-SurvDat<- subset(SurvDat, Block=="B1" & CrossID !="")
-#use the spread function to go from long form to wide form for the survival data
 
-SurvDatToWide<- unite(SurvDat, Value, c(LarvaeSurvived, SELarvaeSurvived, MeanGPD, SEMeanGPD), sep="_")
-SurvWideDat<- spread(SurvDatToWide, JarTrt, value= Value)
-#now split the mean and SE apart again
-SurvWideDat<- separate(SurvWideDat, Control, into= c("MeanLarvSurvivedCon", "SELarvSurvivedCon", "MeanGPDCon", "SEMeanGPDCon"), sep="_")
-SurvWideDat<- separate(SurvWideDat, Exposed, into= c("MeanLarvSurvivedExp", "SELarvSurvivedExp", "MeanGPDExp", "SEMeanGPDCExp"), sep="_")
-#make the means and ses numeric
-SurvWideDat$MeanLarvSurvivedExp<- as.numeric(SurvWideDat$MeanLarvSurvivedExp)
-SurvWideDat$MeanLarvSurvivedCon<- as.numeric(SurvWideDat$MeanLarvSurvivedCon)
-SurvWideDat$SELarvSurvivedExp<- as.numeric(SurvWideDat$SELarvSurvivedExp)
-SurvWideDat$SELarvSurvivedCon<- as.numeric(SurvWideDat$SELarvSurvivedCon)
-SurvWideDat$MeanGPDCon<- as.numeric(SurvWideDat$MeanGPDCon)
-SurvWideDat$MeanGPDExp<- as.numeric(SurvWideDat$MeanGPDExp)
-SurvWideDat$SEMeanGPDCon<- as.numeric(SurvWideDat$SEMeanGPDCon)
-SurvWideDat$SEMeanGPDCExp<- as.numeric(SurvWideDat$SEMeanGPDCExp)
-SurvWideDat$RatSurv<- SurvWideDat$MeanLarvSurvivedExp/SurvWideDat$MeanLarvSurvivedCon
-SurvWideDat$RatGPD<- SurvWideDat$MeanGPDExp/SurvWideDat$MeanGPDCon
-SurvWideDat$SurvChange<- (SurvWideDat$MeanLarvSurvivedCon-SurvWideDat$MeanLarvSurvivedExp)/SurvWideDat$MeanLarvSurvivedCon
-SurvWideDat$CrossID<- as.factor(SurvWideDat$CrossID)
-SurvWideDat$FemaleID<- as.factor(SurvWideDat$FemaleID)
-SurvWideDat$MaleID<- as.factor(SurvWideDat$MaleID)
 LarvByJar<- subset(LarvByJar, Larvae=="TRUE")
 
 #now remove the data we do not want to analyze.
@@ -429,7 +399,10 @@ LarvByJarDat$MaleIDNumber<- substr(LarvByJarDat$MaleIDPlain, 3, 4 )
 LarvByJarDat$FemaleIDNumber<- substr(LarvByJarDat$FemIDPlain, 3, 4 )
 
 LarvaeDat$PerimLenRat<-LarvaeDat$LarvaePerimeterum/LarvaeDat$LarvaeDiamum
+LarvByJarDat$EggCorrection<- mean(meanegg$EggDiamum)/LarvByJarDat$EggDiamum#correction factor for the rank of the egg size for that dam
+LarvByJarDat$GPDCorr<- (LarvByJarDat$LarvaeDiamum*LarvByJarDat$EggCorrection)/3
 ```
+
 
 ## Analyze jar chemistry data
 ```{r JarChemistryStat}
@@ -537,6 +510,33 @@ acf(resid(eggeccenfin))
 summary(eggeccenfin)
 ```
 
+# Look at relationship between egg size and shell length
+```{r}
+#use just control larvae exposure
+LarvaeDatControl<- subset(LarvaeDat, JarTrt=="Control")
+LarvLEggD<- lm(LarvaeDiamum~EggDiamum, data=LarvaeDatControl)
+par(mfcol=c(2,2))
+plot(LarvLEggD)
+par(mfcol=c(1,1))
+acf(LarvLEggD$residuals)
+summary(LarvLEggD)#there is a significant relationship between egg size and growth
+
+plot(LarvaeDiamum~EggDiamum, data=LarvaeDatExposed)
+
+#use just control larvae exposure
+LarvaeDatExposed<- subset(LarvaeDat, JarTrt=="Exposed")
+LarvLEggDexp<- lm(LarvaeDiamum~EggDiamum, data=LarvaeDatExposed)
+par(mfcol=c(2,2))
+plot(LarvLEggD)
+par(mfcol=c(1,1))
+acf(LarvLEggD$residuals)
+summary(LarvLEggDexp)
+
+#use the mean egg diameter for both parental treatments to normalize larvae length by egg size then calculate growth per day
+LarvaeDat$EggCorrection<- mean(meanegg$EggDiamum)/LarvaeDat$EggDiamum#correction factor for the rank of the egg size for that dam
+LarvaeDat$GPDCorr<- (LarvaeDat$LarvaeDiamum*LarvaeDat$EggCorrection)/3
+```
+
 
 Choosing mean or median for larvae length data
 ```{r LarvaeDiamMeanOrMedian}
@@ -567,16 +567,10 @@ acf(resid(larvlenfin)) #this looks good
 summary(larvlenfin)
 ```
 
-## Analyze larvae growth with adult trt as fixed effect and jar as covariate
-```{r Look at GPD with no random effects}
-#remove data with nas for JarSatArg_Total
-LarvaeDatSub<- subset(LarvaeDat, is.na(JarSatArg_Total)==FALSE)
-simpleGPDmod <- lm(GrowthPerDay~ParentTrt*JarSatArg_Total, data= LarvaeDatSub)
-LarvaeDatSub$SimpleModelResids<- simpleGPDmod$residuals
-plot(SimpleModelResids~JarSeatable, data=LarvaeDatSub)
-```
 
+# GPD Stats 
 ```{r LarvGrowthStat}
+#first calculate with GPD calculated as: (L-E)/3
 larvgrow<-lmer(GrowthPerDay~ParentTrt*JarSatArg_Total+(1|MaleID)+(1|CrossID)+(1|JarID) +(1|JarSeatable)+(1|TrtTankID)+(1|MaleTrtTankID), data=LarvaeDat)
 steppedlarvgrow<- step(larvgrow)
 print(steppedlarvgrow)
@@ -591,6 +585,24 @@ acf(resid(larvgrowfin))
 summary(larvgrowfin)
 
 ggplot(LarvaeDat, aes(x=GrowthPerDay,color=JarTrt))+
+  geom_histogram(alpha=0.5, position="identity")+
+  facet_grid(ParentTrt~.)
+
+#Now calculate with GPD calculated as: (L*EggCorrection)/3
+larvgrowcorr<-lmer(GPDCorr~ParentTrt*JarSatArg_Total+(1|MaleID)+(1|CrossID)+(1|JarID) +(1|JarSeatable)+(1|TrtTankID)+(1|MaleTrtTankID), data=LarvaeDat)
+steppedlarvgrowcorr<- step(larvgrowcorr)
+print(steppedlarvgrowcorr)
+#final model chosen by the lme4 step function: y~ParentTrt*JarSatArg+ (1|CrossID)+ (1|JarID) + (1|JarSeatable)
+larvgrowcorrfin<- lmer(GPDCorr~ParentTrt*JarSatArg_Total+(1|CrossID)+ (1|JarID) + (1|JarSeatable), data=LarvaeDat)
+#check the final model to see that it meets assumptions
+plot(larvgrowcorrfin) #seems to meet assumption of linearity and homoscedasticity
+qqnorm(resid(larvgrowcorrfin))
+qqline(resid(larvgrowcorrfin)) #has relatively long tails, based on scale I think it reasonably meets assumption of normality. 
+acf(resid(larvgrowcorrfin))
+
+summary(larvgrowcorrfin)
+
+ggplot(LarvaeDat, aes(x=GPDCorr,color=JarTrt))+
   geom_histogram(alpha=0.5, position="identity")+
   facet_grid(ParentTrt~.)
 
@@ -665,13 +677,13 @@ t.test(SurvCon$RatSurv, mu = 1, alternative = "two.sided")
 
 ## Final Models to Use
 ```{r FinalModels}
-summary(larvgrowfin)
+summary(larvgrowcorrfin)
 summary(larvareafint)
 summary(larvlenfin)
 summary(larvperimfin)
 
 #get final model R2 values
-r.squaredGLMM(larvgrowfin) #GPD R2 use R2c
+r.squaredGLMM(larvgrowcorrfin) #GPD R2 use R2c
 r.squaredGLMM(larvareafint) #area R2 use R2c
 r.squaredGLMM(larvlenfin) #length R2 use R2c
 r.squaredGLMM(larvperimfin) #perimeter R2 use R2c
@@ -957,7 +969,7 @@ legend.enhanced <- function (x, y = NULL, legend, fill = NULL, col = par("col"),
 ```{r MultipanelFigure}
 
 par(mfcol=c(2,2), mar=c(2.5,2, .1,.5), xpd=TRUE, pty="s")
-p1<- visreg(larvgrowfin, "JarSatArg_Total", by="ParentTrt", overlay=TRUE, ylab=expression(paste("Growth (", mu, "m/day)")), xlab="", legend=FALSE, line=list(col=c( "#F7645A", "#004D4F"), lwd=c(2,2)),
+p1<- visreg(larvgrowcorrfin, "JarSatArg_Total", by="ParentTrt", overlay=TRUE, ylab=expression(paste("Growth (", mu, "m/day)")), xlab="", legend=FALSE, line=list(col=c( "#F7645A", "#004D4F"), lwd=c(2,2)),
               fill=list(col=c("#FCCECB", "#3BFAFF")),
         points=list(col=c("#F98880", "#007367"), pch=19, cex=0.4))
 
@@ -984,14 +996,15 @@ par(mfcol=c(1,1), xpd=F)
 #get means of the data for each family for each treatment
 FamMeans<- ddply(LarvByJarDat, .(CrossID, JarTrt), numcolwise(mean, na.rm=T))
 #use spread function in tidyr to make the families in wide form
-FamMeansWide<- pivot_wider(FamMeans, id_cols= CrossID, names_from= JarTrt, values_from= c(MeanGPD, LarvaeAreaum2, LarvaeDiamum, LarvaePerimeterum))
+FamMeansWide<- pivot_wider(FamMeans, id_cols= CrossID, names_from= JarTrt, values_from= c(MeanGPD, GPDCorr, LarvaeAreaum2, LarvaeDiamum, LarvaePerimeterum))
 
 FamMeansWide$OACont_GPD<- (FamMeansWide$MeanGPD_Exposed-FamMeansWide$MeanGPD_Control)/FamMeansWide$MeanGPD_Control
+FamMeansWide$OACont_GPDcorr<- (FamMeansWide$GPDCorr_Exposed-FamMeansWide$GPDCorr_Control)/FamMeansWide$GPDCorr_Control
 FamMeansWide$OACont_Len<- (FamMeansWide$LarvaeDiamum_Exposed-FamMeansWide$LarvaeDiamum_Control)/FamMeansWide$LarvaeDiamum_Control
 FamMeansWide$OACont_SA<- (FamMeansWide$LarvaeAreaum2_Exposed-FamMeansWide$LarvaeAreaum2_Control)/FamMeansWide$LarvaeAreaum2_Control
 FamMeansWide$OACont_P<- (FamMeansWide$LarvaePerimeterum_Exposed-FamMeansWide$LarvaePerimeterum_Control)/FamMeansWide$LarvaePerimeterum_Control
 
-write.csv(FamMeansWide,"~/R/GitHub/LarvaeTransGen2018/data/CalcPercDiffs.csv", row.names = FALSE)
+
 ```
 
 ## Get descriptive statistics
