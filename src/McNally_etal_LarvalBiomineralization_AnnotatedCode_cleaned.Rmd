@@ -40,15 +40,6 @@ library(MuMIn)
 knitr::opts_chunk$set(error = TRUE)
 ```
 
-```{r Create Functions}
-coefvariation<- function(x){
-  sd(x,na.rm=T)/abs(mean(x, na.rm=T))
-}
-
-logitTransform<- function(p){
-  log(p/(1-p))
-}
-```
 
 ```{r ChemSummary Table Function}
 CarbChemTable<- as.data.frame(matrix(nrow=50, ncol=4)) # make a table to hold the carbonate summary data. This table will be for just 2 pCO2 levels: Control & OA
@@ -125,7 +116,7 @@ Name the data you export from FileMaker Pro by their exact table names and save 
 ```{r LoadData}
 #setwd("~/Repos/LarvaeTransGen2018")
 setwd("~/R/GitHub/LarvaeTransGen2018/data") #Elise's working directory
-#upload all of the data tables for the larvae experiment
+#import all of the data tables for the larvae experiment
 Larvae_Morphology <- read.csv("../data/Larvae_morphology.csv") #contains data from CellProfiler from the larvae outlines
 Barcode_Jar <- read.csv("../data/Barcode_Jar.csv") #contains data on CrossID, seatable, and whether or not larvae were present
 Block_ID <- read.csv("../data/Block_ID.csv") #contains data on the block
@@ -187,12 +178,12 @@ TankSes<- ddply(Tank_WCB1, .(Tank, Block, ParentTrt), numcolwise(se, na.rm=T))
 ```
 
 ## Carbonate Chemistry Summary Table for Tanks
-Compile all of the data for the summary table. 
+Compile all of the data for the water chemistry summary table. 
 ```{r CarbChemSummaryTable}
 Tank_WCB1sum<- subset(Tank_WCB1, select=c("ParentTrt", "pHTotal", "salinity", "temperature", "DIC_corr", "Alk_corr", "AT_Calc_SW", "pCO2_ATDIC", "HCO3_ATDIC", "CO3_ATDIC", "CO2_ATDIC", "SatCalcite_ATDIC", "SatArag_ATDIC"))
 colnames(Tank_WCB1sum)<- paste(c("Trt", "pH", "Sal", "Temp", "DIC", "ATmeas","ATcalc", "pCO2", "HCO3", "CO3", "CO2", "Calcite", "Aragonite"))
 CarbChemTanks<- CarbChemSummary(DF=Tank_WCB1sum)
-write.csv(CarbChemTanks,"~/R/GitHub/LarvaeTransGen2018/data/TankCarbChemSummary.csv")
+#write.csv(CarbChemTanks,"~/R/GitHub/LarvaeTransGen2018/data/TankCarbChemSummary.csv")
 ```
 
 # Join the data into dataframe for Egg analysis
@@ -211,7 +202,7 @@ Eggs$FemaleID<- as.factor(Eggs$FemaleID)
 EggsB1<- subset(Eggs, Block =="B1")
 ```
 
-Visualize the data for eggs to start
+Visualize the data for eggs
 ```{r EggVisualization}
 #get the original range of the eggs
 range(EggsB1$EggDiamum)
@@ -299,7 +290,7 @@ boxplot(EggDiamum~FemaleID, data=EggsB1)
 boxplot(EggDiamum~ParentTrt, data=EggsB1)
 #get the range without outliers
 range(EggsB1$EggDiamum, na.rm=TRUE)
-#note that the eggs were filtered through a 70 um filter, but it appears that larger ones made it through.
+#eggs were filtered through a 70 um filter, but it appears that larger ones made it through.
 #plot histograms of the egg data with outliers removed
 ggplot(EggsB1, aes(x=EggDiamum, color=ParentTrt))+
   geom_histogram(alpha=0.5, position="identity")
@@ -308,10 +299,10 @@ eggmedians<- aggregate(EggDiamum~ParentTrt, data=EggsB1, FUN=median)#400 = 62.91
 #I will use the mean egg size. 
 ```
 
-## Make datasets without the egg size outliers
+## Make datasets with mean egg size after egg outliers were removed
 ```{r MakeLarvaeDataframes}
 meanegg<- ddply(EggsB1, .(FemaleID), numcolwise(mean, na.rm=T)) #get mean egg size
-#select only columns that we need for egg morph
+#select only columns that we need for egg morphology
 meanegg<- subset(meanegg, select=c("FemaleID", "EggDiamum"))
 FemAdults<- merge(x=FemaleInfo, y= meanegg, by.x="ParentBlockID", by.y= "FemaleID", all.y=TRUE, all.x=TRUE)
 #Next dataframe will be for one line per traced larva, includes all the data for that jar, including average egg size for that jar 
@@ -329,8 +320,8 @@ Larvae$FixedDateTime<- as.POSIXct(paste(Larvae$FixedDateFormatted, Larvae$TimeFi
 
 #get the growth per day for the larva
 Larvae$GrowthPerDay<- (Larvae$LarvaeDiamum*(mean(eggmeans$EggDiamum)/Larvae$EggDiamum))/3
-#Final data frame will be one line per Jar, includes all data for the jar, including the average larva size per jar and cilia
 
+#Next data frame will be one line per Jar, includes all data for the jar, including the average larva size per jar and cilia
 LarvByJar<- merge(x=Larvae_Calcification, y=Barcode_Jar, by="JarID", all.x=TRUE) %>%  merge(y=Larvae_WC, by="JarID", all.x=TRUE)%>% merge(y=Fert_QG_long, by.x=c("JarID", "CrossID"), by.y=c("JarID","CrossID"), all.x=TRUE) %>% merge(y=Cross, by="CrossID", all.x=TRUE) %>% 
 merge(y=FemAdults, by.x="FemaleID", by.y="ParentBlockID", all.x=TRUE) %>% merge(y=MaleInfo, by.x="MaleID", by.y="MaleParentBlockID", all.x=TRUE) %>% merge(y=Larvae_Counts, by="JarID", all.x=TRUE)
 
@@ -430,12 +421,12 @@ LarvByJarDat$MaleIDPlain<- vapply(strsplit(as.character(LarvByJarDat$MaleID),"_"
 LarvByJarDat$MaleIDNumber<- substr(LarvByJarDat$MaleIDPlain, 3, 4 )
 LarvByJarDat$FemaleIDNumber<- substr(LarvByJarDat$FemIDPlain, 3, 4 )
 
-LarvaeDat$PerimLenRat<-LarvaeDat$LarvaePerimeterum/LarvaeDat$LarvaeDiamum
+LarvaeDat$PerimLenRat<-LarvaeDat$LarvaePerimeterum/LarvaeDat$LarvaeDiamum #get the perimeter to length ratio for the larvae
 ```
 
 ## Analyze jar chemistry data
 ```{r JarChemistryStat}
-CalJar<- subset(LarvByJarDat, BottleChemistry=="TRUE" )#only use those that had their chem measured
+CalJar<- subset(LarvByJarDat, BottleChemistry=="TRUE" )#subset for jars that had bottle chemistry measured
 #look at the saturation state for jars
 boxplot(JarSatArg_Total~JarTrt*JarSeatable, data=CalJar)
 Jar2<- lmer(JarSatArg_Total~JarTrt + (1|JarSeatable), data=CalJar)
@@ -452,7 +443,7 @@ summary(JarFin)
 ```
 
 ## Compare Header, Control Jar, and Experiment Jar pH
-```{r JarChem Comparison to controls}
+```{r JarChem Comparison to header tanks}
 #subset main water chem dataframes to just get the bottles we are interested in.
 HeaderB1<- subset(Header_WC, Date==20180709 , select=c(Treatment, HeadSatArg_Total, HeadpHTotal))
 HeaderB1$JarType<- paste("Header")
@@ -463,7 +454,7 @@ LarvaeJars<- Larvae_WC
 LarvaeJars$BlockID<- vapply(strsplit(as.character(LarvaeJars$JarID),"_"), `[`, 2, FUN.VALUE=character(1))
 LarvaeJars<- subset(LarvaeJars, BlockID=="B1" & ControlJar=="FALSE" & JarpHTotal !="NA", select=c(Trt, JarSatArg_Total, JarpHTotal))
 LarvaeJars$JarType<- paste("Larvae")
-#combine the rows that have the treatment and the aragonite sat state data
+#combine the rows that have the treatment and the aragonite saturation state data
 JarWaterChem<- rbind(HeaderB1,LarvaeJars)
 JarWaterChem$JarType<- factor(JarWaterChem$JarType)
 JarWaterExp<- subset(JarWaterChem, Trt=="Exposed")
@@ -473,13 +464,13 @@ jarmod<- t.test(JarSatArg_Total~ JarType, data=JarWaterExp, var.equal=T)
 jarmod
 shapiro.test(JarWaterExp$JarSatArg_Total)
 leveneTest(data = JarWaterExp, JarSatArg_Total ~ JarType, center = mean)
-#no significant difference between header and larvae jars = no significant drift. 
+#no significant difference between header and larvae jars for exposed larvae treatment = no significant drift. 
 
 jarmod2<- t.test(JarSatArg_Total~ JarType, data=JarWaterCon, var.equal=T)
 jarmod2
 shapiro.test(JarWaterCon$JarSatArg_Total)
 leveneTest(data = JarWaterCon, JarSatArg_Total ~ JarType, center = mean)
-
+#no significant difference between header and larvae jars for control larvae treatment = no significant drift
 boxplot(JarSatArg_Total~JarType, data=JarWaterCon, ylab="pH total", xlab="Jar Type", ylim=c(0,1))
 par(new=TRUE)
 boxplot(JarSatArg_Total~JarType, data=JarWaterExp, ylab="", xlab="", ylim=c(0,1))
@@ -490,12 +481,11 @@ boxplot(JarSatArg_Total~JarType, data=JarWaterExp, ylab="", xlab="", ylim=c(0,1)
 HeaderB1all<- subset(Header_WC, BlockID=="B1" & HeadVindtaTemp !="NA", select= c("Treatment", "HeadpHTotal", "HeadSalinity", "HeadDICCorr", "HeadATCorr", "HeadATCalc_Total", "HeadpCO2_Total", "HeadHCO3_Total", "HeadCO3_Total", "HeadCO2_Total", "HeadSatCal_Total", "HeadSatArg_Total" ))
 #rename to columns to match the names for the function
 colnames(HeaderB1all)<- paste(c("Trt", "pH", "Sal", "DIC", "ATmeas","ATcalc", "pCO2", "HCO3", "CO3", "CO2", "Calcite", "Aragonite"))
-HeaderB1all$Temp<- 20 #add a column for temp so that the function runs correctly
+HeaderB1all$Temp<- 20 #add a column for temp so that the function runs correctly headers were kept in temp controlled room. 
 HeaderCarb<-CarbChemSummary(DF=HeaderB1all)
 #write.csv(HeaderCarb, "~/R/GitHub/LarvaeTransGen2018/data/HeaderCarbChemSummary.csv")
 
 ```
-
 
 # Get Jar Chemistry Carb Summary Table
 ```{r Jar Carb Sum}
@@ -549,8 +539,8 @@ ggplot(LarvaeDat, aes(x=LarvaeDiamum, color=JarTrt))+
 larvmeans<- aggregate(LarvaeDiamum~ParentTrt*JarTrt, data=LarvaeDat, FUN=mean)
 #use the mean for these data 
 
-#look for the number of jars in each treatment
-larvjarn<- aggregate(LarvaeDiamum~ParentTrt*JarTrt, data=LarvByJarDat, FUN=length)
+#get the number of jars in each treatment
+(larvjarn<- aggregate(LarvaeDiamum~ParentTrt*JarTrt, data=LarvByJarDat, FUN=length))
 ```
 
 ## Look at the larvae diameter data
@@ -570,6 +560,7 @@ acf(resid(larvlenfin)) #this looks good
 summary(larvlenfin)
 ```
 
+# Look at larvae growth data
 ```{r LarvGrowthStat}
 larvgrow<-lmer(GrowthPerDay~ParentTrt*JarSatArg_Total+(1|MaleID)+(1|CrossID)+(1|JarID) +(1|JarSeatable)+(1|TrtTankID)+(1|MaleTrtTankID), data=LarvaeDat)
 steppedlarvgrow<- step(larvgrow)
@@ -590,7 +581,8 @@ ggplot(LarvaeDat, aes(x=GrowthPerDay,color=JarTrt))+
 
 ```
 
-## Look at larvae area; Parent Trt as fixed effect and Jar Treatment as covariate
+## Look at larvae surface area
+Parent Trt as fixed effect and Jar Treatment as covariate
 ```{r SurfaceAreaStat}
 larvareat<-lmer(sqrt(LarvaeAreaum2)~ParentTrt*JarSatArg_Total+ (1|FemaleID)+(1|MaleID)+(1|CrossID)+(1|JarSeatable)+(1|JarID)+(1|TrtTankID)+(1|MaleTrtTankID) , data=LarvaeDat)
 steppedlarvareat<-step(larvareat)
@@ -604,7 +596,7 @@ acf(resid(larvareafint)) #this looks fine to me.
 summary(larvareafint)
 ```
 
-Test Larvae perimeter
+# Test Larvae perimeter
 ```{r PerimeterStat}
 larvperim<-lmer(LarvaePerimeterum~ParentTrt*JarSatArg_Total+ (1|FemaleID)+(1|MaleID)+(1|CrossID)+(1|JarSeatable)+(1|JarID)+(1|TrtTankID)+(1|MaleTrtTankID), data=LarvaeDat)
 steppedlarvperim<- step(larvperim)
@@ -619,7 +611,7 @@ acf(resid(larvperimfin)) #this looks fine to me.
 summary(larvperimfin)
 ```
 
-Test larvae perimeter:length ratio
+# Test larvae perimeter:length ratio
 ```{r LarvaeShapeStat}
 PerDiRat<- lmer((LarvaePerimeterum/LarvaeDiamum)~ParentTrt*JarSatArg_Total+(1|FemaleID)+(1|MaleID)+(1|JarSeatable)+(1|JarID) +(1|CrossID)+(1|TrtTankID)+(1|MaleTrtTankID), data=LarvaeDat)
 PerDiStep<- step(PerDiRat)
@@ -632,11 +624,11 @@ qqnorm(resid(PerDiRatFin))
 qqline(resid(PerDiRatFin)) #this looks fine
 acf(resid(PerDiRatFin))
 summary(PerDiRatFin)
-r.squaredGLMM(PerDiRatFin) #use R2c
+r.squaredGLMM(PerDiRatFin) #get R2; use R2c
 ```
 
 
-## Analyze survival data with parent as a fixed effect
+# Analyze survival data with parent as a fixed effect
 ```{r SurvivalStat}
 par(mfcol=c(1,1))
 surv1<- lmer(RatSurv~ParentTrt+ (1|FemaleID)+(1|MaleID)+(1|TrtTankID)+(1|MaleTrtTankID), data=SurvWideDat)
@@ -673,6 +665,8 @@ r.squaredGLMM(larvperimfin) #perimeter R2 use R2c
 ```
 
 ```{r LegendEnhanced function, include=FALSE}
+#make legend function
+
 legend.enhanced <- function (x, y = NULL, legend, fill = NULL, col = par("col"), 
           border = "black", lty, lwd, pch, angle = 45, density = NULL, 
           bty = "o", bg = par("bg"), box.lwd = par("lwd"), box.lty = par("lty"), 
@@ -959,6 +953,7 @@ p1<- visreg(larvgrowfin, "JarSatArg_Total", by="ParentTrt", overlay=TRUE, ylab=e
 
 
 #p2<-visreg(larvlenfin, "JarSatArg_Total", by="ParentTrt", overlay=TRUE, ylab=expression(paste("Length (", mu, "m)")),  xlab=expression(paste("Larvae Treatment ", Omega[Aragonite])), legend=FALSE, line=list(col=c( "#F7645A", "#004D4F"), lwd=c(2,2)), fill=list(col=c("#FCCECB", "#3BFAFF")), points=list(col=c("#F98880", "#007367"), pch=19, cex=0.4))
+
 p3<-visreg(larvareafint, "JarSatArg_Total", by="ParentTrt", overlay=TRUE, ylab=expression(sqrt(paste("Area (", mu, m^2,")"))), xlab="", legend=FALSE, cex=0.6, line=list(col=c( "#F7645A", "#004D4F"), lwd=c(2,2)),
               fill=list(col=c("#FCCECB", "#3BFAFF")),
         points=list(col=c("#F98880", "#007367"), pch=19, cex=0.4))
@@ -966,12 +961,11 @@ p4<-visreg(larvperimfin, "JarSatArg_Total", by="ParentTrt", overlay=TRUE, ylab=e
               fill=list(col=c("#FCCECB", "#3BFAFF")),
         points=list(col=c("#F98880", "#007367"), pch=19, cex=0.4))
 
-
 par(mfcol=c(1,1), xpd=F)
 ```
 
 
-## Get ratio of OA to control to understand differences in calcification
+# Get ratio of OA to control to understand differences in calcification by family
 ```{r OA:Control Calcification}
 #get means of the data for each family for each treatment
 FamMeans<- ddply(LarvByJarDat, .(CrossID, JarTrt), numcolwise(mean, na.rm=T))
@@ -983,10 +977,10 @@ FamMeansWide$OACont_Len<- (FamMeansWide$LarvaeDiamum_Exposed-FamMeansWide$Larvae
 FamMeansWide$OACont_SA<- (FamMeansWide$LarvaeAreaum2_Exposed-FamMeansWide$LarvaeAreaum2_Control)/FamMeansWide$LarvaeAreaum2_Control
 FamMeansWide$OACont_P<- (FamMeansWide$LarvaePerimeterum_Exposed-FamMeansWide$LarvaePerimeterum_Control)/FamMeansWide$LarvaePerimeterum_Control
 
-write.csv(FamMeansWide,"~/R/GitHub/LarvaeTransGen2018/data/CalcPercDiffs.csv", row.names = FALSE)
+#write.csv(FamMeansWide,"~/R/GitHub/LarvaeTransGen2018/data/CalcPercDiffs.csv", row.names = FALSE)
 ```
 
-## Get descriptive statistics
+# Get descriptive statistics
 ```{r GetDescriptiveStats}
 #get the mean length of the oysters collected (n=80)
 mean(Adult_Sample$AdultLength*2.54)
@@ -1014,7 +1008,7 @@ mean(mgpd$LarvaePerimeterum[1:2])/mean(mgpd$LarvaePerimeterum[3:4])
 
 mean(SurvWideDat$RatSurv, na.rm=TRUE)
 
-#get difference in gpd within parental treatments
+#get difference in growth per day within parental treatments
 (mgpd$MeanGPD[4]- mgpd$MeanGPD[2])/mgpd$MeanGPD[2] #control parents
 (mgpd$MeanGPD[3]- mgpd$MeanGPD[1])/mgpd$MeanGPD[1] #exposed parents
 (mgpd$MeanGPD[3]- mgpd$MeanGPD[2])/mgpd$MeanGPD[2] #exposed parents exposed larvae vs. control parents control larvae
@@ -1062,12 +1056,13 @@ mean(FamWideDat$GPDPercDiff)
 
 
 # Visualize variance among families: Calcification
-Right now this is using the mean for each jar (not all larvae measured could do that with LarvaeDat)
+Use the mean for each jar
 ```{r Visualize Calcification Variance}
 #pull means for the control larvae control parents 
 ConConMeans<- meanJarTrt %>% 
   filter(JarTrt=="Control" & ParentTrt=="400") %>% 
   subset(select= c("MeanGPD", "LarvaePerimeterum", "LarvaeAreaum2",  "LarvaeDiamum"))
+#pull means for exposed larvae control parents
 ConExpMeans<- meanJarTrt %>% 
   filter(JarTrt=="Exposed" & ParentTrt=="400") %>% 
   subset(select= c("MeanGPD", "LarvaePerimeterum", "LarvaeAreaum2",  "LarvaeDiamum"))
@@ -1199,7 +1194,6 @@ ggplot(Control.Parents, aes(y=MeanGPD,x=JarTrt, color=JarTrt))+
         panel.spacing = unit(0.7, "mm"),                    # remove spacing between facets
         strip.background = element_rect(size = 0.5), axis.text.x=element_text(angle=90),plot.title = element_text(size=10, hjust = 0.5)) 
 
-#not fixed below
 ggplot(LarvByJarVarVizDat, aes(y=LarvaeAreaum2,x=MaleIDPlain, color=JarTrt))+
   geom_boxplot(alpha=0.5, position="identity") +
   facet_grid(~FemIDPlain, scale="free_x")+ 
@@ -1254,7 +1248,7 @@ ggplot(LarvByJarVarVizDat, aes(y=(LarvaePerimeterum/LarvaeDiamum),x=MaleIDPlain,
         strip.background = element_rect(size = 0.5), axis.text.x=element_text(angle=90),plot.title = element_text(size=10, hjust = 0.5)) 
 ```
 
-Visualize larval survival
+# Visualize larval survival
 ```{r SurvivalVisualization}
 SurvDat$ParentTrt<- factor(SurvDat$ParentTrt, levels=c("400", "2600"))
 MeanSurvDat<- ddply(SurvWideDat, .(ParentTrt), numcolwise(mean, na.rm=T))
@@ -1314,12 +1308,10 @@ ggplot(LarvByJarVarVizDat, aes(y=LarvaeSurvived,x=MaleIDPlain, color=JarTrt))+
         strip.background = element_rect(size = 0.5), axis.text.x=element_text(angle=90),plot.title = element_text(size=10, hjust = 0.5)) 
 ```
 
-
-
 # Look at trade offs between growth and survival
 
-# Survival ratio and GPD in exposed conditions
-I think this is the best approach because it considers OA and Control conditions for survival. One point for each family with SE for x and y axes
+## Survival ratio and GPD in exposed conditions
+One point for each family with SE for x and y axes
 ```{r RatiosSurvivalandGPD}
 ConFams<- subset(SurvWideDat, ParentTrt=="400")
 ExpFams<- subset(SurvWideDat, ParentTrt=="2600")
@@ -1390,9 +1382,10 @@ plots.png.paths<- list.files(plots.dir.path, pattern=".png", full.names=TRUE)
 file.copy(from=plots.png.paths, to="../results")
 ```
 
+
 Do simple t-tests on the means for oa-exposed and control exposed parents within each larvae treatment
 ```{r t-tests}
-#get Bonferoni adjusted p-crit: 
+#get Bonferoni adjusted p-critical value: 
 0.05/10
 
 Lexp<- subset(LarvaeDat, JarTrt=="Exposed")
@@ -1417,7 +1410,7 @@ t.test(PerimLenRat~ParentTrt, data=Lcon, var.equal=TRUE)#not significantly diffe
 ```
 
 
-## Protocol versions check
+# Survival protocol versions check
 Run survival model with just the data for protocol 1 and then just the data from protocol 2 and compare the results to the actual output. Steps: 
 1) subset the data by protocol
 2) get Sfams for prot 1 and prot 2 data
@@ -1555,8 +1548,8 @@ summary(anovmod)
 
 ```
 
+# Sire and dam effects
 ```{r Sire and dam effects}
-
 par(mfcol=c(1,1), xpd=F)
 #get mean for each dam and each sire growth per day
 SireMeans<- ddply(LarvaeDat, .(MaleID, JarTrt), numcolwise(mean, na.rm=T))
