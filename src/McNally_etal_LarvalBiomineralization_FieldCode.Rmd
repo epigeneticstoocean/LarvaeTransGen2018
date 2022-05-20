@@ -148,6 +148,7 @@ plot(pH~SimpleDate, data=LogAgg)
 
 # Make figures using bottle data
 ```{r Bottle Figures}
+dev.off()
 #round relative tide
 BARNsub$RelTideRounded<- round(BARNsub$RelTide)
 BottMeans<- ddply(BARNsub, .(RelTideRounded), numcolwise(mean, na.rm=TRUE))
@@ -163,19 +164,30 @@ arrows(x0=BottMeans$RelTideRounded, x1=BottMeans$RelTideRounded,y0=BottMeans$pCO
 plot(CO3~RelTideRounded, data=BottMeans, pch=19, xlab="Relative Tide Time", ylab= expression(paste("[", CO[3], "] (", mu, "m)")), ylim=c(0, 125))
 arrows(x0=BottMeans$RelTideRounded, x1=BottMeans$RelTideRounded,y0=BottMeans$CO3-BottSes$CO3, y1=BottMeans$CO3+BottSes$CO3, angle=90, code=3, length=0.05, col="black")
 
+plot(SalCorr~RelTideRounded, data=BottMeans, pch=19, xlab="Relative Tide Time", ylab="Salinity (ppt)", ylim= c(20,32))
+arrows(x0=BottMeans$RelTideRounded, x1=BottMeans$RelTideRounded,y0=BottMeans$SalCorr-BottSes$SalCorr, y1=BottMeans$SalCorr+BottSes$SalCorr, angle=90, code=3, length=0.05, col="black")
+
 ```
 
 # Make figures using pH logger data
 ```{r Logger figures}
 
 LoggerSub$Yearday<- yday(LoggerSub$DateTimeGMT) #get the year day of the data
+LoggerSub$pHTempF<- as.numeric(LoggerSub$pHTempF)
+LoggerSub$pHTempC<- (LoggerSub$pHTempF-32)*5/9
 LogMeans<- ddply(LoggerSub, .(Yearday), numcolwise(mean, na.rm=TRUE))
 
 LogSes<- ddply(LoggerSub, .(Yearday), numcolwise(se, na.rm=TRUE))
-
-Plot<- plot(pH~Yearday, data=LogMeans, pch=19, type="p", xaxt="n", xlab="Date", ylim=c(7.5, 8.05), ylab= "pH (NBS)")
+par(mar = c(5, 4, 4, 4) + 0.3)
+Plot<- plot(pH~Yearday, data=LogMeans, pch=19, type="p", xaxt="n", xlab="", ylim=c(7.4, 8.05), ylab= "pH (NBS)")
 axis(1,at=LoggerSub$Yearday, labels=LoggerSub$DayMonth)
 arrows(x0=LogMeans$Yearday, x1=LogMeans$Yearday, y0=LogMeans$pH - LogSes$pH, y1=LogMeans$pH + LogSes$pH, code=3, angle=90, length= 0.1)
+par(new=T)
+plot(pHTempC~Yearday, data=LogMeans, pch=17, type="p", axes=FALSE, bty="n", xlab="Date", ylab= "", col="blue", ylim=c(19, 27))
+axis(side=4,at=pretty(range(LoggerSub$pHTempC)), col.axis="blue")
+arrows(x0=LogMeans$Yearday, x1=LogMeans$Yearday, y0=LogMeans$pHTempC - LogSes$pHTempC, y1=LogMeans$pHTempC + LogSes$pHTempC, code=3, angle=90, length= 0.1, col="blue")
+mtext("Temperature (C)", side= 4, line=3, col="blue")
+
 ```
 
 

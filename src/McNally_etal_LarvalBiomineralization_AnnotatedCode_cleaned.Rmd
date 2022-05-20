@@ -516,7 +516,8 @@ acf(resid(eggdiamfin))
 summary(eggdiamfin)
 #Conclusion: Female matters but not treatment or adult length. Acclimation tank and treatment tank also don't matter.  
 plot(EggDiamum~FemaleID, data=CalEggs) #we need to account for FemaleID, but not egg size in Larvae models. 
-
+eggsizeSEs<- aggregate(EggDiamum~FemaleID, data=CalEggs, FUN=se)
+max(eggsizeSEs$EggDiamum)
 #test shape of eggs using eccentricity
 eggeccen<- lmer(EggEccentricity~SatArag_ATDIC*AdultLength + (1|FemaleID) + (1|AccTankID), data=CalEggs)
 eccenstep<- step(eggeccen)
@@ -1317,14 +1318,27 @@ ConFams<- subset(SurvWideDat, ParentTrt=="400")
 ExpFams<- subset(SurvWideDat, ParentTrt=="2600")
 
 #do Type II regression with data from each parent treatment separately
-#I will use an OLS method and have MeanGPDExp be the y variable because it has the largest error. 
+ExpFams$MeanGPDExp2<- ExpFams$MeanGPDExp^2 #make a squared variable
+ExpFams$LogMeanGPDExp<- log(ExpFams$MeanGPDExp)
 EPmodlm<- lmodel2(RatSurv~MeanGPDExp, data=ExpFams, nperm= 1000)
+EPmodlm2<- lmodel2(RatSurv~MeanGPDExp+ MeanGPDExp2, data=ExpFams, nperm= 1000)
+EPmodlm3<- lmodel2(RatSurv~MeanGPDExp2, data= ExpFams, nperm=1000)
+EPmodlm4<- lmodel2(RatSurv~MeanGPDExp + LogMeanGPDExp, data=ExpFams, nperm=1000)
+EPmodlm5<- lmodel2(RatSurv~ LogMeanGPDExp, data=ExpFams, nperm=1000)
 EPmodlmsimp<- lm(RatSurv~1, data=ExpFams)
+EPmodlm
+EPmodlm2
+EPmodlm3
+EPmodlm4
+EPmodlm5
 par(mfcol=c(2,2))
 plot(EPmodlm)
+ConFams$MeanGPDExp2<- ConFams$MeanGPDExp^2
 EPmodlmcon<- lmodel2(RatSurv~MeanGPDExp, data=ConFams, nperm=1000)
-EPmodlmconsimp<- lm(RatSurv~1, data=ConFams)
 
+EPmodlmcon2<- lmodel2(RatSurv~MeanGPDExp + MeanGPDExp2, data=ConFams, nperm=1000)
+EPmodlmconsimp<- lm(RatSurv~1, data=ConFams)
+EPmodlmcon2
 plot(EPmodlmcon)
 par(mfcol=c(1,1))
 EPmodlm
@@ -1641,5 +1655,37 @@ ggplot(data = FamMeansWide) +                        # Set data
   labs(x="Female ID", y= "Male ID", fill= "Perimeter Difference \n (OA-Control)")+
   theme_classic()
 
+```
+
+# Effect size/importance of faster growth rate 
+
+```{r Extrapolate growth per day}
+#larvae that are >202 um are closer to the bottom, so let's use that size and see how long larvae from each treatment take to get there
+
+#make a new column that is days to 202 for each larvae jar
+LarvByJarDat$Daysto202 <- (202-LarvByJarDat$LarvaeDiamum)/LarvByJarDat$MeanGPD
+#get the mean number of days for each treatment
+aggregate(MeanGPD~JarTrt*ParentTrt, data= LarvByJarDat, FUN=mean)
+aggregate(LarvaeDiamum~JarTrt*ParentTrt, data= LarvByJarDat, FUN=mean)
+```
+# get number of eggs per female
+```{r}
+table(Egg_Morphology$FemaleID)
+```
+
+
+```{r get standard error of larvae measurements}
+larvaemeasSEs<- aggregate(LarvaeDiamum~JarID, data=LarvaeDat, FUN= se)
+
+```
+
+# Get salinity to alkalinity relationship
+```{r Sal to At relationship}
+SalAT<- lm(Alk_corr~salinity, data=Tank_WC)
+par(mfcol=c(2,2))
+plot(SalAT)
+par(mfcol=c(1,1))
+summary(SalAT)
+plot(Alk_corr~salinity, data=Tank_WC)
 ```
 
